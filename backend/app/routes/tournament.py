@@ -5,6 +5,7 @@ Tournament routes — Americano Padel clone (full benchmark).
 """
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
 from flask_login import current_user
+from app.utils.auth import login_required_json, require_tournament_owner
 from app.models import (
     Tournament, TournamentParticipant, TournamentRound, TournamentMatch,
     TournamentPlayoff, User, TOURNAMENT_FORMATS
@@ -335,6 +336,8 @@ def tournament_list():
 
 
 @bp.route('/delete/<int:tournament_id>', methods=['POST'])
+@login_required_json
+@require_tournament_owner
 def delete_tournament(tournament_id):
     t = Tournament.query.get_or_404(tournament_id)
     # Cascade delete
@@ -815,10 +818,22 @@ def detail(tournament_id):
 
     round_obj = next((r for r in rounds if r.round_number == current_rnd), None)
 
+    # Guest = not logged in OR logged in but membership not paid
+    is_guest = not current_user.is_authenticated or (
+        not current_user.membership_paid and
+        getattr(current_user, 'role', '') not in ('admin', 'treasurer')
+    )
+    is_owner = (
+        current_user.is_authenticated and
+        (tournament.created_by == current_user.id or
+         getattr(current_user, 'role', '') in ('admin', 'treasurer'))
+    )
+
     return render_template('tournament/v1/detail.html',
                            tournament=tournament, rounds=rounds,
                            current_round=current_rnd, round_obj=round_obj,
-                           leaderboard=leaderboard, playoffs=playoffs, tab=tab)
+                           leaderboard=leaderboard, playoffs=playoffs, tab=tab,
+                           is_guest=is_guest, is_owner=is_owner)
 
 
 @bp.route('/<int:tournament_id>/v2')
@@ -845,6 +860,7 @@ def v2_detail(tournament_id):
 # ── Score ──
 
 @bp.route('/<int:tournament_id>/score/<int:match_id>', methods=['POST'])
+@login_required_json
 def update_score(tournament_id, match_id):
     match = TournamentMatch.query.get_or_404(match_id)
     tournament = Tournament.query.get_or_404(tournament_id)
@@ -879,6 +895,7 @@ def update_score(tournament_id, match_id):
 
 
 @bp.route('/<int:tournament_id>/cancel_match/<int:match_id>', methods=['POST'])
+@login_required_json
 def cancel_match(tournament_id, match_id):
     match = TournamentMatch.query.get_or_404(match_id)
     match.status = 'canceled'
@@ -890,6 +907,7 @@ def cancel_match(tournament_id, match_id):
 # ── Round Nav ──
 
 @bp.route('/<int:tournament_id>/next_round', methods=['POST'])
+@login_required_json
 def next_round(tournament_id):
     tournament = Tournament.query.get_or_404(tournament_id)
 
@@ -987,6 +1005,7 @@ def next_round(tournament_id):
 # ── Playoff ──
 
 @bp.route('/<int:tournament_id>/generate_playoff', methods=['POST'])
+@login_required_json
 def generate_playoff(tournament_id):
     tournament = Tournament.query.get_or_404(tournament_id)
     bracket_size = request.form.get('bracket_size', 4, type=int)  # 4, 8, or 16
@@ -1041,6 +1060,7 @@ def generate_playoff(tournament_id):
 
 
 @bp.route('/<int:tournament_id>/playoff_score/<int:playoff_id>', methods=['POST'])
+@login_required_json
 def playoff_score(tournament_id, playoff_id):
     playoff = TournamentPlayoff.query.get_or_404(playoff_id)
     sets = []
@@ -1084,6 +1104,8 @@ def playoff_score(tournament_id, playoff_id):
 
 
 @bp.route('/<int:tournament_id>/complete', methods=['POST'])
+@login_required_json
+@require_tournament_owner
 def complete_tournament(tournament_id):
     from app.models import master_tournament_cascade
     tournament = Tournament.query.get_or_404(tournament_id)
@@ -1106,6 +1128,8 @@ def complete_tournament(tournament_id):
 
 
 @bp.route('/<int:tournament_id>/settings', methods=['GET', 'POST'])
+@login_required_json
+@require_tournament_owner
 def settings(tournament_id):
     tournament = Tournament.query.get_or_404(tournament_id)
     if request.method == 'POST':
@@ -1204,6 +1228,7 @@ def search_members():
 
 
 @bp.route('/<int:tournament_id>/rename/<int:participant_id>', methods=['POST'])
+@login_required_json
 def rename_participant(tournament_id, participant_id):
     """Tap name in leaderboard → rename + toggle sitting out."""
     p = TournamentParticipant.query.get_or_404(participant_id)

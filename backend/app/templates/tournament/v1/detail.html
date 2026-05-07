@@ -197,6 +197,18 @@ body.lb-detail .c-wlt,body.lb-detail .c-diff{display:block}
 .pg-secondary{background:#f0f0f0;color:#1B1C1A}
 
 @keyframes sheetUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* ═══ GUEST GATE ═══ */
+.guest-gate{position:fixed;bottom:0;left:0;right:0;max-width:480px;margin:0 auto;
+            background:#fff;border-radius:20px 20px 0 0;padding:24px 20px 40px;
+            box-shadow:0 -4px 24px rgba(0,0,0,.12);z-index:200;text-align:center}
+.guest-gate-title{font-weight:800;font-size:18px;margin-bottom:6px;color:#1B1C1A}
+.guest-gate-sub{font-size:14px;color:#888;margin-bottom:20px}
+.guest-gate-btn{display:block;width:100%;padding:15px;border-radius:12px;
+                font-weight:700;font-size:15px;text-decoration:none;margin-bottom:10px}
+.guest-gate-primary{background:#3F3D99;color:#fff}
+.guest-gate-secondary{background:#f0f0f0;color:#1B1C1A}
+.mc-pair.guest-locked{opacity:.4;cursor:not-allowed;pointer-events:none}
 </style>
 </head>
 <body>
@@ -214,10 +226,12 @@ body.lb-detail .c-wlt,body.lb-detail .c-diff{display:block}
             <a class="ov-item" href="/tournament/{{ tournament.id }}/share">
                 <span class="ov-icon">📤</span> Share result
             </a>
+            {% if not is_guest %}
             <a class="ov-item" href="?tab=standing#stg" onclick="event.preventDefault();goToSettings()">
                 <span class="ov-icon">⚙️</span> Settings
             </a>
-            {% if tournament.status == 'playing' %}
+            {% endif %}
+            {% if is_owner and tournament.status == 'playing' %}
             <form action="/tournament/{{ tournament.id }}/complete" method="post" style="margin:0">
                 <button type="submit" class="ov-item" style="width:100%;text-align:left"
                         onclick="return confirm('Selesaikan turnamen?')">
@@ -268,11 +282,11 @@ body.lb-detail .c-wlt,body.lb-detail .c-diff{display:block}
 <div class="mc">
     <p class="mc-court">Court {{ match.court }}</p>
     <div class="mc-scores">
-        <div class="mc-pair" id="d-{{ match.id }}-1"{% if tournament.status != 'completed' %} onclick="openPad({{ match.id }},1)"{% endif %}>
+        <div class="mc-pair{{ ' guest-locked' if is_guest }}" id="d-{{ match.id }}-1"{% if tournament.status != 'completed' and not is_guest %} onclick="openPad({{ match.id }},1)"{% endif %}>
             <span class="mc-d">{{ (s1 // 10)|string }}</span>
             <span class="mc-d">{{ (s1 % 10)|string }}</span>
         </div>
-        <div class="mc-pair" id="d-{{ match.id }}-2"{% if tournament.status != 'completed' %} onclick="openPad({{ match.id }},2)"{% endif %}>
+        <div class="mc-pair{{ ' guest-locked' if is_guest }}" id="d-{{ match.id }}-2"{% if tournament.status != 'completed' and not is_guest %} onclick="openPad({{ match.id }},2)"{% endif %}>
             <span class="mc-d">{{ (s2 // 10)|string }}</span>
             <span class="mc-d">{{ (s2 % 10)|string }}</span>
         </div>
@@ -352,6 +366,7 @@ body.lb-detail .c-wlt,body.lb-detail .c-diff{display:block}
     </div>
     {% endif %}
 
+    {% if not is_guest %}
     <div class="stg" id="stg">
         <p class="stg-title">Settings</p>
         <div class="stg-row">
@@ -381,6 +396,7 @@ body.lb-detail .c-wlt,body.lb-detail .c-diff{display:block}
             Sort head to head after wins
         </label>
     </div>
+    {% endif %}{# end not is_guest #}
 </section>
 {% endif %}
 
@@ -643,5 +659,18 @@ function saveSettings(){
         .catch(()=>{ alert('Gagal menyimpan — coba lagi'); });
 }
 </script>
+
+{% if is_guest %}
+<div class="guest-gate" id="guestGate">
+    <p class="guest-gate-title">🏆 Ikut kelola turnamen ini?</p>
+    <p class="guest-gate-sub">Login atau upgrade membership untuk input skor, settings, dan lebih banyak.</p>
+    <a href="{{ url_for('auth.login') }}" class="guest-gate-btn guest-gate-primary">Masuk</a>
+    <a href="{{ url_for('main.membership') }}" class="guest-gate-btn guest-gate-secondary">Upgrade Membership</a>
+    <button onclick="document.getElementById('guestGate').style.display='none'"
+            style="font-size:13px;color:#bbb;background:none;border:none;cursor:pointer;margin-top:4px">
+        Tutup
+    </button>
+</div>
+{% endif %}
 </body>
 </html>

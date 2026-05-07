@@ -145,11 +145,24 @@ class TestSortModes:
 
 
 class TestScoreValidation:
-    """Server-side score clamping."""
+    """Server-side score clamping. Score route now requires login."""
+
+    def _login(self, client, app, user_id):
+        with client.session_transaction() as sess:
+            sess['_user_id'] = str(user_id)
+            sess['_fresh'] = True
 
     def test_score_clamped_to_max(self, app, db, tournament_8p, client):
         t, players, rnd, matches = tournament_8p
-        # Try to submit score=999
+        # Create a user and log in (score requires login)
+        from app.models import User
+        u = User(username='Scorer', email='scorer@t.com', phone='099',
+                 membership='member', membership_paid=True, role='member')
+        u.set_password('pw')
+        db.session.add(u)
+        db.session.commit()
+        self._login(client, app, u.id)
+
         client.post(f'/tournament/{t.id}/score/{matches[0].id}',
                     data={'points_t1': '999', 'points_t2': '5'})
 
@@ -159,6 +172,14 @@ class TestScoreValidation:
 
     def test_negative_score_clamped_to_zero(self, app, db, tournament_8p, client):
         t, players, rnd, matches = tournament_8p
+        from app.models import User
+        u = User(username='Scorer2', email='scorer2@t.com', phone='098',
+                 membership='member', membership_paid=True, role='member')
+        u.set_password('pw')
+        db.session.add(u)
+        db.session.commit()
+        self._login(client, app, u.id)
+
         client.post(f'/tournament/{t.id}/score/{matches[0].id}',
                     data={'points_t1': '-5', 'points_t2': '10'})
 
