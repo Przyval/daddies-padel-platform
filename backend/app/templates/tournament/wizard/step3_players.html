@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+{% block title %}Peserta — {{ tournament.name }}{% endblock %}
+
+{% block header_left %}
+<a href="{{ url_for('tournament.create_step', tournament_id=tournament.id, step=2) }}" class="text-primary-container">
+    <span class="material-symbols-outlined">arrow_back</span>
+</a>
+<h1 class="font-headline font-bold tracking-tight text-xl text-primary-container">Pemain</h1>
+{% endblock %}
+
+{% block content %}
+{% set current_step = 3 %}
+{% include "tournament/wizard/_step_bar.html" %}
+
+{% set is_mix = tournament.format in ('mixicano', 'mix_americano') %}
+{% set is_team = tournament.format == 'team_mexicano' %}
+{% set m_count = participants|selectattr('gender', 'equalto', 'M')|list|length %}
+{% set f_count = participants|selectattr('gender', 'equalto', 'F')|list|length %}
+{% set need = 4 - (participants|length % 4) if participants|length % 4 != 0 else 0 %}
+
+<!-- Counter + progress -->
+<section class="card !p-4">
+    <div class="flex items-center justify-between mb-2">
+        <div class="flex items-baseline gap-2">
+            <span class="text-3xl font-extrabold text-primary">{{ participants|length }}</span>
+            <span class="text-sm text-on-surface-variant">pemain</span>
+        </div>
+        <div class="text-right">
+            {% if is_mix %}
+            <p class="text-xs font-bold {{ 'text-success' if m_count == f_count and m_count > 0 else 'text-warning' }}">
+                {{ m_count }}M + {{ f_count }}F
+                {% if m_count != f_count %} · harus sama{% endif %}
+            </p>
+            {% elif participants|length >= 4 and need == 0 %}
+            <p class="text-xs font-bold text-success">Siap mulai!</p>
+            {% elif participants|length > 0 %}
+            <p class="text-xs font-semibold text-warning">Perlu {{ need }} lagi</p>
+            {% else %}
+            <p class="text-xs text-on-surface-variant">Min. 4 pemain</p>
+            {% endif %}
+        </div>
+    </div>
+    <div class="w-full bg-surface-container-high rounded-full h-2">
+        {% set pct = ([participants|length / 8 * 100, 100] | min) | int %}
+        <div class="h-2 rounded-full transition-all {{ 'bg-success' if need == 0 and participants|length >= 4 else 'bg-primary' }}"
+             style="width: {{ pct }}%"></div>
+    </div>
+</section>
+
+<!-- Team Mexicano hint -->
+{% if is_team %}
+<section class="card !p-3 bg-warning/5 flex items-start gap-3">
+    <span class="material-symbols-outlined text-warning text-lg flex-shrink-0 mt-0.5">group_work</span>
+    <p class="text-xs text-on-surface-variant leading-relaxed">
+        <strong class="text-on-surface">Team Mexicano:</strong> Masukkan berpasangan.
+        #1 &amp; #2 = Tim A, #3 &amp; #4 = Tim B. Partner tetap, lawan berubah.
+    </p>
+</section>
+{% endif %}
+
+<!-- ═══ PRIMARY INPUT: Single name field + quick add ═══ -->
+<section class="card space-y-4">
+
+    <!-- Single name input (most common action) -->
+    <form method="post" class="flex items-center gap-2" id="addForm">
+        <input type="hidden" name="action" value="add_guest">
+        <div class="flex-1 relative">
+            <input name="guest_name" id="nameInput" class="input-field !py-3 text-base pr-12"
+                   placeholder="Ketik nama pemain..." required autocomplete="off"
+                   oninput="filterSuggestions(this.value)">
+            {% if is_mix %}
+            <select name="gender" class="absolute right-2 top-1/2 -translate-y-1/2 bg-transparent text-xs font-bold
+                                         text-primary border-none outline-none cursor-pointer w-10 text-center">
+                <option value="M">M</option>
+                <option value="F">F</option>
+            </select>
+            {% endif %}
+        </div>
+        <button type="submit" class="btn-primary !py-3 !px-4">
+            <span class="material-symbols-outlined text-xl">add</span>
+        </button>
+    </form>
+
+    <!-- Member suggestions (searchable, appears when typing) -->
+    {% if available_users|length > 0 %}
+    <div id="suggestions" class="hidden">
+        <p class="text-[9px] font-bold uppercase tracking-widest text-on-surface-variant mb-2">Anggota Daddies</p>
+        <div class="flex flex-wrap gap-1.5" id="memberChips">
+            {% for u in available_users %}
+            <button type="button" onclick="addMember({{ u.id }}, '{{ u.username }}')"
+                    class="member-chip inline-flex items-center gap-1 px-3 py-1.5 rounded-full
+                           bg-surface-container-low text-xs font-semibold text-on-surface
+                           hover:bg-primary hover:text-on-primary active:scale-95 transition-all"
+                    data-name="{{ u.username|lower }}">
+                <span class="w-5 h-5 rounded-full bg-primary-container/30 flex items-center justify-center text-[8px] font-bold">
+                    {{ u.initials }}
+                </span>
+                {{ u.first_name }}
+            </button>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Bulk add (expandable) -->
+    <div>
+        <button type="button" onclick="document.getElementById('bulkSection').classList.toggle('hidden')"
+                class="text-xs font-semibold text-primary flex items-center gap-1">
+            <span class="material-symbols-outlined text-sm">playlist_add</span>
+            Tambah banyak sekaligus
+        </button>
+        <div id="bulkSection" class="hidden mt-2">
+            <form method="post" class="space-y-2">
+                <input type="hidden" name="action" value="bulk_add">
+                <input name="bulk_names" class="input-field !py-2.5 text-sm"
+                       placeholder="Andi, Budi, Citra, Dewi">
+                <button type="submit" class="btn-ghost w-full py-2 text-xs">
+                    Tambah Semua
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- Hidden form for adding members -->
+<form method="post" id="memberForm" class="hidden">
+    <input type="hidden" name="action" value="add_member">
+    <input type="hidden" name="user_id" id="memberUserId">
+    <input type="hidden" name="gender" id="memberGender">
+</form>
+
+<!-- ═══ PLAYER LIST ═══ -->
+{% if participants|length > 0 %}
+<section>
+    <h3 class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-2">
+        Daftar ({{ participants|length }})
+    </h3>
+    <div class="space-y-1.5">
+        {% for p in participants %}
+        {% if is_team and loop.index is odd %}
+        <div class="flex items-center gap-2 mt-3 mb-1">
+            <div class="w-5 h-5 rounded-full bg-warning/15 flex items-center justify-center">
+                <span class="text-[8px] font-extrabold text-warning">{{ ((loop.index - 1) // 2) + 1 }}</span>
+            </div>
+            <span class="text-[9px] font-bold uppercase tracking-widest text-warning">Tim {{ ((loop.index - 1) // 2) + 1 }}</span>
+        </div>
+        {% endif %}
+        <div class="flex items-center justify-between py-2 px-3 rounded-2xl
+                    {{ 'bg-white shadow-sm' if is_team and loop.index is even else 'bg-surface-container-lowest' }}">
+            <div class="flex items-center gap-2.5">
+                <span class="text-xs font-bold text-on-surface-variant w-5 text-center">{{ loop.index }}</span>
+                <p class="text-sm font-semibold text-on-surface">{{ p.name }}</p>
+                {% if p.gender %}
+                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full
+                             {{ 'bg-info/10 text-info' if p.gender == 'M' else 'bg-error/10 text-error' }}">
+                    {{ p.gender }}
+                </span>
+                {% endif %}
+                {% if p.user %}
+                <span class="text-[9px] text-on-surface-variant">member</span>
+                {% endif %}
+            </div>
+            <form method="post" class="contents">
+                <input type="hidden" name="action" value="remove">
+                <input type="hidden" name="participant_id" value="{{ p.id }}">
+                <button type="submit" class="p-1 hover:bg-error/10 rounded-full">
+                    <span class="material-symbols-outlined text-error/40 text-base">close</span>
+                </button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- Nav -->
+<div class="flex gap-3">
+    <a href="{{ url_for('tournament.create_step', tournament_id=tournament.id, step=2) }}"
+       class="btn-ghost flex-1 py-3.5 text-sm">
+        <span class="material-symbols-outlined text-lg">arrow_back</span> Kembali
+    </a>
+    {% if participants|length >= 4 and need == 0 %}
+    <a href="{{ url_for('tournament.create_step', tournament_id=tournament.id, step=4) }}"
+       class="btn-primary flex-1 py-3.5 text-sm gap-1">
+        Review <span class="material-symbols-outlined text-lg">arrow_forward</span>
+    </a>
+    {% else %}
+    <div class="btn-primary flex-1 py-3.5 text-sm gap-1 opacity-30 cursor-not-allowed text-center">
+        Review <span class="material-symbols-outlined text-lg">arrow_forward</span>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+// Auto-focus name input
+document.getElementById('nameInput').focus();
+
+// Show member suggestions when user starts typing
+const suggestions = document.getElementById('suggestions');
+const chips = document.querySelectorAll('.member-chip');
+
+function filterSuggestions(query) {
+    if (!suggestions) return;
+    query = query.toLowerCase().trim();
+    if (query.length === 0) {
+        suggestions.classList.add('hidden');
+        return;
+    }
+    suggestions.classList.remove('hidden');
+    let visible = 0;
+    chips.forEach(chip => {
+        const name = chip.dataset.name;
+        const match = name.includes(query);
+        chip.style.display = match ? '' : 'none';
+        if (match) visible++;
+    });
+    if (visible === 0) suggestions.classList.add('hidden');
+}
+
+// Add member by clicking chip
+function addMember(userId, name) {
+    document.getElementById('memberUserId').value = userId;
+    {% if is_mix %}
+    const gender = prompt('Gender untuk ' + name + '? (M/F)', 'M');
+    if (!gender) return;
+    document.getElementById('memberGender').value = gender.toUpperCase();
+    {% endif %}
+    document.getElementById('memberForm').submit();
+}
+
+// Enter key submits the form
+document.getElementById('nameInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('addForm').submit();
+    }
+});
+</script>
+{% endblock %}

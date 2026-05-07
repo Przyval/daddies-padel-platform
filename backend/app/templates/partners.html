@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Partner — Daddies Padel{% endblock %}
+
+{% block header_left %}
+<a href="{{ url_for('member.index') }}" class="hover:opacity-80 transition-opacity text-primary-container">
+    <span class="material-symbols-outlined">arrow_back</span>
+</a>
+<h1 class="font-headline font-bold tracking-tight text-xl text-primary-container">Partner</h1>
+{% endblock %}
+
+{% block content %}
+{% for category, partners_list in categories.items() %}
+<section>
+    <p class="label-overline mb-3">{{ category | upper }}</p>
+    <div class="space-y-3">
+        {% for partner in partners_list %}
+        <div class="card !p-4 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-full bg-surface-container-low flex items-center justify-center flex-shrink-0">
+                <span class="material-symbols-outlined text-primary">handshake</span>
+            </div>
+            <div class="flex-1 min-w-0">
+                <p class="font-bold text-on-surface text-sm">{{ partner.name }}</p>
+                <p class="text-xs text-on-surface-variant mt-0.5">{{ partner.description }}</p>
+            </div>
+            {% if partner.website %}
+            <a href="{{ partner.website }}" target="_blank" class="text-primary">
+                <span class="material-symbols-outlined">open_in_new</span>
+            </a>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% else %}
+<section class="card text-center py-12">
+    <span class="material-symbols-outlined text-4xl text-on-surface-variant/30 mb-2">handshake</span>
+    <h3 class="font-bold text-on-surface">Belum ada partner</h3>
+    <p class="text-sm text-on-surface-variant mt-1">Partner akan ditampilkan di sini.</p>
+</section>
+{% endfor %}
+{% endblock %}

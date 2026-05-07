@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ tournament.name }} — Daddies Padel</title>
+    <meta property="og:title" content="{{ tournament.name }} — Live Results">
+    <meta property="og:description" content="{{ tournament.format_label }} · {{ tournament.participants.count() }} pemain · {{ tournament.venue }}">
+    <meta property="og:image" content="https://padeldaddies.site/tournament/{{ tournament.id }}/share/download">
+    <meta property="og:url" content="https://padeldaddies.site/r/{{ tournament.id }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { theme: { extend: { colors: {
+            "primary": "#082217", "primary-container": "#1e372b",
+            "on-primary": "#ffffff", "surface": "#faf9f5",
+            "surface-container-low": "#f4f4f0", "on-surface": "#1b1c1a",
+            "on-surface-variant": "#424844", "success": "#4a7c59",
+            "warning": "#d4a843", "error": "#ba1a1a", "info": "#3d6b8e",
+        }}}}
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh;
+               background: linear-gradient(135deg, #082217 0%, #1E372B 40%, #0D3B13 100%); }
+        .glass-header { background: rgba(8,34,23,0.4); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+        .card-section { background: #FAF9F5; border-radius: 2rem 2rem 0 0; }
+        .lb-row { display: flex; align-items: center; padding: 14px 16px; border-radius: 1rem; margin: 4px 0; min-height: 52px; }
+        .lb-gold { background: linear-gradient(135deg, #D4A843 0%, #E8C76A 100%); color: #fff; }
+        .lb-silver { background: #E9E8E4; }
+        .lb-bronze { background: #E3D5C8; }
+        .lb-normal { background: #F4F4F0; }
+        .match-card { background: #fff; border-radius: 1.5rem; padding: 16px; margin: 8px 0;
+                      box-shadow: 0 2px 20px rgba(8,34,23,0.04); }
+        .score-box { background: #082217; color: #fff; border-radius: 12px; width: 48px; height: 48px;
+                     display: flex; align-items: center; justify-content: center;
+                     font-weight: 800; font-size: 1.25rem; }
+        .score-box.winner { background: #4A7C59; }
+        .round-pill { display: inline-flex; align-items: center; justify-content: center;
+                      padding: 8px 16px; border-radius: 9999px; font-weight: 700; font-size: 0.8rem;
+                      cursor: pointer; transition: all 0.2s; min-height: 36px; }
+        .round-pill.active { background: #082217; color: #fff; }
+        .round-pill:not(.active) { background: #E9E8E4; color: #424844; }
+        .blur-toggle { filter: blur(8px); transition: filter 0.3s; }
+        .blur-toggle.visible { filter: none; }
+        .badge { display: inline-flex; padding: 4px 12px; border-radius: 9999px; font-size: 10px;
+                 font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+        .auto-refresh { animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    </style>
+</head>
+<body>
+
+{# ═══ HERO HEADER ═══ #}
+<header class="glass-header sticky top-0 z-50 px-6 py-4">
+    <div class="max-w-lg mx-auto flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
+                <span class="material-symbols-outlined text-white text-lg" style="font-variation-settings:'FILL' 1">pets</span>
+            </div>
+            <div>
+                <p class="text-white/60 text-xs font-bold uppercase tracking-widest">Daddies Padel</p>
+                <p class="text-white text-sm font-bold">Live Results</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            {% if tournament.status == 'playing' %}
+            <span class="badge bg-success/20 text-success auto-refresh">● LIVE</span>
+            {% else %}
+            <span class="badge bg-white/10 text-white/60">SELESAI</span>
+            {% endif %}
+        </div>
+    </div>
+</header>
+
+{# ═══ TOURNAMENT TITLE ═══ #}
+<section class="px-6 pt-8 pb-12">
+    <div class="max-w-lg mx-auto">
+        <h1 class="text-3xl font-extrabold text-white tracking-tight">{{ tournament.name }}</h1>
+        <p class="text-white/50 text-sm mt-2">
+            {{ tournament.format_label }} · {{ tournament.participants.count() }} pemain · {{ tournament.venue }}
+        </p>
+        <div class="flex gap-2 mt-3">
+            <span class="badge bg-white/10 text-white/70">{{ rounds|length }} ronde</span>
+            <span class="badge bg-white/10 text-white/70">{{ tournament.num_courts }} court</span>
+            <span class="badge bg-white/10 text-white/70">{{ tournament.scoring_mode|upper }}</span>
+        </div>
+    </div>
+</section>
+
+{# ═══ MAIN CONTENT (white card) ═══ #}
+<div class="card-section min-h-screen px-5 pt-8 pb-20 relative">
+    <div class="max-w-lg mx-auto">
+
+        {# Toggle + Print buttons #}
+        <div class="flex justify-between items-center mb-6" style="margin-top:-40px">
+            <button onclick="toggleBlur()" class="badge bg-surface-container-low text-on-surface-variant cursor-pointer"
+                    id="blurBtn" style="padding:8px 16px">
+                Sembunyikan Ranking
+            </button>
+            <a href="{{ url_for('tournament.share', tournament_id=tournament.id) }}"
+               class="badge bg-surface-container-low text-on-surface-variant" style="padding:8px 16px">
+                <span class="material-symbols-outlined text-sm mr-1">share</span> Share
+            </a>
+        </div>
+
+        {# ═══ LEADERBOARD ═══ #}
+        <div id="leaderboard" class="blur-toggle visible mb-8">
+            {# Header #}
+            <div class="flex items-center px-4 mb-2 text-xs font-bold text-on-surface-variant uppercase tracking-wider">
+                <span class="w-8">#</span>
+                <span class="flex-1">Pemain</span>
+                <span class="w-16 text-center">W-L-T</span>
+                <span class="w-12 text-center">Diff</span>
+                <span class="w-10 text-center">P</span>
+            </div>
+
+            {% for s in leaderboard %}
+            <div class="lb-row {{ 'lb-gold' if loop.index == 1 else 'lb-silver' if loop.index == 2 else 'lb-bronze' if loop.index == 3 else 'lb-normal' }}">
+                <span class="w-8 font-extrabold text-sm {{ 'text-white' if loop.index == 1 else '' }}">{{ loop.index }}.</span>
+                <span class="flex-1 font-bold text-sm {{ 'text-white' if loop.index == 1 else 'text-on-surface' }}">{{ s.participant.first_name }}</span>
+                <span class="w-16 text-center text-xs font-bold {{ 'text-white/80' if loop.index == 1 else '' }}">
+                    {{ s.wins }}-{{ s.losses }}-{{ s.ties }}
+                </span>
+                <span class="w-12 text-center text-xs font-bold
+                    {% set diff = s.games_won - s.games_lost %}
+                    {{ 'text-white/80' if loop.index == 1 else 'text-success' if diff > 0 else 'text-error' if diff < 0 else '' }}">
+                    {{ '+' if diff > 0 }}{{ diff }}
+                </span>
+                <span class="w-10 text-center font-extrabold {{ 'text-white' if loop.index == 1 else 'text-on-surface' }}">
+                    {% if s.get('even_pts', 0) > 0 %}
+                    <span class="text-on-surface-variant text-[9px]">(+{{ s.even_pts|int }})</span>
+                    {% endif %}
+                    {{ s.points|int }}
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+
+        {# ═══ ROUNDS ═══ #}
+        <div>
+            {# Round pills #}
+            <div class="flex gap-2 overflow-x-auto no-scrollbar pb-3 mb-4">
+                {% for r in rounds %}
+                <div class="round-pill {{ 'active' if r.round_number == current_round }}"
+                     onclick="showRound({{ r.round_number }})">
+                    R{{ r.round_number }}
+                    {% if r.is_complete %}<span class="ml-1 text-[10px]">✓</span>{% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            {# Match cards per round #}
+            {% for r in rounds %}
+            <div id="round-{{ r.round_number }}" class="{{ 'hidden' if r.round_number != current_round }}" style="animation: fadeIn 0.3s ease-out">
+                <h3 class="text-base font-extrabold text-on-surface mb-3">
+                    Ronde {{ r.round_number }}
+                    {% if r.is_complete %}<span class="text-success text-sm ml-1">✓</span>{% endif %}
+                </h3>
+
+                {% for match in r.matches %}
+                {% if match.status != 'canceled' %}
+                <div class="match-card">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-bold text-on-surface-variant">Court {{ match.court }}</span>
+                        {% if match.status == 'completed' %}
+                        <span class="text-[10px] font-bold text-success">SELESAI</span>
+                        {% else %}
+                        <span class="text-[10px] font-bold text-warning">PENDING</span>
+                        {% endif %}
+                    </div>
+
+                    {# Score display #}
+                    <div class="flex items-center justify-center gap-4 mb-3">
+                        <div class="score-box {{ 'winner' if match.status == 'completed' and match.winner == 'team1' }}">
+                            {{ '%02d'|format(match.score_team1 if match.status == 'completed' else 0) }}
+                        </div>
+                        <div class="score-box {{ 'winner' if match.status == 'completed' and match.winner == 'team2' }}">
+                            {{ '%02d'|format(match.score_team2 if match.status == 'completed' else 0) }}
+                        </div>
+                    </div>
+
+                    {# Team names #}
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1 {{ 'opacity-40' if match.status == 'completed' and match.winner == 'team2' }}">
+                            <p class="text-sm font-bold text-on-surface">{{ match.team1_p1.first_name if match.team1_p1 else '?' }}</p>
+                            <p class="text-sm font-bold text-on-surface">{{ match.team1_p2.first_name if match.team1_p2 else '?' }}</p>
+                        </div>
+                        <span class="text-xs font-bold text-on-surface-variant/40 px-3">vs</span>
+                        <div class="flex-1 text-right {{ 'opacity-40' if match.status == 'completed' and match.winner == 'team1' }}">
+                            <p class="text-sm font-bold text-on-surface">{{ match.team2_p1.first_name if match.team2_p1 else '?' }}</p>
+                            <p class="text-sm font-bold text-on-surface">{{ match.team2_p2.first_name if match.team2_p2 else '?' }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+
+        {# ═══ FOOTER ═══ #}
+        <div class="text-center pt-8 pb-4 space-y-4">
+            <a href="https://padeldaddies.site/tournament/{{ tournament.id }}/share"
+               class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary text-on-primary text-sm font-bold">
+                <span class="material-symbols-outlined text-lg">share</span>
+                Share ke WhatsApp
+            </a>
+            <p class="text-xs text-on-surface-variant/50">
+                Powered by <strong>Daddies Padel</strong> · padeldaddies.site
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+// Toggle blur on leaderboard
+function toggleBlur() {
+    const lb = document.getElementById('leaderboard');
+    const btn = document.getElementById('blurBtn');
+    lb.classList.toggle('visible');
+    btn.textContent = lb.classList.contains('visible') ? 'Sembunyikan Ranking' : 'Tampilkan Ranking';
+}
+
+// Show specific round
+function showRound(num) {
+    document.querySelectorAll('[id^="round-"]').forEach(el => el.classList.add('hidden'));
+    document.getElementById('round-' + num).classList.remove('hidden');
+    document.querySelectorAll('.round-pill').forEach((el, i) => {
+        el.classList.toggle('active', i + 1 === num);
+    });
+}
+
+// Auto-refresh every 15 seconds if tournament is live
+{% if tournament.status == 'playing' %}
+setInterval(() => { location.reload(); }, 15000);
+{% endif %}
+</script>
+
+<style>
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+</style>
+
+</body>
+</html>

@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block title %}Poker Night — Daddies Padel{% endblock %}
+
+{% block header_left %}
+<a href="{{ url_for('main.profile') }}" class="text-primary-container">
+    <span class="material-symbols-outlined">arrow_back</span>
+</a>
+<h1 class="font-headline font-bold tracking-tight text-xl text-primary-container">Poker Night</h1>
+{% endblock %}
+
+{% block content %}
+{% if event %}
+<!-- Active event -->
+<section class="card text-center space-y-4 py-8">
+    <div class="text-4xl">🃏</div>
+    <div>
+        <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Grand Final</p>
+        <h2 class="text-2xl font-extrabold text-on-surface">{{ event.name }}</h2>
+        <p class="text-sm text-on-surface-variant mt-1">{{ event.date.strftime('%a, %d %b %Y · %H:%M') if event.date else 'TBD' }}</p>
+    </div>
+
+    <!-- Slot counter (scarcity) -->
+    <div class="flex items-center justify-center gap-6">
+        <div>
+            <p class="text-3xl font-extrabold text-primary">{{ event.slots_taken }}</p>
+            <p class="text-[9px] font-bold uppercase tracking-widest text-on-surface-variant">Terdaftar</p>
+        </div>
+        <div class="text-2xl text-on-surface-variant font-bold">/</div>
+        <div>
+            <p class="text-3xl font-extrabold text-on-surface-variant">{{ event.max_participants }}</p>
+            <p class="text-[9px] font-bold uppercase tracking-widest text-on-surface-variant">Max Slot</p>
+        </div>
+    </div>
+
+    {% if event.slots_remaining > 0 and event.slots_remaining <= 4 %}
+    <p class="text-sm font-bold text-error">
+        {{ event.slots_remaining }} slot tersisa!
+    </p>
+    {% endif %}
+
+    <!-- Progress bar -->
+    <div class="w-full bg-surface-container-high rounded-full h-2.5 max-w-xs mx-auto">
+        {% set pct = (event.slots_taken / event.max_participants * 100)|int %}
+        <div class="bg-warning rounded-full h-2.5 transition-all" style="width: {{ pct }}%"></div>
+    </div>
+</section>
+
+<!-- Buy-in info -->
+<section class="card !p-5 space-y-3">
+    <h3 class="text-sm font-bold">Buy-in</h3>
+    <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-warning text-xl">toll</span>
+            <div>
+                <p class="text-lg font-extrabold text-on-surface">{{ '{:,}'.format(event.buy_in_chips) }} Chips</p>
+                <p class="text-xs text-on-surface-variant">Saldo kamu: {{ '{:,}'.format(current_user.chips_balance) }}</p>
+            </div>
+        </div>
+        {% if current_user.chips_balance >= event.buy_in_chips %}
+        <span class="badge badge-confirmed">CUKUP</span>
+        {% else %}
+        <span class="badge badge-canceled">KURANG {{ '{:,}'.format(event.buy_in_chips - current_user.chips_balance) }}</span>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Register / Status -->
+{% if user_registered %}
+<section class="card !p-5 text-center space-y-3">
+    <span class="material-symbols-outlined text-success text-3xl">check_circle</span>
+    <p class="text-lg font-bold text-success">Kamu sudah terdaftar!</p>
+    <p class="text-xs text-on-surface-variant">Bersiap untuk Grand Final.</p>
+</section>
+{% elif not event.is_full %}
+<form action="{{ url_for('main.poker_night_register', event_id=event.id) }}" method="post"
+      onsubmit="return confirm('Buy-in {{ '{:,}'.format(event.buy_in_chips) }} chips. Lanjutkan?')">
+    <button type="submit" class="btn-primary w-full py-4 text-base gap-2
+            {{ 'opacity-40 pointer-events-none' if current_user.chips_balance < event.buy_in_chips }}">
+        <span class="material-symbols-outlined text-lg">confirmation_number</span>
+        Daftar — Buy-in {{ '{:,}'.format(event.buy_in_chips) }} Chips
+    </button>
+</form>
+{% else %}
+<div class="card !p-5 text-center">
+    <span class="material-symbols-outlined text-error text-3xl">block</span>
+    <p class="text-lg font-bold text-error mt-2">Slot Penuh</p>
+    <p class="text-xs text-on-surface-variant">Kumpulkan chips untuk Poker Night berikutnya.</p>
+</div>
+{% endif %}
+
+<!-- Registered players -->
+{% if event.registrations.count() > 0 %}
+<section>
+    <h3 class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-3">Peserta ({{ event.slots_taken }})</h3>
+    <div class="space-y-2">
+        {% for reg in event.registrations %}
+        <div class="card !p-3 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-warning/10 flex items-center justify-center">
+                <span class="text-xs font-bold text-warning">{{ loop.index }}</span>
+            </div>
+            <p class="text-sm font-bold text-on-surface">{{ reg.user.display_name }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+{% else %}
+<!-- No active event -->
+<section class="card text-center py-12 space-y-4">
+    <div class="text-5xl">🃏</div>
+    <h2 class="text-xl font-extrabold text-on-surface">Poker Night</h2>
+    <p class="text-sm text-on-surface-variant">Grand Final setiap akhir season.<br>Kumpulkan chips untuk buy-in!</p>
+    <p class="text-xs text-on-surface-variant">Buy-in: 20,000 chips · Max 16 pemain</p>
+</section>
+{% endif %}
+
+<!-- Past events -->
+{% if past_events %}
+<section>
+    <h3 class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-3">Riwayat</h3>
+    <div class="space-y-2">
+        {% for ev in past_events %}
+        <div class="card !p-4 flex items-center justify-between">
+            <div>
+                <p class="text-sm font-bold text-on-surface">{{ ev.name }}</p>
+                <p class="text-[10px] text-on-surface-variant">{{ ev.date.strftime('%d %b %Y') if ev.date else '-' }} · {{ ev.slots_taken }} peserta</p>
+            </div>
+            {% if ev.champion %}
+            <div class="text-right">
+                <span class="text-lg">🏆</span>
+                <p class="text-xs font-bold text-warning">{{ ev.champion.first_name }}</p>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+{% endblock %}

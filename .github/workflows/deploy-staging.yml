@@ -1,0 +1,38 @@
+name: Deploy Staging
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: true
+
+jobs:
+  deploy-preview:
+    name: Deploy to Firebase Preview Channel
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.41.0'
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build web
+        run: flutter build web --release
+
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          channelId: staging
+          expires: 7d
+          projectId: padel-daddies

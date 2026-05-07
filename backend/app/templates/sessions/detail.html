@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% block title %}{{ match.title }} — Daddies Padel{% endblock %}
+
+{% block header_left %}
+<a href="{{ url_for('main.sessions') }}" class="hover:opacity-80 transition-opacity text-primary-container">
+    <span class="material-symbols-outlined">arrow_back</span>
+</a>
+<h1 class="font-headline font-bold tracking-tight text-xl text-primary-container">Detail Sesi</h1>
+{% endblock %}
+
+{% block header_right %}
+{% if current_user.is_authenticated and current_user.role == 'admin' %}
+<a href="{{ url_for('main.session_edit', match_id=match.id) }}" class="hover:opacity-80 text-primary-container">
+    <span class="material-symbols-outlined">edit</span>
+</a>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<!-- Heritage badge + title -->
+<section class="flex items-center justify-between">
+    <div class="space-y-1">
+        <p class="text-[0.75rem] font-bold uppercase tracking-widest text-on-surface-variant">
+            {{ match.date_time.strftime('%A, %d %B %Y') }}
+        </p>
+        <h2 class="text-xl font-extrabold tracking-tight text-primary">{{ match.title }}</h2>
+        <p class="text-sm text-on-surface-variant flex items-center gap-1">
+            <span class="material-symbols-outlined text-base">schedule</span>
+            {{ match.date_time.strftime('%H:%M') }}
+            <span class="mx-1">·</span>
+            <span class="material-symbols-outlined text-base">location_on</span>
+            {{ match.location }}
+        </p>
+    </div>
+    <div class="w-14 h-14 bg-primary-container rounded-full flex items-center justify-center text-surface shadow-lg">
+        <span class="material-symbols-outlined filled">sports_tennis</span>
+    </div>
+</section>
+
+<!-- Stats row -->
+<section class="grid grid-cols-3 gap-3">
+    <div class="stat-card text-center">
+        <p class="text-2xl font-extrabold text-primary">{{ match.confirmed_count }}</p>
+        <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mt-1">Confirmed</p>
+    </div>
+    <div class="stat-card text-center">
+        <p class="text-2xl font-extrabold text-warning">{{ match.waitlist_count }}</p>
+        <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mt-1">Waitlist</p>
+    </div>
+    <div class="stat-card text-center">
+        <p class="text-2xl font-extrabold text-on-surface">{{ match.max_players }}</p>
+        <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mt-1">Maks</p>
+    </div>
+</section>
+
+<!-- Price -->
+<section class="card !p-5 flex items-center justify-between">
+    <div>
+        <p class="text-[0.65rem] font-bold uppercase tracking-widest text-on-surface-variant">Biaya</p>
+        <div class="flex items-baseline gap-1 mt-1">
+            <span class="text-2xl font-extrabold text-primary">IDR {{ "{:,.0f}".format(match.price) }}</span>
+            <span class="text-xs font-bold text-on-surface-variant">/orang</span>
+        </div>
+    </div>
+    <span class="badge badge-{{ match.status }}">{{ match.status | upper }}</span>
+</section>
+
+<!-- Venue Map Card -->
+{% if venue %}
+<section class="card !p-0 overflow-hidden">
+    <!-- Map embed (tappable → opens navigation) -->
+    {% if venue.osm_embed_url %}
+    <a href="{{ venue.maps_navigate_url }}" target="_blank" rel="noopener" class="block">
+        <iframe src="{{ venue.osm_embed_url }}"
+                style="width:100%; height:160px; border:none; pointer-events:none;"
+                loading="lazy"></iframe>
+    </a>
+    {% endif %}
+
+    <div class="p-4 space-y-3">
+        <div>
+            <p class="text-sm font-bold text-on-surface flex items-center gap-1">
+                <span class="material-symbols-outlined text-primary text-base">location_on</span>
+                {{ venue.name }}
+            </p>
+            <p class="text-xs text-on-surface-variant mt-1">{{ venue.address }}</p>
+            {% if venue.courts or venue.price_per_hour %}
+            <p class="text-[10px] text-on-surface-variant mt-1">
+                {% if venue.courts %}{{ venue.courts }} court{% endif %}
+                {% if venue.courts and venue.price_per_hour %} · {% endif %}
+                {% if venue.price_per_hour %}IDR {{ '{:,}'.format(venue.price_per_hour) }}/jam{% endif %}
+            </p>
+            {% endif %}
+        </div>
+
+        <div class="flex gap-2">
+            {% if venue.phone %}
+            <a href="tel:{{ venue.phone }}" class="btn-ghost flex-1 py-2.5 text-sm gap-1">
+                <span class="material-symbols-outlined text-sm">call</span> Telepon
+            </a>
+            {% endif %}
+            <a href="{{ venue.maps_navigate_url }}" target="_blank" rel="noopener"
+               class="btn-primary flex-1 py-2.5 text-sm gap-1">
+                <span class="material-symbols-outlined text-sm">navigation</span> Buka Maps
+            </a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{% if match.notes %}
+<section class="card !p-5">
+    <p class="text-[0.65rem] font-bold uppercase tracking-widest text-on-surface-variant mb-2">Catatan</p>
+    <p class="text-sm text-on-surface">{{ match.notes }}</p>
+</section>
+{% endif %}
+
+<!-- Player list -->
+<section>
+    <h3 class="text-lg font-bold tracking-tight mb-4">Pemain ({{ bookings | length }})</h3>
+    <div class="space-y-3">
+        {% for booking in bookings %}
+        <div class="card !p-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-surface-container-low flex items-center justify-center">
+                    <span class="text-sm font-bold text-on-surface-variant">{{ booking.player.initials }}</span>
+                </div>
+                <div>
+                    <p class="font-bold text-on-surface text-sm">{{ booking.player.display_name }}</p>
+                    <a href="https://wa.me/{{ booking.player.phone }}" target="_blank"
+                       class="text-xs text-success flex items-center gap-0.5">
+                        <span class="material-symbols-outlined text-xs">chat</span>
+                        {{ booking.player.phone }}
+                    </a>
+                </div>
+            </div>
+            <span class="badge badge-{{ booking.status }}">{{ booking.status | upper }}</span>
+        </div>
+        {% else %}
+        <div class="card text-center py-8">
+            <span class="material-symbols-outlined text-3xl text-on-surface-variant/30 mb-2">group_off</span>
+            <p class="text-sm text-on-surface-variant">Belum ada pemain terdaftar</p>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Action bar -->
+{% if current_user.is_authenticated %}
+<section class="fixed bottom-[96px] left-0 w-full px-6 z-40">
+    <div class="max-w-md mx-auto bg-surface-bright/80 backdrop-blur-xl rounded-xl p-5 shadow-2xl border border-outline-variant/20">
+        {% if user_booking %}
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-[0.65rem] font-bold uppercase tracking-widest text-on-surface-variant">Status Kamu</p>
+                    <span class="badge badge-{{ user_booking.status }} mt-1">{{ user_booking.status | upper }}</span>
+                </div>
+                {% if user_booking.status == 'approved' %}
+                <a href="{{ url_for('member.upload_payment', match_id=match.id) }}"
+                   class="btn-primary px-6 py-3 text-sm">
+                    Upload Bukti Bayar
+                </a>
+                {% endif %}
+            </div>
+        {% elif match.status == 'open' %}
+            <form action="{{ url_for('member.join_match', match_id=match.id) }}" method="POST" class="flex items-center justify-between">
+                <div>
+                    <p class="text-[0.65rem] font-bold uppercase tracking-widest text-on-surface-variant">Harga</p>
+                    <span class="text-xl font-extrabold text-primary">IDR {{ "{:,.0f}".format(match.price) }}</span>
+                </div>
+                <button type="submit" class="btn-primary px-8 py-4 font-bold shadow-lg">
+                    Join Waitlist
+                </button>
+            </form>
+        {% else %}
+            <p class="text-center text-sm font-semibold text-on-surface-variant">Sesi sudah penuh</p>
+        {% endif %}
+    </div>
+</section>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Sponsor — Daddies Padel{% endblock %}
+
+{% block header_left %}
+<a href="{{ url_for('main.profile') }}" class="text-primary-container">
+    <span class="material-symbols-outlined">arrow_back</span>
+</a>
+<h1 class="font-headline font-bold tracking-tight text-xl text-primary-container">Sponsor</h1>
+{% endblock %}
+
+{% block content %}
+<!-- Stats -->
+<section class="grid grid-cols-3 gap-3">
+    <div class="stat-card text-center">
+        <p class="text-2xl font-extrabold text-primary">{{ placements|length }}</p>
+        <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mt-1">Placement</p>
+    </div>
+    <div class="stat-card text-center">
+        <p class="text-2xl font-extrabold text-primary">{{ '{:,}'.format(total_impressions) }}</p>
+        <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mt-1">Impressions</p>
+    </div>
+    <div class="stat-card text-center">
+        <p class="text-2xl font-extrabold text-info">{{ '{:,}'.format(total_clicks) }}</p>
+        <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mt-1">Clicks</p>
+    </div>
+</section>
+
+<!-- Pitch card -->
+<section class="card !p-5 space-y-3">
+    <h3 class="text-sm font-bold">Pitch Material</h3>
+    <p class="text-xs text-on-surface-variant">
+        Daddies Padel Club — komunitas padel eksklusif Jakarta.
+        <strong>{{ '{:,}'.format(total_impressions) }} impressions</strong> per bulan.
+        Product placement ditonton oleh member menengah-atas yang aktif.
+    </p>
+    <div class="flex gap-2">
+        <span class="badge badge-open">{{ partners|length }} Partners</span>
+        <span class="badge badge-confirmed">{{ placements|length }} Active Placements</span>
+    </div>
+</section>
+
+<!-- Active placements -->
+<section>
+    <h3 class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-3">Active Placements</h3>
+    <div class="space-y-2">
+        {% for p in placements %}
+        <div class="card !p-4 flex items-center justify-between">
+            <div>
+                <p class="text-sm font-bold text-on-surface">{{ p.partner.name }}</p>
+                <p class="text-[10px] text-on-surface-variant">
+                    {{ p.placement|replace('_',' ')|title }} ·
+                    {{ p.start_date.strftime('%d %b') }} — {{ p.end_date.strftime('%d %b %Y') }}
+                </p>
+            </div>
+            <div class="text-right">
+                <p class="text-sm font-bold text-primary">{{ '{:,}'.format(p.impressions) }}</p>
+                <p class="text-[9px] text-on-surface-variant">{{ '%.1f'|format(p.ctr) }}% CTR</p>
+            </div>
+        </div>
+        {% else %}
+        <div class="card text-center py-6">
+            <p class="text-sm text-on-surface-variant">Belum ada placement.</p>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Add placement form -->
+<section class="card space-y-4">
+    <h3 class="text-sm font-bold">Tambah Placement</h3>
+    <form action="{{ url_for('main.sponsor_add') }}" method="post" class="space-y-3">
+        <select name="partner_id" class="input-field">
+            {% for p in partners %}
+            <option value="{{ p.id }}">{{ p.name }} ({{ p.category }})</option>
+            {% endfor %}
+        </select>
+        <select name="placement" class="input-field">
+            <option value="banner_home">Banner Homepage</option>
+            <option value="banner_session">Banner Sesi</option>
+            <option value="tournament_sponsor">Tournament Sponsor</option>
+        </select>
+        <div class="grid grid-cols-2 gap-3">
+            <input name="start_date" type="date" class="input-field" required>
+            <input name="end_date" type="date" class="input-field" required>
+        </div>
+        <button type="submit" class="btn-primary w-full py-3 text-sm">Tambah</button>
+    </form>
+</section>
+{% endblock %}

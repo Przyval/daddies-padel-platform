@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}Format — {{ tournament.name }}{% endblock %}
+
+{% block header_left %}
+<a href="{{ url_for('tournament.v2_create') }}" class="text-primary-container">
+    <span class="material-symbols-outlined">arrow_back</span>
+</a>
+<h1 class="font-headline font-bold tracking-tight text-xl text-primary-container">Format</h1>
+{% endblock %}
+
+{% block content %}
+{% set current_step = 1 %}
+{% include "tournament/wizard_v2/_step_bar.html" %}
+
+<section class="text-center mb-4">
+    <h2 class="text-xl font-extrabold tracking-tight text-on-surface">Mau main gimana?</h2>
+    <p class="text-sm text-on-surface-variant mt-1">Pilih satu format</p>
+</section>
+
+<form method="post" class="space-y-6">
+
+    {# ── TOP PICK: 2 big cards with emoji + simple explanation ── #}
+    <div class="space-y-3">
+        {# Americano — THE default #}
+        <label class="card !p-0 cursor-pointer has-[:checked]:ring-2 has-[:checked]:ring-primary
+                      has-[:checked]:shadow-lg transition-all active:scale-[0.98] block overflow-hidden">
+            <input type="radio" name="format" value="americano"
+                   {{ 'checked' if tournament.format == 'americano' or tournament.format == '' }} class="sr-only">
+            <div class="flex items-center gap-4 p-5">
+                <div class="text-4xl">🎾</div>
+                <div class="flex-1">
+                    <p class="text-lg font-extrabold text-on-surface">Americano</p>
+                    <p class="text-sm text-on-surface-variant leading-snug">Partner acak setiap ronde. Paling populer!</p>
+                </div>
+                <div class="w-6 h-6 rounded-full border-2 border-primary/20 flex items-center justify-center flex-shrink-0
+                            peer-checked:bg-primary">
+                </div>
+            </div>
+            <div class="bg-success/5 px-5 py-2">
+                <p class="text-[11px] font-bold text-success">⭐ Paling sering dipakai</p>
+            </div>
+        </label>
+
+        {# Team Mexicano #}
+        <label class="card !p-5 cursor-pointer has-[:checked]:ring-2 has-[:checked]:ring-primary
+                      has-[:checked]:shadow-lg transition-all active:scale-[0.98] block">
+            <input type="radio" name="format" value="team_mexicano"
+                   {{ 'checked' if tournament.format == 'team_mexicano' }} class="sr-only">
+            <div class="flex items-center gap-4">
+                <div class="text-4xl">👥</div>
+                <div class="flex-1">
+                    <p class="text-lg font-extrabold text-on-surface">Team Mexicano</p>
+                    <p class="text-sm text-on-surface-variant leading-snug">Partner tetap, lawan berubah tiap ronde</p>
+                </div>
+            </div>
+        </label>
+    </div>
+
+    {# ── OTHERS: collapsed by default — keep it simple ── #}
+    <div>
+        <button type="button" id="showMoreBtn"
+                onclick="document.getElementById('moreFormats').classList.toggle('hidden'); this.classList.toggle('hidden')"
+                class="w-full py-3 text-sm font-semibold text-primary flex items-center justify-center gap-1 active:scale-[0.97]">
+            <span class="material-symbols-outlined text-base">expand_more</span>
+            Lihat {{ formats|length - 2 }} format lainnya
+        </button>
+
+        <div id="moreFormats" class="hidden space-y-2 mt-2">
+            {% set emojis = {
+                'mexicano': '🏅', 'mix_americano': '♀♂', 'mixicano': '🔀',
+                'super_mexicano': '⚡', 'team_americano': '🤝', 'beatbox': '📦',
+                'groups': '🏟️', 'groups_team': '🏟️', 'doubles_unlimited': '♾️',
+                'club_team': '🏢', 'club_americano': '🏢', 'club_mexicano': '🏢'
+            } %}
+            {% for key, fmt in formats.items() %}
+            {% if key not in ('americano', 'team_mexicano') %}
+            <label class="flex items-center gap-4 p-4 rounded-2xl bg-surface-container-lowest cursor-pointer
+                          has-[:checked]:ring-2 has-[:checked]:ring-primary has-[:checked]:bg-primary-fixed/10
+                          transition-all active:scale-[0.98]" style="min-height:56px">
+                <input type="radio" name="format" value="{{ key }}"
+                       {{ 'checked' if tournament.format == key }} class="sr-only">
+                <span class="text-2xl">{{ emojis.get(key, '🎾') }}</span>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-bold text-on-surface">{{ fmt.label }}</p>
+                    <p class="text-xs text-on-surface-variant leading-snug">{{ fmt.desc }}</p>
+                </div>
+            </label>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    {# ── BIG bottom button ── #}
+    <button type="submit" class="btn-primary w-full py-5 text-lg gap-2 font-extrabold active:scale-[0.97]"
+            style="min-height:60px">
+        Lanjut
+        <span class="material-symbols-outlined text-xl">arrow_forward</span>
+    </button>
+
+    <a href="{{ url_for('tournament.v2_create') }}"
+       class="btn-ghost w-full py-3 text-sm active:scale-[0.97]" style="min-height:48px">
+        <span class="material-symbols-outlined text-lg">arrow_back</span> Kembali
+    </a>
+</form>
+{% endblock %}

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; width: 1080px; height: 1080px; overflow: hidden; }
+        .card { width: 1080px; height: 1080px; border-radius: 48px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; padding: 80px; }
+        .tier-bronze  { background: linear-gradient(135deg, #082217, #1E372B); }
+        .tier-silver  { background: linear-gradient(135deg, #0F4F4F, #1A7A6A); }
+        .tier-gold    { background: linear-gradient(135deg, #8B6914, #D4A843); }
+        .tier-diamond { background: linear-gradient(135deg, #1A1A2E, #16213E); }
+        .tier-none    { background: linear-gradient(135deg, #082217, #1E372B); }
+        .card::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 80% 30%, rgba(255,255,255,0.05) 0%, transparent 50%), radial-gradient(circle at 20% 80%, rgba(255,255,255,0.03) 0%, transparent 50%); }
+        .flame { position: absolute; right: 40px; top: 50%; transform: translateY(-50%); font-size: 300px; opacity: 0.15; filter: blur(2px); }
+        .content { position: relative; z-index: 1; }
+        .pre-text { font-size: 48px; color: rgba(255,255,255,0.85); font-weight: 400; }
+        .hero-number { font-size: 360px; color: white; font-weight: 900; line-height: 0.85; letter-spacing: -0.03em; margin: 20px 0; }
+        .post-text { font-size: 48px; color: rgba(255,255,255,0.85); font-weight: 400; line-height: 1.3; }
+        .brand { font-size: 32px; color: rgba(255,255,255,0.4); font-weight: 600; letter-spacing: 3px; text-transform: uppercase; }
+        .member-name { font-size: 28px; color: rgba(255,255,255,0.5); font-weight: 500; margin-top: 8px; }
+    </style>
+</head>
+<body>
+<div class="card tier-{{ streak.tier }}">
+    <div class="flame">{% if streak.tier == 'diamond' %}💎{% else %}🔥{% endif %}</div>
+    <div class="content" style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+        <p class="pre-text">Aku udah</p>
+        <p class="hero-number">{{ streak.current }}</p>
+        <p class="post-text">minggu berturut-turut<br>main padel!</p>
+    </div>
+    <div class="content" style="display: flex; justify-content: space-between; align-items: flex-end;">
+        <div>
+            <p class="brand">DADDIES PADEL</p>
+            <p class="member-name">{{ user.first_name }}</p>
+        </div>
+        <div style="text-align: right;">
+            <p style="font-size: 24px; color: rgba(255,255,255,0.3); font-weight: 600;">
+                {% if streak.tier == 'diamond' %}DIAMOND{% elif streak.tier == 'gold' %}GOLD{% elif streak.tier == 'silver' %}SILVER{% elif streak.tier == 'bronze' %}BRONZE{% endif %}
+            </p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

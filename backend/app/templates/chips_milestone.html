@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1080">
+    <title>{{ milestone.title }} — Daddies Padel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #1a1a1a; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 40px; }
+        .card { width: 1080px; height: 1080px; background: linear-gradient(135deg, #082217, #1E372B); border-radius: 48px; position: relative; overflow: hidden; padding: 80px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        .card::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 50% 40%, rgba(212,168,67,0.08) 0%, transparent 60%); }
+        .content { position: relative; z-index: 1; }
+        .emoji { font-size: 120px; margin-bottom: 32px; }
+        .pre { font-size: 36px; color: rgba(255,255,255,0.7); font-weight: 400; }
+        .number { font-size: 200px; font-weight: 900; color: white; line-height: 0.9; letter-spacing: -0.03em; margin: 20px 0; }
+        .post { font-size: 36px; color: rgba(255,255,255,0.7); font-weight: 400; line-height: 1.4; }
+        .title { font-size: 48px; font-weight: 900; color: #D4A843; margin-top: 32px; letter-spacing: 2px; text-transform: uppercase; }
+        .brand { font-size: 28px; color: rgba(255,255,255,0.3); font-weight: 600; letter-spacing: 3px; text-transform: uppercase; margin-top: 60px; }
+        .name { font-size: 24px; color: rgba(255,255,255,0.4); margin-top: 8px; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="content">
+        <div class="emoji">{{ milestone.emoji }}</div>
+        <p class="pre">Aku baru kumpulkan</p>
+        <p class="number">{{ '{:,}'.format(milestone.threshold) }}</p>
+        <p class="post">Daddies Chips!</p>
+        <p class="title">{{ milestone.title }}</p>
+        <p class="brand">DADDIES PADEL</p>
+        <p class="name">{{ user.first_name }}</p>
+    </div>
+</div>
+</body>
+</html>

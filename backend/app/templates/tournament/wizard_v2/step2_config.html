@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+{% block title %}Pengaturan — {{ tournament.name }}{% endblock %}
+
+{% block header_left %}
+<a href="{{ url_for('tournament.v2_create_step', tournament_id=tournament.id, step=1) }}" class="text-primary-container">
+    <span class="material-symbols-outlined">arrow_back</span>
+</a>
+<h1 class="font-headline font-bold tracking-tight text-xl text-primary-container">Pengaturan</h1>
+{% endblock %}
+
+{% block content %}
+{% set current_step = 2 %}
+{% include "tournament/wizard_v2/_step_bar.html" %}
+
+<form method="post" class="space-y-5">
+
+    {# ══ COURTS — the most important question, BIG visual ══ #}
+    <section class="card space-y-4">
+        <div class="text-center">
+            <span class="text-3xl">🏟️</span>
+            <h3 class="text-base font-extrabold text-on-surface mt-1">Berapa court?</h3>
+        </div>
+        <div class="grid grid-cols-4 gap-2.5">
+            {% for c in range(1, 9) %}
+            <label class="cursor-pointer">
+                <input type="radio" name="num_courts" value="{{ c }}"
+                       {{ 'checked' if tournament.num_courts == c }} class="sr-only peer">
+                <div class="w-full aspect-square flex items-center justify-center rounded-2xl
+                            bg-surface-container-low text-on-surface text-xl font-extrabold
+                            peer-checked:bg-primary peer-checked:text-on-primary
+                            peer-checked:shadow-lg transition-all active:scale-[0.90]">{{ c }}</div>
+            </label>
+            {% endfor %}
+        </div>
+    </section>
+
+    {# ══ SCORING — simple A/B choice ══ #}
+    <section class="card space-y-4">
+        <div class="text-center">
+            <span class="text-3xl">📊</span>
+            <h3 class="text-base font-extrabold text-on-surface mt-1">Cara hitung skor</h3>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+            <label class="cursor-pointer">
+                <input type="radio" name="scoring_mode" value="sets"
+                       {{ 'checked' if tournament.scoring_mode == 'sets' }} class="sr-only peer"
+                       onchange="document.getElementById('ppg-section').classList.add('hidden')">
+                <div class="text-center py-6 rounded-2xl bg-surface-container-low
+                            peer-checked:bg-primary peer-checked:text-on-primary
+                            peer-checked:shadow-lg transition-all active:scale-[0.95]">
+                    <span class="text-3xl block mb-2">🎾</span>
+                    <p class="text-base font-extrabold">Sets</p>
+                    <p class="text-xs mt-1 opacity-70">6-4, 7-5</p>
+                </div>
+            </label>
+            <label class="cursor-pointer">
+                <input type="radio" name="scoring_mode" value="points"
+                       {{ 'checked' if tournament.scoring_mode == 'points' }} class="sr-only peer"
+                       onchange="document.getElementById('ppg-section').classList.remove('hidden')">
+                <div class="text-center py-6 rounded-2xl bg-surface-container-low
+                            peer-checked:bg-primary peer-checked:text-on-primary
+                            peer-checked:shadow-lg transition-all active:scale-[0.95]">
+                    <span class="text-3xl block mb-2">🔢</span>
+                    <p class="text-base font-extrabold">Poin</p>
+                    <p class="text-xs mt-1 opacity-70">Main sampai 21</p>
+                </div>
+            </label>
+        </div>
+        {# Points target — only when Poin selected #}
+        <div id="ppg-section" class="{{ 'hidden' if tournament.scoring_mode != 'points' }}">
+            <p class="text-xs font-bold text-on-surface-variant text-center mb-2">Sampai berapa poin?</p>
+            <div class="grid grid-cols-4 gap-2">
+                {% for v in [16, 21, 24, 31] %}
+                <label class="cursor-pointer">
+                    <input type="radio" name="points_per_game" value="{{ v }}"
+                           {{ 'checked' if tournament.points_per_game == v }} class="sr-only peer">
+                    <div class="w-full py-3.5 rounded-xl bg-surface-container-low text-center text-base font-extrabold
+                                peer-checked:bg-primary peer-checked:text-on-primary
+                                transition-all active:scale-[0.95]" style="min-height:48px">{{ v }}</div>
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    {# ══ DATE/VENUE — simplified, below fold ══ #}
+    <section class="card space-y-4">
+        <div class="text-center">
+            <span class="text-3xl">📍</span>
+            <h3 class="text-base font-extrabold text-on-surface mt-1">Kapan &amp; dimana?</h3>
+        </div>
+        <div class="space-y-3">
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="text-[11px] font-bold uppercase tracking-widest text-on-surface-variant mb-1.5 block">Tanggal</label>
+                    <input class="input-field !py-3.5 text-base w-full" name="date" type="date"
+                           value="{{ tournament.date.strftime('%Y-%m-%d') }}" required style="min-height:52px">
+                </div>
+                <div>
+                    <label class="text-[11px] font-bold uppercase tracking-widest text-on-surface-variant mb-1.5 block">Jam</label>
+                    <input class="input-field !py-3.5 text-base w-full" name="time" type="time"
+                           value="{{ tournament.date.strftime('%H:%M') }}" required style="min-height:52px">
+                </div>
+            </div>
+            <div>
+                <label class="text-[11px] font-bold uppercase tracking-widest text-on-surface-variant mb-1.5 block">Venue</label>
+                <select class="input-field !py-3.5 text-base w-full" name="venue" style="min-height:52px">
+                    <option {{ 'selected' if tournament.venue == 'Daddies Court' }}>Daddies Court</option>
+                    <option {{ 'selected' if tournament.venue == 'GBK Padel Arena' }}>GBK Padel Arena</option>
+                    <option {{ 'selected' if tournament.venue == 'The Padel Club' }}>The Padel Club</option>
+                </select>
+            </div>
+        </div>
+    </section>
+
+    {# ══ ADVANCED — hidden, smart defaults ══ #}
+    <details class="group">
+        <summary class="flex items-center justify-between w-full py-3 text-sm text-on-surface-variant cursor-pointer
+                        list-none active:scale-[0.98]">
+            <span class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-lg">tune</span>
+                Pengaturan lanjutan
+            </span>
+            <span class="material-symbols-outlined text-lg transition-transform group-open:rotate-180">expand_more</span>
+        </summary>
+        <div class="space-y-4 pt-2 pb-2">
+            {# Win/Draw stepper #}
+            <div class="card !p-5 space-y-4">
+                <p class="text-sm font-bold text-on-surface text-center">Poin per hasil</p>
+                <div class="grid grid-cols-2 gap-4">
+                    {% for name, label, emoji, val in [('win_points', 'Menang', '🏆', tournament.win_points),
+                                                       ('draw_points', 'Seri', '🤝', tournament.draw_points)] %}
+                    <div class="text-center space-y-2">
+                        <p class="text-sm font-bold text-on-surface">{{ emoji }} {{ label }}</p>
+                        <div class="flex items-center justify-center gap-2">
+                            <button type="button" onclick="stepVal('{{ name }}', -1)"
+                                    class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center
+                                           active:scale-[0.85] active:bg-surface-container-highest transition-all">
+                                <span class="material-symbols-outlined text-xl">remove</span>
+                            </button>
+                            <input class="w-14 text-center text-2xl font-extrabold bg-transparent outline-none"
+                                   name="{{ name }}" type="number" value="{{ val }}" min="0" max="10" id="{{ name }}">
+                            <button type="button" onclick="stepVal('{{ name }}', 1)"
+                                    class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center
+                                           active:scale-[0.85] active:bg-surface-container-highest transition-all">
+                                <span class="material-symbols-outlined text-xl">add</span>
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <input type="hidden" name="loss_points" value="0">
+            </div>
+
+            {# Timer #}
+            <div class="card !p-5 space-y-3">
+                <p class="text-sm font-bold text-on-surface text-center">⏱️ Timer per game</p>
+                <div class="grid grid-cols-4 gap-2">
+                    {% for m in [0, 10, 15, 20, 30, 45, 60] %}
+                    <label class="cursor-pointer">
+                        <input type="radio" name="minutes_to_play" value="{{ m }}"
+                               {{ 'checked' if tournament.minutes_to_play == m }} class="sr-only peer">
+                        <div class="w-full py-3 rounded-xl bg-surface-container-low text-sm font-bold text-center
+                                    peer-checked:bg-primary peer-checked:text-on-primary
+                                    transition-all active:scale-[0.95]" style="min-height:44px">
+                            {{ 'Off' if m == 0 else (m ~ 'm') }}
+                        </div>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {# Tiebreaker #}
+            <div class="card !p-5 space-y-2">
+                <p class="text-sm font-bold text-on-surface text-center">Tiebreaker</p>
+                {% for name, label in [('sort_by_wins', 'Sort by Wins'), ('h2h_tiebreaker', 'Head-to-Head')] %}
+                <label class="flex items-center justify-between cursor-pointer py-3 px-3 -mx-1 rounded-xl
+                              active:bg-surface-container-low transition-colors" style="min-height:52px">
+                    <span class="text-sm font-semibold text-on-surface">{{ label }}</span>
+                    <div class="relative">
+                        <input type="checkbox" name="{{ name }}" {{ 'checked' if tournament[name] }}
+                               class="w-6 h-6 rounded-lg accent-primary cursor-pointer">
+                    </div>
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+    </details>
+
+    {# ══ BIG Lanjut button ══ #}
+    <button type="submit" class="btn-primary w-full py-5 text-lg gap-2 font-extrabold active:scale-[0.97]"
+            style="min-height:60px">
+        Lanjut
+        <span class="material-symbols-outlined text-xl">arrow_forward</span>
+    </button>
+
+    <a href="{{ url_for('tournament.v2_create_step', tournament_id=tournament.id, step=1) }}"
+       class="btn-ghost w-full py-3 text-sm active:scale-[0.97]" style="min-height:48px">
+        <span class="material-symbols-outlined text-lg">arrow_back</span> Kembali
+    </a>
+</form>
+
+<script>
+function stepVal(id, delta) {
+    const el = document.getElementById(id);
+    el.value = Math.max(0, Math.min(10, parseInt(el.value) + delta));
+}
+</script>
+{% endblock %}

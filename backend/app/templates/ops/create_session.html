@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Buat Sesi — Daddies Padel{% endblock %}
+
+{% block header_left %}
+<a href="{{ url_for('ops.dashboard') }}" class="hover:opacity-80 transition-opacity text-primary-container">
+    <span class="material-symbols-outlined">arrow_back</span>
+</a>
+<h1 class="font-headline font-bold tracking-tight text-xl text-primary-container">Buat Sesi</h1>
+{% endblock %}
+
+{% block content %}
+<section class="card">
+    <form action="{{ url_for('ops.create_session') }}" method="POST" class="space-y-4">
+        <div>
+            <label class="label-overline mb-2 block">Judul Sesi</label>
+            <input class="input-field" name="title" type="text" placeholder="mis. Tuesday Night Grind" required>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+            <div>
+                <label class="label-overline mb-2 block">Tanggal</label>
+                <input class="input-field" name="date" type="date" required>
+            </div>
+            <div>
+                <label class="label-overline mb-2 block">Waktu</label>
+                <input class="input-field" name="time" type="time" required>
+            </div>
+        </div>
+        <div>
+            <label class="label-overline mb-2 block">Lokasi</label>
+            <input class="input-field" name="location" type="text" value="Daddies Court" required>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+            <div>
+                <label class="label-overline mb-2 block">Harga (IDR)</label>
+                <input class="input-field" name="price" type="number" value="75000" required>
+            </div>
+            <div>
+                <label class="label-overline mb-2 block">Maks Pemain</label>
+                <input class="input-field" name="max_players" type="number" value="4" required>
+            </div>
+        </div>
+        <div class="pt-2">
+            <button type="submit" class="btn-primary w-full py-4 text-base">Buat Sesi</button>
+        </div>
+    </form>
+</section>
+{% endblock %}

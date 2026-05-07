@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Pengaturan — Daddies Padel{% endblock %}
+
+{% block header_left %}
+<a href="{{ url_for('main.profile') }}" class="hover:opacity-80 transition-opacity text-primary-container">
+    <span class="material-symbols-outlined">arrow_back</span>
+</a>
+<h1 class="font-headline font-bold tracking-tight text-xl text-primary-container">Pengaturan</h1>
+{% endblock %}
+
+{% block content %}
+<!-- Account -->
+<section>
+    <p class="label-overline mb-3">Akun</p>
+    <div class="card !p-0 divide-y divide-outline-variant/10">
+        <a href="{{ url_for('main.edit_profile') }}" class="flex items-center justify-between px-5 py-4">
+            <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-on-surface-variant">person</span>
+                <span class="text-sm font-semibold text-on-surface">Edit Profil</span>
+            </div>
+            <span class="material-symbols-outlined text-on-surface-variant/50 text-base">chevron_right</span>
+        </a>
+        <a href="{{ url_for('main.kta') }}" class="flex items-center justify-between px-5 py-4">
+            <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-on-surface-variant">badge</span>
+                <span class="text-sm font-semibold text-on-surface">KTA Digital</span>
+            </div>
+            <span class="material-symbols-outlined text-on-surface-variant/50 text-base">chevron_right</span>
+        </a>
+    </div>
+</section>
+
+<!-- Notifications -->
+<section>
+    <p class="label-overline mb-3">Notifikasi</p>
+    <div class="card !p-0 divide-y divide-outline-variant/10">
+        <div class="flex items-center justify-between px-5 py-4">
+            <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+                <span class="text-sm font-semibold text-on-surface">Sesi Baru</span>
+            </div>
+            <div class="w-10 h-6 bg-primary rounded-full flex items-center px-0.5">
+                <div class="w-5 h-5 bg-white rounded-full ml-auto shadow-sm"></div>
+            </div>
+        </div>
+        <div class="flex items-center justify-between px-5 py-4">
+            <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-on-surface-variant">payments</span>
+                <span class="text-sm font-semibold text-on-surface">Status Pembayaran</span>
+            </div>
+            <div class="w-10 h-6 bg-primary rounded-full flex items-center px-0.5">
+                <div class="w-5 h-5 bg-white rounded-full ml-auto shadow-sm"></div>
+            </div>
+        </div>
+        <div class="flex items-center justify-between px-5 py-4">
+            <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-on-surface-variant">alarm</span>
+                <span class="text-sm font-semibold text-on-surface">Pengingat Sesi</span>
+            </div>
+            <div class="w-10 h-6 bg-primary rounded-full flex items-center px-0.5">
+                <div class="w-5 h-5 bg-white rounded-full ml-auto shadow-sm"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About -->
+<section>
+    <p class="label-overline mb-3">Tentang</p>
+    <div class="card !p-0 divide-y divide-outline-variant/10">
+        <a href="{{ url_for('main.partners') }}" class="flex items-center justify-between px-5 py-4">
+            <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-on-surface-variant">handshake</span>
+                <span class="text-sm font-semibold text-on-surface">Partner</span>
+            </div>
+            <span class="material-symbols-outlined text-on-surface-variant/50 text-base">chevron_right</span>
+        </a>
+        <div class="flex items-center justify-between px-5 py-4">
+            <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-on-surface-variant">info</span>
+                <span class="text-sm font-semibold text-on-surface">Versi</span>
+            </div>
+            <span class="text-sm text-on-surface-variant">1.0.0</span>
+        </div>
+    </div>
+</section>
+
+<!-- Logout -->
+<section class="text-center pt-4">
+    <a href="{{ url_for('auth.logout') }}" class="btn-ghost px-8 py-3 text-sm text-error !border-error/20">
+        <span class="material-symbols-outlined text-base mr-1">logout</span>
+        Keluar
+    </a>
+</section>
+{% endblock %}

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1080">
+    <title>Leaderboard — Daddies Padel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #1a1a1a; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 40px; }
+        .card { width: 1080px; height: 1080px; background: linear-gradient(135deg, #082217 0%, #1E372B 40%, #082217 100%); border-radius: 48px; padding: 80px 90px; display: flex; flex-direction: column; position: relative; overflow: hidden; color: white; }
+        .card::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 80% 15%, rgba(255,255,255,0.03) 0%, transparent 50%); pointer-events: none; }
+        .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 48px; position: relative; z-index: 1; }
+        .brand-label { font-size: 22px; letter-spacing: 3px; color: rgba(255,255,255,0.4); text-transform: uppercase; font-weight: 500; }
+        .season-name { font-size: 36px; font-weight: 800; color: rgba(255,255,255,0.95); margin-top: 6px; }
+        .season-meta { font-size: 22px; color: rgba(255,255,255,0.35); margin-top: 4px; }
+        .badge-live { background: rgba(74,124,89,0.2); border-radius: 24px; padding: 10px 24px; font-size: 18px; font-weight: 700; color: rgba(139,230,139,0.9); letter-spacing: 2px; text-transform: uppercase; }
+        .ranking-list { flex: 1; display: flex; flex-direction: column; gap: 12px; position: relative; z-index: 1; }
+        .rank-row { display: grid; grid-template-columns: 56px 48px 1fr auto; align-items: center; gap: 20px; padding: 18px 28px; border-radius: 20px; }
+        .rank-row.highlighted { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); }
+        .rank-row.top1 .rank-num { color: rgba(255,215,0,0.9); }
+        .rank-row.top2 .rank-num { color: rgba(192,192,192,0.8); }
+        .rank-row.top3 .rank-num { color: rgba(205,127,50,0.8); }
+        .rank-num { font-size: 32px; font-weight: 700; color: rgba(255,255,255,0.5); text-align: center; }
+        .rank-change { font-size: 22px; font-weight: 600; text-align: center; }
+        .rank-change.up { color: rgba(74,124,89,0.9); }
+        .rank-change.down { color: rgba(186,26,26,0.8); }
+        .rank-change.same { color: rgba(255,255,255,0.25); }
+        .rank-name { font-size: 28px; font-weight: 600; color: rgba(255,255,255,0.9); }
+        .rank-tier { font-size: 18px; color: rgba(255,255,255,0.35); margin-top: 2px; }
+        .rank-chips { font-size: 28px; font-weight: 700; color: rgba(255,255,255,0.7); text-align: right; }
+        .rank-chips-label { font-size: 16px; color: rgba(255,255,255,0.3); text-align: right; }
+        .separator { display: flex; align-items: center; gap: 16px; padding: 4px 28px; }
+        .separator-line { flex: 1; height: 1px; background: rgba(255,255,255,0.08); }
+        .separator-text { font-size: 16px; color: rgba(255,255,255,0.25); letter-spacing: 2px; text-transform: uppercase; }
+        .stats-bar { display: flex; justify-content: center; gap: 48px; margin-top: 32px; padding-top: 28px; border-top: 1px solid rgba(255,255,255,0.06); position: relative; z-index: 1; }
+        .stat-item { font-size: 22px; color: rgba(255,255,255,0.35); }
+        .stat-item strong { color: rgba(255,255,255,0.6); font-weight: 600; }
+        .footer { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 28px; position: relative; z-index: 1; }
+        .cta { background: rgba(255,255,255,0.1); border-radius: 40px; padding: 14px 36px; font-size: 22px; color: rgba(255,255,255,0.7); font-weight: 500; }
+        .footer-brand { font-size: 22px; letter-spacing: 3px; color: rgba(255,255,255,0.25); font-weight: 500; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="header">
+        <div>
+            <div class="brand-label">Daddies Padel</div>
+            <div class="season-name">Season 1 — Leaderboard</div>
+            <div class="season-meta">2026</div>
+        </div>
+        <div class="badge-live">Live</div>
+    </div>
+
+    <div class="ranking-list">
+        {% for u in ranked %}
+        {% set is_me = u.id == user.id %}
+        {% if is_me and loop.index > 4 %}
+        <div class="separator">
+            <div class="separator-line"></div>
+            <div class="separator-text">Kamu</div>
+            <div class="separator-line"></div>
+        </div>
+        {% endif %}
+        <div class="rank-row {{ 'top1' if loop.index == 1 else 'top2' if loop.index == 2 else 'top3' if loop.index == 3 }} {{ 'highlighted' if is_me }}">
+            <div class="rank-num">{{ loop.index }}</div>
+            <div class="rank-change same">━</div>
+            <div>
+                <div class="rank-name">{{ u.first_name }}</div>
+                <div class="rank-tier">{{ u.membership_label }}</div>
+            </div>
+            <div>
+                <div class="rank-chips">{{ '{:,}'.format(u.chips_balance) }}</div>
+                <div class="rank-chips-label">chips</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-item"><strong>{{ total_players }}</strong> pemain</div>
+        <div class="stat-item">Grand Final: <strong>2026</strong></div>
+    </div>
+
+    <div class="footer">
+        <div class="cta">daddiespadel.app</div>
+        <div class="footer-brand">DADDIES PADEL</div>
+    </div>
+</div>
+
+<!-- Share buttons -->
+<div style="margin-top: 32px; max-width: 500px; text-align: center; font-family: 'Plus Jakarta Sans', sans-serif;">
+    <button onclick="shareNow()"
+            style="display: flex; align-items: center; justify-content: center; gap: 12px;
+                   padding: 20px 40px; background: #25D366; color: white; border: none;
+                   border-radius: 999px; font-weight: 800; font-size: 20px; cursor: pointer;
+                   width: 100%; font-family: 'Plus Jakarta Sans', sans-serif;
+                   box-shadow: 0 6px 30px rgba(37,211,102,0.4);" id="shareBtn">
+        <svg viewBox="0 0 24 24" style="width:24px; height:24px; fill:white;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492l4.605-1.468A11.96 11.96 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75c-2.198 0-4.247-.6-6.003-1.644l-.43-.257-2.733.871.891-2.64-.28-.447A9.723 9.723 0 012.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75z"/></svg>
+        Share ke WhatsApp
+    </button>
+    <a href="{{ url_for('main.leaderboard_download') }}" download
+       style="display: inline-flex; align-items: center; gap: 8px; margin-top: 16px;
+              padding: 12px 24px; color: rgba(255,255,255,0.6); font-size: 14px;
+              text-decoration: none; font-weight: 500;">📥 Simpan gambar</a>
+    <br>
+    <a href="{{ url_for('main.leaderboard') }}" style="display: inline-block; margin-top: 8px; padding: 8px 20px; color: rgba(255,255,255,0.35); font-size: 13px; text-decoration: none;">← Kembali</a>
+</div>
+
+<script>
+async function shareNow() {
+    const btn = document.getElementById('shareBtn');
+    btn.style.opacity = '0.6'; btn.innerHTML = '⏳ Menyiapkan...';
+    const shareText = '🏆 Daddies Padel — Leaderboard Season 2026\n\n{% for u in ranked[:5] %}{{ loop.index }}. {{ u.first_name }} — {{ "{:,}".format(u.chips_balance) }} chips\n{% endfor %}\n🎾 Main bareng di Daddies Padel?';
+    try {
+        if (navigator.canShare) {
+            const res = await fetch('{{ url_for("main.leaderboard_download") }}');
+            const blob = await res.blob();
+            const file = new File([blob], 'daddies-leaderboard.png', { type: 'image/png' });
+            if (navigator.canShare({ files: [file] })) {
+                await navigator.share({ text: shareText, files: [file] });
+                btn.innerHTML = '✅ Shared!'; btn.style.background = '#082217'; return;
+            }
+        }
+    } catch (e) { if (e.name === 'AbortError') { resetBtn(); return; } }
+    // Fallback
+    const link = document.createElement('a'); link.href = '{{ url_for("main.leaderboard_download") }}'; link.download = 'daddies-leaderboard.png'; link.click();
+    await new Promise(r => setTimeout(r, 1500));
+    window.open('https://wa.me/?text=' + encodeURIComponent(shareText), '_blank');
+    btn.innerHTML = '✅ Downloaded + WhatsApp'; btn.style.background = '#082217';
+}
+function resetBtn() { const b = document.getElementById('shareBtn'); b.style.opacity = '1'; b.style.background = '#25D366'; b.innerHTML = 'Share ke WhatsApp'; }
+</script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Buat Turnamen — Daddies Padel{% endblock %}
+
+{% block header_left %}
+<a href="{{ url_for('tournament.tournament_list') }}" class="text-primary-container">
+    <span class="material-symbols-outlined">arrow_back</span>
+</a>
+<h1 class="font-headline font-bold tracking-tight text-xl text-primary-container">Turnamen Baru</h1>
+{% endblock %}
+
+{% block content %}
+{% set current_step = 0 %}
+{% include "tournament/wizard_v2/_step_bar.html" %}
+
+<section class="flex flex-col items-center pt-4 pb-8">
+    {# Big friendly emoji #}
+    <div class="text-6xl mb-4">🏆</div>
+    <h2 class="text-2xl font-extrabold tracking-tight text-on-surface text-center">Mau main apa hari ini?</h2>
+    <p class="text-sm text-on-surface-variant text-center mt-1">Kasih nama buat turnamen kamu</p>
+</section>
+
+<form method="post" class="space-y-6">
+    <div class="card !p-5">
+        <input name="name" id="nameInput"
+               class="w-full text-center text-xl font-extrabold text-on-surface bg-transparent
+                      border-b-2 border-primary/20 focus:border-primary outline-none pb-3 pt-1
+                      placeholder:text-on-surface-variant/30 transition-colors"
+               type="text" placeholder="Friday Night Padel" required autofocus
+               style="min-height:52px">
+        <p class="text-xs text-on-surface-variant/50 text-center mt-3">Contoh: "Malam Jumat Seru", "Weekend Warriors"</p>
+    </div>
+
+    <button type="submit" class="btn-primary w-full py-5 text-lg gap-2 font-extrabold active:scale-[0.97]"
+            style="min-height:60px">
+        Lanjut
+        <span class="material-symbols-outlined text-xl">arrow_forward</span>
+    </button>
+</form>
+
+<script>
+document.getElementById('nameInput').focus();
+document.getElementById('nameInput').select();
+</script>
+{% endblock %}

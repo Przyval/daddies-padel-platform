@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Admin Ops — Daddies Padel{% endblock %}
+
+{% block header_left %}
+<a href="{{ url_for('member.index') }}" class="hover:opacity-80 transition-opacity text-primary-container">
+    <span class="material-symbols-outlined">arrow_back</span>
+</a>
+<h1 class="font-headline font-extrabold tracking-tight text-xl text-primary-container">Admin Ops</h1>
+{% endblock %}
+
+{% block header_right %}
+<a href="{{ url_for('ops.create_session') }}" class="hover:opacity-80 text-primary-container">
+    <span class="material-symbols-outlined">add_circle</span>
+</a>
+{% endblock %}
+
+{% block content %}
+<!-- Quick stats -->
+<section class="grid grid-cols-3 gap-3">
+    <div class="stat-card text-center">
+        <p class="text-2xl font-extrabold text-primary">{{ matches | length }}</p>
+        <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mt-1">Sesi</p>
+    </div>
+    <div class="stat-card text-center">
+        <p class="text-2xl font-extrabold text-warning">{{ matches | sum(attribute='waitlist_count') }}</p>
+        <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mt-1">Waitlist</p>
+    </div>
+    <div class="stat-card text-center">
+        <p class="text-2xl font-extrabold text-success">{{ matches | sum(attribute='confirmed_count') }}</p>
+        <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mt-1">Confirmed</p>
+    </div>
+</section>
+
+<!-- Sessions -->
+<section>
+    <h3 class="text-lg font-bold tracking-tight mb-4">Sesi Mendatang</h3>
+    <div class="space-y-3">
+        {% for match in matches %}
+        <a href="{{ url_for('ops.manage_session', match_id=match.id) }}"
+           class="card !p-4 flex items-center justify-between active:scale-[0.98] transition-transform">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded bg-surface-container-low flex flex-col items-center justify-center">
+                    <span class="text-[9px] font-bold text-on-surface-variant uppercase">{{ match.date_time.strftime('%b') }}</span>
+                    <span class="text-base font-extrabold text-primary leading-tight">{{ match.date_time.strftime('%d') }}</span>
+                </div>
+                <div>
+                    <p class="font-bold text-on-surface text-sm">{{ match.title }}</p>
+                    <p class="text-xs text-on-surface-variant">{{ match.date_time.strftime('%H:%M') }} · {{ match.location }}</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="text-right">
+                    <span class="text-sm font-bold text-on-surface">{{ match.confirmed_count }}/{{ match.max_players }}</span>
+                    <span class="block text-[10px] text-on-surface-variant">WL: {{ match.waitlist_count }}</span>
+                </div>
+                <span class="badge badge-{{ match.status }}">{{ match.status | upper }}</span>
+                <span class="material-symbols-outlined text-on-surface-variant/50 text-base">chevron_right</span>
+            </div>
+        </a>
+        {% else %}
+        <div class="card text-center py-8">
+            <p class="text-sm text-on-surface-variant">Belum ada sesi. Buat yang baru!</p>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Create session CTA -->
+<section class="fixed bottom-[96px] left-0 w-full px-6 z-40">
+    <div class="max-w-md mx-auto">
+        <a href="{{ url_for('ops.create_session') }}" class="btn-primary w-full py-4 text-base block text-center shadow-lg">
+            <span class="material-symbols-outlined text-base mr-1 align-middle">add</span>
+            Buat Sesi Baru
+        </a>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,48 @@
+# Dart/Flutter static analysis configuration
+# https://dart.dev/guides/language/analysis-options
+
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  errors:
+    # Treat these as errors (build-blocking)
+    missing_required_param: error
+    missing_return: error
+    dead_code: warning
+    unused_import: warning
+    unused_local_variable: warning
+  exclude:
+    - build/**
+    - lib/firebase_options.dart
+
+linter:
+  rules:
+    # --- Code Quality ---
+    avoid_print: true                        # use AppLogger instead
+    avoid_unnecessary_containers: true
+    avoid_unused_constructor_parameters: true
+    cancel_subscriptions: true               # prevent memory leaks
+    close_sinks: true                        # prevent resource leaks
+    use_key_in_widget_constructors: true
+
+    # --- Style Consistency ---
+    prefer_single_quotes: true
+    prefer_const_constructors: true
+    prefer_const_declarations: true
+    prefer_const_literals_to_create_immutables: true
+    sort_child_properties_last: true
+    sized_box_for_whitespace: true
+    sized_box_shrink_expand: true
+    use_colored_box: true
+    use_decorated_box: true
+
+    # --- Imports ---
+    directives_ordering: true
+    always_use_package_imports: true
+
+    # --- Null Safety ---
+    cast_nullable_to_non_nullable: true
+    null_check_on_nullable_type_parameter: true
+
+    # --- Performance ---
+    avoid_slow_async_io: true

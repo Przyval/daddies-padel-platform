@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Masuk — Daddies Padel{% endblock %}
+
+{% block bottom_nav %}{% endblock %}
+
+{% block content %}
+<div class="flex flex-col items-center justify-center min-h-[60vh]">
+    <div class="w-full space-y-8">
+        <!-- Logo -->
+        <div class="text-center space-y-4">
+            <div class="w-20 h-20 bg-primary-container rounded-full flex items-center justify-center mx-auto shadow-lg">
+                <span class="material-symbols-outlined filled text-surface text-3xl">pets</span>
+            </div>
+            <div>
+                <h1 class="text-2xl font-extrabold tracking-tight text-on-surface">Masuk ke Daddies</h1>
+                <p class="text-sm text-on-surface-variant mt-1">Komunitas padel kamu dimulai di sini</p>
+            </div>
+        </div>
+
+        <!-- Form -->
+        <form action="{{ url_for('auth.login') }}" method="POST" class="space-y-4">
+            <div>
+                <label class="label-overline mb-2 block" for="email">Email</label>
+                <input class="input-field" id="email" name="email" type="email"
+                       placeholder="nama@email.com" required autocomplete="email">
+            </div>
+            <div>
+                <label class="label-overline mb-2 block" for="password">Password</label>
+                <input class="input-field" id="password" name="password" type="password"
+                       placeholder="Masukkan password" required autocomplete="current-password">
+            </div>
+            <div class="pt-2">
+                <button type="submit" class="btn-primary w-full py-4 text-base">Masuk</button>
+            </div>
+        </form>
+
+        <!-- Divider -->
+        <div class="flex items-center gap-4">
+            <div class="flex-1 h-px bg-outline-variant/20"></div>
+            <span class="text-xs text-on-surface-variant font-medium">atau</span>
+            <div class="flex-1 h-px bg-outline-variant/20"></div>
+        </div>
+
+        <!-- Register -->
+        <a href="{{ url_for('auth.register') }}" class="btn-secondary w-full py-3.5 text-sm block text-center">
+            Buat Akun Baru
+        </a>
+
+        <!-- Fast Login (Demo Mode) -->
+        <div class="pt-4">
+            <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant text-center mb-3">Quick Demo Login</p>
+            <div class="grid grid-cols-2 gap-2">
+                <button onclick="fastLogin('reza@daddiespadel.com')"
+                        class="card !p-3 text-left active:scale-[0.97] transition-transform cursor-pointer">
+                    <p class="text-sm font-bold text-on-surface">Reza</p>
+                    <p class="text-[9px] text-on-surface-variant">Admin · Elite · 8.5K chips</p>
+                </button>
+                <button onclick="fastLogin('hendy@daddiespadel.com')"
+                        class="card !p-3 text-left active:scale-[0.97] transition-transform cursor-pointer">
+                    <p class="text-sm font-bold text-on-surface">Hendy</p>
+                    <p class="text-[9px] text-on-surface-variant">Admin · Member · 7.5K chips</p>
+                </button>
+                <button onclick="fastLogin('fajar@daddiespadel.com')"
+                        class="card !p-3 text-left active:scale-[0.97] transition-transform cursor-pointer">
+                    <p class="text-sm font-bold text-on-surface">Fajar</p>
+                    <p class="text-[9px] text-on-surface-variant">Bendahara · 500 chips</p>
+                </button>
+                <button onclick="fastLogin('arif@daddiespadel.com')"
+                        class="card !p-3 text-left active:scale-[0.97] transition-transform cursor-pointer">
+                    <p class="text-sm font-bold text-on-surface">Arif</p>
+                    <p class="text-[9px] text-on-surface-variant">Member biasa · 5.5K chips</p>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function fastLogin(email) {
+    document.getElementById('email').value = email;
+    document.getElementById('password').value = 'daddies';
+    document.querySelector('form').submit();
+}
+</script>
+{% endblock %}

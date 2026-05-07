@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Daddies Padel splash: "D" with padel ball in a circle -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+
+    <!-- Circle background -->
+    <path
+        android:fillColor="#EFEDE6"
+        android:pathData="M60,60 m-50,0 a50,50 0 1,0 100,0 a50,50 0 1,0 -100,0"/>
+
+    <!-- Letter D -->
+    <path
+        android:fillColor="#2F3E34"
+        android:pathData="M40,35 L40,85 L55,85 C71,85 82,74 82,60 C82,46 71,35 55,35 L40,35 Z
+                          M49,44 L55,44 C65,44 73,50 73,60 C73,70 65,76 55,76 L49,76 L49,44 Z"/>
+
+    <!-- Small padel ball -->
+    <path
+        android:fillColor="#6E7F6A"
+        android:pathData="M76,42 m-5,0 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0"/>
+</vector>

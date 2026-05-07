@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1080">
+    <title>{{ streak.current }} Minggu Streak — {{ user.first_name }} · Daddies Padel</title>
+    <meta property="og:title" content="{{ user.first_name }} — {{ streak.current }} Minggu Streak!">
+    <meta property="og:description" content="Aku udah {{ streak.current }} minggu berturut-turut main padel di Daddies Padel!">
+    <meta property="og:image" content="https://padeldaddies.site/streak/download">
+    <meta property="og:url" content="https://padeldaddies.site/streak/share">
+    <meta property="og:site_name" content="Daddies Padel Club">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: #1a1a1a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 40px;
+        }
+
+        .card {
+            width: 1080px;
+            height: 1080px;
+            border-radius: 48px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 80px;
+        }
+
+        /* Tier gradients — matching DESIGN.md primary colors */
+        .tier-bronze  { background: linear-gradient(135deg, #082217, #1E372B); }
+        .tier-silver  { background: linear-gradient(135deg, #0F4F4F, #1A7A6A); }
+        .tier-gold    { background: linear-gradient(135deg, #8B6914, #D4A843); }
+        .tier-diamond { background: linear-gradient(135deg, #1A1A2E, #16213E); }
+        .tier-none    { background: linear-gradient(135deg, #082217, #1E372B); }
+
+        /* Subtle background pattern */
+        .card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 80% 30%, rgba(255,255,255,0.05) 0%, transparent 50%),
+                radial-gradient(circle at 20% 80%, rgba(255,255,255,0.03) 0%, transparent 50%);
+        }
+
+        /* Streak flame illustration */
+        .flame {
+            position: absolute;
+            right: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 300px;
+            opacity: 0.15;
+            filter: blur(2px);
+        }
+
+        .content { position: relative; z-index: 1; }
+
+        .pre-text {
+            font-size: 48px;
+            color: rgba(255,255,255,0.85);
+            font-weight: 400;
+        }
+
+        .hero-number {
+            font-size: 360px;
+            color: white;
+            font-weight: 900;
+            line-height: 0.85;
+            letter-spacing: -0.03em;
+            margin: 20px 0;
+        }
+
+        .post-text {
+            font-size: 48px;
+            color: rgba(255,255,255,0.85);
+            font-weight: 400;
+            line-height: 1.3;
+        }
+
+        .brand {
+            font-size: 32px;
+            color: rgba(255,255,255,0.4);
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .member-name {
+            font-size: 28px;
+            color: rgba(255,255,255,0.5);
+            font-weight: 500;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+<div class="card tier-{{ streak.tier }}">
+    <!-- Flame/visual (right side, subtle) -->
+    <div class="flame">
+        {% if streak.tier == 'diamond' %}💎
+        {% elif streak.tier == 'gold' %}🔥
+        {% elif streak.tier == 'silver' %}🔥
+        {% else %}🔥{% endif %}
+    </div>
+
+    <!-- Content (left-aligned, Duolingo formula) -->
+    <div class="content" style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+        <!-- "Aku udah" -->
+        <p class="pre-text">Aku udah</p>
+
+        <!-- THE NUMBER (hero — must dominate) -->
+        <p class="hero-number">{{ streak.current }}</p>
+
+        <!-- "minggu berturut-turut main padel!" -->
+        <p class="post-text">minggu berturut-turut<br>main padel!</p>
+    </div>
+
+    <!-- Brand footer -->
+    <div class="content" style="display: flex; justify-content: space-between; align-items: flex-end;">
+        <div>
+            <p class="brand">DADDIES PADEL</p>
+            <p class="member-name">{{ user.first_name }}</p>
+        </div>
+        <div style="text-align: right;">
+            <p style="font-size: 24px; color: rgba(255,255,255,0.3); font-weight: 600;">
+                {% if streak.tier == 'diamond' %}DIAMOND
+                {% elif streak.tier == 'gold' %}GOLD
+                {% elif streak.tier == 'silver' %}SILVER
+                {% elif streak.tier == 'bronze' %}BRONZE
+                {% endif %}
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Share actions (below card) -->
+<div style="margin-top: 32px; max-width: 500px; text-align: center; font-family: 'Plus Jakarta Sans', sans-serif;">
+
+    <!-- PRIMARY: One big share button -->
+    <button onclick="shareNow()" id="shareBtn"
+            style="display: flex; align-items: center; justify-content: center; gap: 12px;
+                   padding: 20px 40px; background: #25D366; color: white; border: none;
+                   border-radius: 999px; font-weight: 800; font-size: 20px; cursor: pointer;
+                   width: 100%; font-family: 'Plus Jakarta Sans', sans-serif;
+                   box-shadow: 0 6px 30px rgba(37,211,102,0.4); transition: all 0.2s;">
+        <svg viewBox="0 0 24 24" style="width:24px; height:24px; fill:white;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492l4.605-1.468A11.96 11.96 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75c-2.198 0-4.247-.6-6.003-1.644l-.43-.257-2.733.871.891-2.64-.28-.447A9.723 9.723 0 012.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75z"/></svg>
+        Share ke WhatsApp
+    </button>
+
+    <!-- Loading state -->
+    <p id="shareStatus" style="margin-top: 12px; font-size: 13px; color: rgba(255,255,255,0.5); display: none;"></p>
+
+    <!-- Save image (secondary) -->
+    <a href="{{ url_for('main.streak_download') }}" download
+       style="display: inline-flex; align-items: center; gap: 8px; margin-top: 16px;
+              padding: 12px 24px; color: rgba(255,255,255,0.6); font-size: 14px;
+              text-decoration: none; font-weight: 500;">
+        📥 Simpan gambar
+    </a>
+
+    <br>
+    <a href="{{ url_for('main.streak') }}"
+       style="display: inline-block; margin-top: 8px; padding: 8px 20px;
+              color: rgba(255,255,255,0.35); font-size: 13px; text-decoration: none;">
+        ← Kembali
+    </a>
+</div>
+
+<script>
+const shareText = 'Aku udah {{ streak.current }} minggu berturut-turut main padel! Main bareng di Daddies Padel? Seru dan bikin ketagihan!';
+const shareUrl = '{{ url_for("main.streak_download") }}';
+const status = document.getElementById('shareStatus');
+
+async function shareNow() {
+    const btn = document.getElementById('shareBtn');
+    btn.style.opacity = '0.6';
+    btn.innerHTML = '⏳ Menyiapkan...';
+    status.style.display = 'block';
+    status.textContent = 'Generating image...';
+
+    try {
+        // Method 1: Native Web Share API with file (mobile)
+        if (navigator.canShare) {
+            status.textContent = 'Downloading image...';
+            const res = await fetch(shareUrl);
+            const blob = await res.blob();
+            const file = new File([blob], 'daddies-streak-{{ streak.current }}w.png', { type: 'image/png' });
+
+            if (navigator.canShare({ files: [file] })) {
+                status.textContent = 'Opening share...';
+                await navigator.share({
+                    text: shareText,
+                    files: [file]
+                });
+                btn.innerHTML = '✅ Shared!';
+                btn.style.background = '#082217';
+                status.textContent = '';
+                return;
+            }
+        }
+    } catch (e) {
+        if (e.name === 'AbortError') {
+            // User cancelled — that's fine
+            resetBtn(btn);
+            status.style.display = 'none';
+            return;
+        }
+    }
+
+    // Method 2: Fallback — open WhatsApp with text (image sent separately)
+    try {
+        status.textContent = 'Downloading image to your device...';
+        // Auto-download the image
+        const link = document.createElement('a');
+        link.href = shareUrl;
+        link.download = 'daddies-streak-{{ streak.current }}w.png';
+        link.click();
+
+        // Wait a moment, then open WhatsApp
+        await new Promise(r => setTimeout(r, 1500));
+        status.textContent = 'Opening WhatsApp... Attach the downloaded image!';
+        window.open('https://wa.me/?text=' + encodeURIComponent(shareText), '_blank');
+
+        btn.innerHTML = '✅ Image downloaded + WhatsApp opened';
+        btn.style.background = '#082217';
+        status.textContent = 'Attach gambar yang sudah di-download ke chat WhatsApp.';
+    } catch (e2) {
+        status.textContent = 'Error: ' + e2.message;
+        resetBtn(btn);
+    }
+}
+
+function resetBtn(btn) {
+    btn.style.opacity = '1';
+    btn.style.background = '#25D366';
+    btn.innerHTML = '<svg viewBox="0 0 24 24" style="width:24px;height:24px;fill:white;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492l4.605-1.468A11.96 11.96 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75c-2.198 0-4.247-.6-6.003-1.644l-.43-.257-2.733.871.891-2.64-.28-.447A9.723 9.723 0 012.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75z"/></svg> Share ke WhatsApp';
+}
+</script>
+</body>
+</html>

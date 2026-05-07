@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Review — {{ tournament.name }}{% endblock %}
+
+{% block header_left %}
+<a href="{{ url_for('tournament.v2_create_step', tournament_id=tournament.id, step=3) }}" class="text-primary-container">
+    <span class="material-symbols-outlined">arrow_back</span>
+</a>
+<h1 class="font-headline font-bold tracking-tight text-xl text-primary-container">Review</h1>
+{% endblock %}
+
+{% block content %}
+{% set current_step = 4 %}
+{% include "tournament/wizard_v2/_step_bar.html" %}
+
+{# ═══ Tournament Preview Card ═══ #}
+<section class="card space-y-5">
+    <div class="text-center space-y-3">
+        <div class="text-5xl">🏆</div>
+        <h2 class="text-2xl font-extrabold tracking-tight text-on-surface">{{ tournament.name }}</h2>
+        <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary/10 text-sm font-bold text-primary">
+            {{ tournament.format_label }}
+        </span>
+    </div>
+
+    {# Details — big, clear, visual #}
+    <div class="space-y-0">
+        {% set details = [
+            ('📍', 'Lokasi', tournament.venue),
+            ('📅', 'Tanggal', tournament.date.strftime('%a, %d %b %Y')),
+            ('🕐', 'Waktu', tournament.date.strftime('%H:%M')),
+            ('🏟️', 'Court', tournament.num_courts ~ ' court'),
+            ('📊', 'Skor', 'Sets & Games' if tournament.scoring_mode == 'sets' else 'Poin (sampai ' ~ tournament.points_per_game ~ ')'),
+            ('🏆', 'Menang/Seri', '' ~ tournament.win_points ~ ' / ' ~ tournament.draw_points ~ ' poin'),
+        ] %}
+        {% for emoji, label, value in details %}
+        <div class="flex items-center justify-between py-3.5 {{ 'border-b border-surface-container-high/50' if not loop.last }}"
+             style="min-height:52px">
+            <span class="flex items-center gap-3 text-sm text-on-surface-variant">
+                <span class="text-lg">{{ emoji }}</span> {{ label }}
+            </span>
+            <span class="text-sm font-extrabold text-on-surface">{{ value }}</span>
+        </div>
+        {% endfor %}
+        {% if tournament.minutes_to_play > 0 %}
+        <div class="flex items-center justify-between py-3.5" style="min-height:52px">
+            <span class="flex items-center gap-3 text-sm text-on-surface-variant">
+                <span class="text-lg">⏱️</span> Timer
+            </span>
+            <span class="text-sm font-extrabold text-on-surface">{{ tournament.minutes_to_play }} menit</span>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+{# ═══ Players — big colorful chips ═══ #}
+<section class="card space-y-3">
+    <div class="flex items-center justify-between">
+        <h3 class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Pemain</h3>
+        <span class="text-base font-extrabold text-primary">{{ participants|length }}</span>
+    </div>
+    {% set colors = ['bg-primary', 'bg-success', 'bg-info', 'bg-warning', 'bg-error', 'bg-tertiary',
+                     'bg-primary-container', 'bg-secondary'] %}
+    <div class="flex flex-wrap gap-2">
+        {% for p in participants %}
+        <span class="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-surface-container-low
+                     text-sm font-bold text-on-surface" style="min-height:44px">
+            <span class="w-7 h-7 rounded-full {{ colors[(loop.index0) % 8] }} flex items-center justify-center
+                         text-[11px] font-extrabold text-white">{{ loop.index }}</span>
+            {{ p.first_name }}
+            {% if p.gender %}
+            <span class="text-xs {{ 'text-info' if p.gender == 'M' else 'text-error' }}">{{ '♂' if p.gender == 'M' else '♀' }}</span>
+            {% endif %}
+        </span>
+        {% endfor %}
+    </div>
+</section>
+
+{# ═══ START — The biggest button on the app ═══ #}
+<form method="post" class="space-y-3">
+    <button type="submit"
+            class="btn-primary w-full py-6 text-xl gap-3 font-extrabold active:scale-[0.97] shadow-xl"
+            style="min-height:72px">
+        <span class="text-2xl">🚀</span>
+        Mulai Turnamen!
+    </button>
+</form>
+
+<a href="{{ url_for('tournament.v2_create_step', tournament_id=tournament.id, step=3) }}"
+   class="btn-ghost w-full py-3 text-sm active:scale-[0.97]" style="min-height:48px">
+    <span class="material-symbols-outlined text-lg">arrow_back</span> Kembali ke Pemain
+</a>
+{% endblock %}

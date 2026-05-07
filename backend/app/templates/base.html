@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html class="light" lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>{% block title %}Daddies Padel{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <!-- Plus Jakarta Sans + Material Symbols -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#082217",
+                        "primary-container": "#1e372b",
+                        "primary-fixed": "#cce9d8",
+                        "primary-fixed-dim": "#b1cdbc",
+                        "on-primary": "#ffffff",
+                        "on-primary-container": "#85a091",
+                        "on-primary-fixed": "#062015",
+                        "on-primary-fixed-variant": "#334c3f",
+                        "secondary": "#5e5e5e",
+                        "secondary-container": "#e2e2e2",
+                        "secondary-fixed": "#e2e2e2",
+                        "secondary-fixed-dim": "#c6c6c6",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-container": "#646464",
+                        "on-secondary-fixed": "#1b1b1b",
+                        "on-secondary-fixed-variant": "#474747",
+                        "tertiary": "#032217",
+                        "tertiary-container": "#1a372c",
+                        "tertiary-fixed": "#c9ead9",
+                        "tertiary-fixed-dim": "#adcebe",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-container": "#81a192",
+                        "on-tertiary-fixed": "#022016",
+                        "on-tertiary-fixed-variant": "#304d40",
+                        "surface": "#faf9f5",
+                        "surface-bright": "#faf9f5",
+                        "surface-dim": "#dbdad6",
+                        "surface-variant": "#e3e2df",
+                        "surface-tint": "#4a6456",
+                        "surface-container": "#efeeea",
+                        "surface-container-low": "#f4f4f0",
+                        "surface-container-high": "#e9e8e4",
+                        "surface-container-highest": "#e3e2df",
+                        "surface-container-lowest": "#ffffff",
+                        "background": "#faf9f5",
+                        "on-surface": "#1b1c1a",
+                        "on-surface-variant": "#424844",
+                        "on-background": "#1b1c1a",
+                        "outline": "#727974",
+                        "outline-variant": "#c2c8c2",
+                        "error": "#ba1a1a",
+                        "error-container": "#ffdad6",
+                        "on-error": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "inverse-surface": "#2f312e",
+                        "inverse-on-surface": "#f2f1ed",
+                        "inverse-primary": "#b1cdbc",
+                        "success": "#4a7c59",
+                        "warning": "#d4a843",
+                        "info": "#3d6b8e",
+                    },
+                    fontFamily: {
+                        "headline": ["Plus Jakarta Sans"],
+                        "body": ["Plus Jakarta Sans"],
+                        "label": ["Plus Jakarta Sans"],
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px",
+                    },
+                },
+            },
+        }
+    </script>
+
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.filled {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #faf9f5;
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Ghost border */
+        .ghost-border { border: 1px solid rgba(194, 200, 194, 0.2); }
+
+        /* Glassmorphism */
+        .glass {
+            background: rgba(250, 249, 245, 0.80);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        /* Primary CTA gradient */
+        .btn-primary {
+            background: linear-gradient(135deg, #082217, #1E372B);
+            color: #fff; border-radius: 9999px; font-weight: 700;
+            transition: all 0.3s ease-out;
+            display: inline-flex; align-items: center; justify-content: center;
+        }
+        .btn-primary:hover { box-shadow: 0 4px 40px rgba(8,34,23,0.15); transform: translateY(-1px); }
+        .btn-primary:active { transform: scale(0.95); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* Secondary button */
+        .btn-secondary {
+            background: #E9E8E4; color: #1B1C1A; border-radius: 9999px; font-weight: 600;
+            transition: all 0.3s ease-out;
+            display: inline-flex; align-items: center; justify-content: center;
+        }
+        .btn-secondary:hover { background: #E3E2DF; }
+        .btn-secondary:active { transform: scale(0.95); }
+
+        /* Ghost button */
+        .btn-ghost {
+            background: transparent; border: 1px solid rgba(194, 200, 194, 0.2);
+            border-radius: 9999px; color: #1B1C1A; font-weight: 600;
+            transition: all 0.3s ease-out;
+            display: inline-flex; align-items: center; justify-content: center;
+        }
+        .btn-ghost:hover { background: #F4F4F0; }
+
+        /* Input fields */
+        .input-field {
+            background: #F4F4F0; border: 1px solid transparent; border-radius: 16px;
+            padding: 14px 16px; font-size: 15px; color: #1B1C1A; font-weight: 500;
+            width: 100%; outline: none; transition: all 0.2s ease;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .input-field::placeholder { color: #727974; font-weight: 400; }
+        .input-field:focus { background: #fff; border-color: rgba(8, 34, 23, 0.2); }
+
+        /* Overline label */
+        .label-overline {
+            font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em;
+            text-transform: uppercase; color: #424844;
+        }
+
+        /* Badge base */
+        .badge {
+            display: inline-flex; align-items: center; padding: 4px 12px;
+            border-radius: 9999px; font-size: 10px; font-weight: 700;
+            letter-spacing: 0.08em; text-transform: uppercase;
+        }
+        .badge-open      { background: rgba(74,124,89,0.1); color: #4A7C59; }
+        .badge-full      { background: rgba(186,26,26,0.1); color: #BA1A1A; }
+        .badge-completed { background: rgba(74,100,86,0.1); color: #4A6456; }
+        .badge-waitlist  { background: rgba(212,168,67,0.1); color: #D4A843; }
+        .badge-approved  { background: rgba(61,107,142,0.1); color: #3D6B8E; }
+        .badge-paid      { background: rgba(74,100,86,0.1); color: #4A6456; }
+        .badge-confirmed { background: rgba(74,124,89,0.1); color: #4A7C59; }
+        .badge-canceled  { background: rgba(186,26,26,0.1); color: #BA1A1A; }
+        .badge-admin     { background: rgba(8,34,23,0.1); color: #082217; }
+        .badge-member    { background: rgba(74,124,89,0.1); color: #4A7C59; }
+
+        /* Card */
+        .card {
+            background: #fff; border-radius: 2rem; padding: 24px;
+            box-shadow: 0 4px 40px rgba(8,34,23,0.06);
+        }
+
+        /* Stat card */
+        .stat-card {
+            background: #fff; border-radius: 2rem; padding: 20px;
+            box-shadow: 0 4px 40px rgba(8,34,23,0.06);
+        }
+
+        /* Flash messages */
+        .flash-success { background: rgba(74,124,89,0.08); color: #4A7C59; }
+        .flash-error   { background: rgba(186,26,26,0.08); color: #BA1A1A; }
+        .flash-info    { background: rgba(61,107,142,0.08); color: #3D6B8E; }
+
+        /* Active nav link detection */
+        .nav-item { transition: all 0.3s ease-out; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen pb-40">
+
+<!-- TopAppBar -->
+<header class="bg-surface sticky top-0 z-50">
+    <div class="flex items-center justify-between px-6 py-4 max-w-md mx-auto w-full">
+        <div class="flex items-center gap-4">
+            {% block header_left %}
+            <a href="{{ url_for('member.index') }}" class="flex items-center gap-3">
+                <div class="w-9 h-9 bg-primary-container rounded-full flex items-center justify-center">
+                    <span class="material-symbols-outlined filled text-surface text-lg">pets</span>
+                </div>
+                <h1 class="font-headline font-extrabold tracking-tight text-xl text-primary-container">
+                    {% block page_title %}DADDIES{% endblock %}
+                </h1>
+            </a>
+            {% endblock %}
+        </div>
+        <div class="flex items-center gap-3">
+            {% block header_right %}
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('main.notifications') }}" class="hover:opacity-80 transition-opacity text-primary-container relative">
+                    <span class="material-symbols-outlined">notifications</span>
+                </a>
+                <a href="{{ url_for('main.profile') }}" class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-xs font-bold text-on-surface-variant">
+                    {{ current_user.username[:2] | upper }}
+                </a>
+            {% else %}
+                <a href="{{ url_for('auth.login') }}" class="btn-primary px-5 py-2 text-sm">Masuk</a>
+            {% endif %}
+            {% endblock %}
+        </div>
+    </div>
+    <div class="bg-surface-container-low h-[1px] w-full"></div>
+</header>
+
+<!-- Main content -->
+<main class="max-w-md mx-auto px-6 pt-6 space-y-8">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="space-y-2">
+                {% for category, message in messages %}
+                    <div class="rounded-full px-5 py-3 text-sm font-semibold
+                        {% if category == 'error' %}flash-error
+                        {% elif category == 'success' %}flash-success
+                        {% else %}flash-info{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+</main>
+
+<!-- Bottom Nav -->
+{% block bottom_nav %}
+{% if current_user.is_authenticated %}
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-[env(safe-area-inset-bottom,12px)] pt-3 bg-surface/80 backdrop-blur-xl rounded-t-[3rem] border-t border-outline-variant/20 shadow-[0_-4px_40px_0_rgba(8,34,23,0.06)]">
+    <a class="nav-item flex flex-col items-center justify-center px-4 py-2
+        {% if active_tab == 'home' %}bg-primary-container text-surface rounded-full px-6{% else %}text-primary-container/50 hover:text-primary-container{% endif %}"
+       href="{{ url_for('member.index') }}">
+        <span class="material-symbols-outlined {% if active_tab == 'home' %}filled{% endif %}">home</span>
+        <span class="text-[10px] font-bold uppercase tracking-widest mt-1">Beranda</span>
+    </a>
+    <a class="nav-item flex flex-col items-center justify-center px-4 py-2
+        {% if active_tab == 'sessions' %}bg-primary-container text-surface rounded-full px-6{% else %}text-primary-container/50 hover:text-primary-container{% endif %}"
+       href="{{ url_for('main.sessions') }}">
+        <span class="material-symbols-outlined {% if active_tab == 'sessions' %}filled{% endif %}">event_available</span>
+        <span class="text-[10px] font-bold uppercase tracking-widest mt-1">Sesi</span>
+    </a>
+    <a class="nav-item flex flex-col items-center justify-center px-4 py-2
+        {% if active_tab == 'members' %}bg-primary-container text-surface rounded-full px-6{% else %}text-primary-container/50 hover:text-primary-container{% endif %}"
+       href="{{ url_for('main.members') }}">
+        <span class="material-symbols-outlined {% if active_tab == 'members' %}filled{% endif %}">group</span>
+        <span class="text-[10px] font-bold uppercase tracking-widest mt-1">Anggota</span>
+    </a>
+    <a class="nav-item flex flex-col items-center justify-center px-4 py-2
+        {% if active_tab == 'profile' %}bg-primary-container text-surface rounded-full px-6{% else %}text-primary-container/50 hover:text-primary-container{% endif %}"
+       href="{{ url_for('main.profile') }}">
+        <span class="material-symbols-outlined {% if active_tab == 'profile' %}filled{% endif %}">person</span>
+        <span class="text-[10px] font-bold uppercase tracking-widest mt-1">Profil</span>
+    </a>
+</nav>
+{% else %}
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-[env(safe-area-inset-bottom,12px)] pt-3 bg-surface/80 backdrop-blur-xl rounded-t-[3rem] border-t border-outline-variant/20 shadow-[0_-4px_40px_0_rgba(8,34,23,0.06)]">
+    <a class="nav-item flex flex-col items-center justify-center px-4 py-2
+        {% if active_tab == 'explore' %}bg-primary-container text-surface rounded-full px-6{% else %}text-primary-container/50 hover:text-primary-container{% endif %}"
+       href="{{ url_for('main.explore') }}">
+        <span class="material-symbols-outlined">explore</span>
+        <span class="text-[10px] font-bold uppercase tracking-widest mt-1">Jelajahi</span>
+    </a>
+    <a class="nav-item flex flex-col items-center justify-center px-4 py-2
+        {% if active_tab == 'leaderboard' %}bg-primary-container text-surface rounded-full px-6{% else %}text-primary-container/50 hover:text-primary-container{% endif %}"
+       href="{{ url_for('main.leaderboard') }}">
+        <span class="material-symbols-outlined">leaderboard</span>
+        <span class="text-[10px] font-bold uppercase tracking-widest mt-1">Ranking</span>
+    </a>
+    <a class="nav-item flex flex-col items-center justify-center text-primary-container/50 hover:text-primary-container px-4 py-2"
+       href="{{ url_for('auth.login') }}">
+        <span class="material-symbols-outlined">login</span>
+        <span class="text-[10px] font-bold uppercase tracking-widest mt-1">Masuk</span>
+    </a>
+</nav>
+{% endif %}
+{% endblock %}
+
+<!-- Global Share Helper — Unified API (reusable across all pages) -->
+<script>
+/**
+ * daddiesShare — ONE function for all share cards.
+ *
+ * Usage: daddiesShare('streak', {}, 'myBtnId')
+ *        daddiesShare('tournament', {tournament_id: 1}, 'myBtnId')
+ *        daddiesShare('leaderboard', {}, 'myBtnId')
+ *        daddiesShare('profile', {}, 'myBtnId')
+ *        daddiesShare('milestone', {threshold: 10000}, 'myBtnId')
+ *
+ * Or legacy mode with direct URL:
+ *        daddiesShare(downloadUrl, shareText, btnId)  — still works
+ */
+async function daddiesShare(cardTypeOrUrl, dataOrText, btnId) {
+    const btn = document.getElementById(btnId);
+    if (!btn) return;
+    const origHTML = btn.innerHTML;
+    btn.style.opacity = '0.6'; btn.innerHTML = '⏳ Menyiapkan...';
+
+    let imageUrl = '';
+    let waText = '';
+
+    try {
+        // New unified API mode
+        if (['streak','tournament','leaderboard','profile','milestone'].includes(cardTypeOrUrl)) {
+            const body = { card_type: cardTypeOrUrl, ...(dataOrText || {}) };
+            const res = await fetch('/api/share/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            const json = await res.json();
+            imageUrl = json.image_path || json.image_url;
+            waText = json.wa_text || '';
+        } else {
+            // Legacy mode: direct URL + text
+            imageUrl = cardTypeOrUrl;
+            waText = dataOrText || '';
+        }
+
+        // Try native share with image (mobile)
+        if (navigator.canShare && imageUrl) {
+            const imgRes = await fetch(imageUrl);
+            const blob = await imgRes.blob();
+            const file = new File([blob], 'daddies-share.png', { type: 'image/png' });
+            if (navigator.canShare({ files: [file] })) {
+                await navigator.share({ text: waText, files: [file] });
+                btn.innerHTML = '✅ Shared!'; btn.style.background = '#082217';
+                setTimeout(() => { btn.innerHTML = origHTML; btn.style.opacity = '1'; btn.style.background = ''; }, 2000);
+                return;
+            }
+        }
+    } catch (e) {
+        if (e.name === 'AbortError') { btn.innerHTML = origHTML; btn.style.opacity = '1'; return; }
+    }
+
+    // Desktop fallback: download + open WA
+    try {
+        if (imageUrl) {
+            const link = document.createElement('a');
+            link.href = imageUrl; link.download = 'daddies-share.png'; link.click();
+            await new Promise(r => setTimeout(r, 1000));
+        }
+        if (waText) {
+            window.open('https://wa.me/?text=' + encodeURIComponent(waText), '_blank');
+        }
+        btn.innerHTML = '✅ Ready'; btn.style.background = '#082217';
+        setTimeout(() => { btn.innerHTML = origHTML; btn.style.opacity = '1'; btn.style.background = ''; }, 3000);
+    } catch (e2) { btn.innerHTML = origHTML; btn.style.opacity = '1'; }
+}
+</script>
+</body>
+</html>

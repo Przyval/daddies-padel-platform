@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block title %}Profil Saya — Daddies Padel{% endblock %}
+
+{% block header_left %}
+<h1 class="font-headline font-extrabold tracking-tight text-xl text-primary-container">Profil Saya</h1>
+{% endblock %}
+
+{% block header_right %}
+<a href="{{ url_for('main.settings') }}" class="hover:opacity-80 text-primary-container">
+    <span class="material-symbols-outlined">settings</span>
+</a>
+{% endblock %}
+
+{% block content %}
+<!-- Avatar & name -->
+<section class="text-center space-y-3">
+    <div class="w-20 h-20 rounded-full bg-primary-container flex items-center justify-center mx-auto shadow-lg">
+        <span class="text-2xl font-extrabold text-surface">{{ user.initials }}</span>
+    </div>
+    <div>
+        <h2 class="text-xl font-extrabold text-on-surface">{{ user.display_name }}</h2>
+        {% if user.bio %}
+        <p class="text-sm text-on-surface-variant mt-1">{{ user.bio }}</p>
+        {% endif %}
+    </div>
+    <div class="flex gap-2 justify-center">
+        <a href="{{ url_for('main.edit_profile') }}" class="btn-ghost px-5 py-2 text-sm">
+            <span class="material-symbols-outlined text-base mr-1">edit</span>
+            Edit Profil
+        </a>
+        <a href="{{ url_for('main.profile_card') }}" class="btn-primary px-5 py-2 text-sm">
+            <span class="material-symbols-outlined text-base mr-1">share</span>
+            Share Card
+        </a>
+    </div>
+</section>
+
+<!-- Stats -->
+<section class="grid grid-cols-3 gap-3">
+    <div class="stat-card text-center">
+        <p class="text-2xl font-extrabold text-primary">{{ user.sessions_played }}</p>
+        <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mt-1">Sesi</p>
+    </div>
+    <div class="stat-card text-center">
+        <p class="text-2xl font-extrabold text-primary">{{ user.chips_balance }}</p>
+        <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mt-1">Chips</p>
+    </div>
+    <div class="stat-card text-center">
+        <p class="text-sm font-extrabold text-primary">{{ user.kta_tier | upper }}</p>
+        <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mt-1">Tier</p>
+    </div>
+</section>
+
+<!-- Quick actions -->
+<section class="space-y-3">
+    <h3 class="text-lg font-bold tracking-tight">Menu</h3>
+
+    {% set menu_items = [
+        ('main.streak', 'local_fire_department', 'Streak', user.streak_data.current ~ ' minggu berturut-turut' if user.streak_data.current > 0 else 'Mulai streak!'),
+        ('main.membership', 'card_membership', 'Membership', user.membership_label ~ ' — lihat progres'),
+        ('main.chips_history', 'toll', 'Daddies Chips', '{:,}'.format(user.chips_balance) ~ ' chips'),
+        ('main.shop', 'storefront', 'Chips Shop', 'Tukar chips dengan merchandise'),
+        ('main.poker_night', 'casino', 'Poker Night', 'Grand Final — buy-in dengan chips'),
+        ('main.kta', 'badge', 'KTA Digital', 'Kartu anggota digital'),
+        ('tournament.tournament_list', 'emoji_events', 'Turnamen', 'Americano & Mexicano'),
+        ('main.session_history', 'history', 'Riwayat Sesi', 'Semua sesi yang pernah diikuti'),
+        ('main.referral', 'share', 'Referral', 'Undang teman dan dapat chips'),
+        ('main.settings', 'settings', 'Pengaturan', 'Notifikasi dan preferensi'),
+    ] %}
+
+    {% for route, icon, title, subtitle in menu_items %}
+    <a href="{{ url_for(route) }}" class="card !p-4 flex items-center justify-between active:scale-[0.98] transition-transform">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-surface-container-low flex items-center justify-center">
+                <span class="material-symbols-outlined text-primary">{{ icon }}</span>
+            </div>
+            <div>
+                <p class="font-bold text-on-surface text-sm">{{ title }}</p>
+                <p class="text-xs text-on-surface-variant">{{ subtitle }}</p>
+            </div>
+        </div>
+        <span class="material-symbols-outlined text-on-surface-variant/50">chevron_right</span>
+    </a>
+    {% endfor %}
+
+    {% if user.role in ('admin', 'treasurer') %}
+    <h3 class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mt-4">Admin</h3>
+    {% endif %}
+
+    {% if user.role == 'admin' %}
+    <a href="{{ url_for('ops.dashboard') }}" class="card !p-4 flex items-center justify-between active:scale-[0.98] transition-transform">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <span class="material-symbols-outlined text-primary">admin_panel_settings</span>
+            </div>
+            <div>
+                <p class="font-bold text-on-surface text-sm">Admin Ops</p>
+                <p class="text-xs text-on-surface-variant">Kelola sesi dan booking</p>
+            </div>
+        </div>
+        <span class="material-symbols-outlined text-on-surface-variant/50">chevron_right</span>
+    </a>
+    <a href="{{ url_for('main.sponsor_dashboard') }}" class="card !p-4 flex items-center justify-between active:scale-[0.98] transition-transform">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-info/10 flex items-center justify-center">
+                <span class="material-symbols-outlined text-info">handshake</span>
+            </div>
+            <div>
+                <p class="font-bold text-on-surface text-sm">Sponsor</p>
+                <p class="text-xs text-on-surface-variant">Kelola placement & impressions</p>
+            </div>
+        </div>
+        <span class="material-symbols-outlined text-on-surface-variant/50">chevron_right</span>
+    </a>
+    {% endif %}
+
+    {% if user.role in ('admin', 'treasurer') %}
+    <a href="{{ url_for('main.kas_dashboard') }}" class="card !p-4 flex items-center justify-between active:scale-[0.98] transition-transform">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center">
+                <span class="material-symbols-outlined text-success">account_balance</span>
+            </div>
+            <div>
+                <p class="font-bold text-on-surface text-sm">Kas Keuangan</p>
+                <p class="text-xs text-on-surface-variant">Kelola keuangan komunitas</p>
+            </div>
+        </div>
+        <span class="material-symbols-outlined text-on-surface-variant/50">chevron_right</span>
+    </a>
+    {% endif %}
+</section>
+
+<!-- Logout -->
+<section class="text-center">
+    <a href="{{ url_for('auth.logout') }}" class="text-sm font-semibold text-error">Keluar</a>
+</section>
+
+<!-- Recent sessions -->
+<section>
+    <h3 class="text-lg font-bold tracking-tight mb-4">Sesi Terakhir</h3>
+    <div class="space-y-3">
+        {% for booking in recent_bookings %}
+        <a href="{{ url_for('main.session_detail', match_id=booking.match.id) }}"
+           class="card !p-4 flex items-center justify-between active:scale-[0.98] transition-transform">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-surface-container-low flex flex-col items-center justify-center">
+                    <span class="text-[9px] font-bold text-on-surface-variant uppercase">{{ booking.match.date_time.strftime('%b') }}</span>
+                    <span class="text-sm font-extrabold text-primary leading-tight">{{ booking.match.date_time.strftime('%d') }}</span>
+                </div>
+                <div>
+                    <p class="font-semibold text-on-surface text-sm">{{ booking.match.title }}</p>
+                    <p class="text-xs text-on-surface-variant">{{ booking.match.location }}</p>
+                </div>
+            </div>
+            <span class="badge badge-{{ booking.status }}">{{ booking.status | upper }}</span>
+        </a>
+        {% else %}
+        <p class="text-sm text-on-surface-variant text-center py-4">Belum ada sesi.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

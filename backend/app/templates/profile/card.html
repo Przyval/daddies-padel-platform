@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1080">
+    <title>{{ user.first_name }} — Daddies Padel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #1a1a1a; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 40px; }
+        .card { width: 1080px; height: 1080px; background: linear-gradient(135deg, #082217, #1E372B); border-radius: 48px; position: relative; overflow: hidden; padding: 80px; display: flex; flex-direction: column; justify-content: space-between; }
+        .card::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 80% 20%, rgba(255,255,255,0.04) 0%, transparent 50%), radial-gradient(circle at 10% 90%, rgba(255,255,255,0.02) 0%, transparent 50%); }
+        .content { position: relative; z-index: 1; }
+        .season { font-size: 20px; color: rgba(255,255,255,0.4); font-weight: 700; letter-spacing: 3px; text-transform: uppercase; }
+        .avatar { width: 120px; height: 120px; border-radius: 50%; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-size: 48px; font-weight: 900; color: white; margin-bottom: 24px; }
+        .name { font-size: 56px; font-weight: 900; color: white; letter-spacing: -0.02em; }
+        .tier { display: inline-block; padding: 8px 24px; border-radius: 999px; font-size: 16px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-top: 12px; }
+        .tier-elite { background: rgba(212,168,67,0.3); color: #D4A843; }
+        .tier-member { background: rgba(74,124,89,0.3); color: #4A7C59; }
+        .tier-pre { background: rgba(61,107,142,0.3); color: #3D6B8E; }
+        .kta { font-size: 20px; color: rgba(255,255,255,0.5); margin-top: 8px; }
+        .stats { display: flex; gap: 40px; margin-top: 48px; }
+        .stat { text-align: center; flex: 1; }
+        .stat-value { font-size: 64px; font-weight: 900; color: white; line-height: 1; }
+        .stat-label { font-size: 16px; color: rgba(255,255,255,0.5); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-top: 8px; }
+        .stat-sub { font-size: 20px; color: rgba(255,255,255,0.3); margin-top: 4px; }
+        .journey { font-size: 24px; color: rgba(255,255,255,0.6); margin-top: 40px; line-height: 1.5; }
+        .brand { font-size: 28px; color: rgba(255,255,255,0.3); font-weight: 600; letter-spacing: 3px; text-transform: uppercase; }
+        .cta { font-size: 22px; color: rgba(255,255,255,0.5); margin-top: 8px; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="content">
+        <p class="season">Season 2026</p>
+    </div>
+
+    <div class="content">
+        <div class="avatar">{{ user.initials }}</div>
+        <h1 class="name">{{ user.display_name }}</h1>
+        <span class="tier tier-{{ 'elite' if user.membership == 'elite' else 'member' if user.membership == 'member' else 'pre' }}">
+            {{ user.membership_label }}
+        </span>
+        {% if user.kta_number %}
+        <p class="kta">{{ user.kta_number }} · Member since {{ user.created_at.strftime('%b %Y') if user.created_at else '2026' }}</p>
+        {% endif %}
+
+        <div class="stats">
+            <div class="stat">
+                <p class="stat-value">#{{ rank }}</p>
+                <p class="stat-label">Ranking</p>
+                <p class="stat-sub">dari {{ total_ranked }}</p>
+            </div>
+            <div class="stat">
+                <p class="stat-value">{{ '{:,}'.format(user.chips_balance) }}</p>
+                <p class="stat-label">Chips</p>
+            </div>
+            <div class="stat">
+                <p class="stat-value">{{ streak.current }}</p>
+                <p class="stat-label">Streak</p>
+                <p class="stat-sub">minggu</p>
+            </div>
+        </div>
+
+        <p class="journey">
+            {{ user.total_games }} match · {{ win_rate }}% win rate · {{ '{:,}'.format(user.chips_balance) }} chips earned
+        </p>
+    </div>
+
+    <div class="content" style="display: flex; justify-content: space-between; align-items: flex-end;">
+        <div>
+            <p class="brand">DADDIES PADEL</p>
+            <p class="cta">Main bareng aku di Daddies Padel</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

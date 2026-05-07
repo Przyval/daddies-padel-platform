@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}Daddies Chips — Daddies Padel{% endblock %}
+
+{% block header_left %}
+<a href="{{ url_for('main.profile') }}" class="text-primary-container">
+    <span class="material-symbols-outlined">arrow_back</span>
+</a>
+<h1 class="font-headline font-bold tracking-tight text-xl text-primary-container">Daddies Chips</h1>
+{% endblock %}
+
+{% block content %}
+<!-- Balance card -->
+<section class="card text-center space-y-3 py-8">
+    <div class="w-16 h-16 bg-warning/10 rounded-full flex items-center justify-center mx-auto">
+        <span class="material-symbols-outlined filled text-warning text-3xl">toll</span>
+    </div>
+    <div>
+        <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Saldo Chips</p>
+        <p class="text-4xl font-extrabold text-primary tracking-tight">{{ '{:,}'.format(current_user.chips_balance) }}</p>
+    </div>
+    <p class="text-xs text-on-surface-variant">
+        Kumpulkan chips dari turnamen. Tukarkan dengan merchandise eksklusif.
+    </p>
+    {% if season_end %}
+    <div class="bg-warning/10 rounded-2xl px-4 py-3 mt-3">
+        <p class="text-xs font-bold text-warning">
+            <span class="material-symbols-outlined text-sm align-middle mr-1">timer</span>
+            Chips hangus dalam {{ season_days_left }} hari ({{ season_end.strftime('%d %b %Y') }})
+        </p>
+        <div class="w-full bg-warning/20 rounded-full h-1.5 mt-2">
+            <div class="bg-warning h-1.5 rounded-full" style="width: {{ [100, (season_days_left / 365 * 100)|int]|min }}%"></div>
+        </div>
+    </div>
+    {% endif %}
+</section>
+
+<!-- How to earn -->
+<section class="card !p-5 space-y-3">
+    <h3 class="text-sm font-bold">Cara Dapat Chips</h3>
+    <div class="space-y-2">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-success/10 flex items-center justify-center flex-shrink-0">
+                <span class="material-symbols-outlined text-success text-sm">emoji_events</span>
+            </div>
+            <div>
+                <p class="text-sm font-semibold text-on-surface">Menang Turnamen</p>
+                <p class="text-xs text-on-surface-variant">#1 = N×1000, #2 = (N-1)×1000, dst</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-info/10 flex items-center justify-center flex-shrink-0">
+                <span class="material-symbols-outlined text-info text-sm">group</span>
+            </div>
+            <div>
+                <p class="text-sm font-semibold text-on-surface">Partisipasi</p>
+                <p class="text-xs text-on-surface-variant">500 chips setiap ikut turnamen</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Transaction history -->
+<section>
+    <h3 class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-3">Riwayat</h3>
+
+    {% if transactions %}
+    <div class="space-y-2">
+        {% for tx in transactions %}
+        <div class="card !p-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0
+                            {{ 'bg-success/10' if tx.amount > 0 else 'bg-error/10' }}">
+                    <span class="material-symbols-outlined text-lg {{ 'text-success' if tx.amount > 0 else 'text-error' }}">
+                        {{ 'arrow_downward' if tx.amount > 0 else 'arrow_upward' }}
+                    </span>
+                </div>
+                <div>
+                    <p class="text-sm font-semibold text-on-surface">{{ tx.description }}</p>
+                    <p class="text-[10px] text-on-surface-variant">
+                        {{ tx.created_at.strftime('%d %b %Y · %H:%M') }}
+                        {% if tx.type == 'tournament_win' %}
+                        · <span class="text-warning font-semibold">Ranking</span>
+                        {% elif tx.type == 'tournament_participation' %}
+                        · <span class="text-info font-semibold">Partisipasi</span>
+                        {% elif tx.type == 'spend' %}
+                        · <span class="text-error font-semibold">Penukaran</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+            <div class="text-right">
+                <p class="text-lg font-extrabold {{ 'text-success' if tx.amount > 0 else 'text-error' }}">
+                    {{ '+' if tx.amount > 0 }}{{ '{:,}'.format(tx.amount) }}
+                </p>
+                <p class="text-[9px] text-on-surface-variant">Saldo: {{ '{:,}'.format(tx.balance_after) }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card text-center py-8">
+        <span class="material-symbols-outlined text-3xl text-on-surface-variant/30">toll</span>
+        <h3 class="font-bold text-on-surface mt-3">Belum ada transaksi</h3>
+        <p class="text-sm text-on-surface-variant mt-1">Ikuti turnamen untuk mulai mengumpulkan chips!</p>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

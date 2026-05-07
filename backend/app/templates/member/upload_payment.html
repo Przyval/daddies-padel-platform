@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Upload Bukti Bayar — Daddies Padel{% endblock %}
+
+{% block header_left %}
+<a href="{{ url_for('main.session_detail', match_id=match.id) }}" class="hover:opacity-80 transition-opacity text-primary-container">
+    <span class="material-symbols-outlined">arrow_back</span>
+</a>
+<h1 class="font-headline font-bold tracking-tight text-xl text-primary-container">Bukti Bayar</h1>
+{% endblock %}
+
+{% block content %}
+<section class="card text-center space-y-4">
+    <div class="w-14 h-14 bg-primary-fixed rounded-full flex items-center justify-center mx-auto">
+        <span class="material-symbols-outlined text-primary text-2xl">receipt_long</span>
+    </div>
+    <div>
+        <h2 class="text-lg font-extrabold text-on-surface">{{ match.title }}</h2>
+        <p class="text-[0.65rem] font-bold uppercase tracking-widest text-on-surface-variant mt-1">
+            {{ match.date_time.strftime('%a, %d %b %H:%M') }}
+        </p>
+        <p class="text-2xl font-extrabold text-primary mt-3">IDR {{ "{:,.0f}".format(match.price) }}</p>
+    </div>
+</section>
+
+<section class="card">
+    <form action="{{ url_for('member.upload_payment', match_id=match.id) }}" method="POST"
+          enctype="multipart/form-data" class="space-y-5">
+        <div>
+            <label class="label-overline mb-2 block">Bukti Transfer</label>
+            <label for="payment_proof"
+                   class="flex flex-col items-center justify-center w-full py-10 rounded bg-surface-container-low
+                          ghost-border cursor-pointer hover:bg-surface-container-high transition-colors">
+                <span class="material-symbols-outlined text-3xl text-on-surface-variant/40 mb-2">cloud_upload</span>
+                <span class="text-sm font-semibold text-on-surface-variant" id="file-label">Ketuk untuk pilih file</span>
+                <span class="text-xs text-on-surface-variant/60 mt-1">JPG, PNG, atau PDF</span>
+            </label>
+            <input class="hidden" id="payment_proof" name="payment_proof" type="file"
+                   accept="image/*,.pdf" required>
+        </div>
+        <div class="flex gap-3">
+            <a href="{{ url_for('member.index') }}" class="btn-ghost flex-1 py-3.5 text-sm text-center">Batal</a>
+            <button type="submit" class="btn-primary flex-1 py-3.5 text-sm">Upload</button>
+        </div>
+    </form>
+</section>
+
+<script>
+document.getElementById('payment_proof').addEventListener('change', function() {
+    const label = document.getElementById('file-label');
+    if (this.files.length > 0) {
+        label.textContent = this.files[0].name;
+        label.style.color = '#082217';
+    }
+});
+</script>
+{% endblock %}

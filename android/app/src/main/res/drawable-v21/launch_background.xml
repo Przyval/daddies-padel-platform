@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Daddies Forest Ink background -->
+    <item android:drawable="@color/forest_ink" />
+    <!-- Centered splash icon -->
+    <item
+        android:drawable="@drawable/splash_icon"
+        android:gravity="center"
+        android:width="120dp"
+        android:height="120dp" />
+</layer-list>

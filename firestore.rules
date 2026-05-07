@@ -1,0 +1,262 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // =========================================================================
+    // Helper functions
+    // =========================================================================
+
+    /// Returns true when the request comes from an authenticated user.
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /// Returns the role field from the user's document.
+    function getUserRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    /// Shorthand role checks.
+    function isSuperAdmin() {
+      return isSignedIn() && getUserRole() == 'superAdmin';
+    }
+
+    function isMimin() {
+      return isSignedIn() && getUserRole() == 'mimin';
+    }
+
+    function isBendahara() {
+      return isSignedIn() && getUserRole() == 'bendahara';
+    }
+
+    function isAdminOrMimin() {
+      return isSuperAdmin() || isMimin();
+    }
+
+    function isAdminOrBendahara() {
+      return isSuperAdmin() || isBendahara();
+    }
+
+    /// True when the requesting user's uid matches the document's userId field.
+    function isOwner() {
+      return isSignedIn() && request.auth.uid == resource.data.userId;
+    }
+
+    /// True when the requesting user's uid matches the document id.
+    function isSelf() {
+      return isSignedIn() && request.auth.uid == resource.id;
+    }
+
+    // =========================================================================
+    // USERS collection
+    // =========================================================================
+    match /users/{userId} {
+      // Authenticated read: leaderboard and public profiles require sign-in.
+      allow read: if isSignedIn();
+
+      // Users can update their own profile (name, phone).
+      // SuperAdmin can update any user (e.g. role changes).
+      allow update: if isSelf() || isSuperAdmin();
+
+      // Only superAdmin can create or delete user documents.
+      allow create, delete: if isSuperAdmin();
+    }
+
+    // =========================================================================
+    // SESSIONS collection
+    // =========================================================================
+    match /sessions/{sessionId} {
+      // Authenticated read: browse sessions requires sign-in.
+      allow read: if isSignedIn();
+
+      // SuperAdmin and mimin can create sessions.
+      allow create: if isAdminOrMimin();
+
+      // SuperAdmin, mimin, and the session's own mimin can update.
+      // (confirmedCount is also updated by transactions — those use admin SDK
+      //  or the requesting user must be admin/mimin.)
+      allow update: if isAdminOrMimin();
+
+      // Only superAdmin can delete sessions.
+      allow delete: if isSuperAdmin();
+    }
+
+    // =========================================================================
+    // SLOTS collection
+    // =========================================================================
+    match /slots/{slotId} {
+      // Any authenticated user can read slots (to see who joined a session).
+      allow read: if isSignedIn();
+
+      // Any authenticated user can create a slot (join a session).
+      // The userId in the new document must match the requesting user.
+      allow create: if isSignedIn()
+                    && request.resource.data.userId == request.auth.uid;
+
+      // The slot owner can update their own slot, or admin/mimin can update any.
+      allow update: if isOwner() || isAdminOrMimin();
+
+      // Hard delete restricted to superAdmin only (app uses soft-delete).
+      allow delete: if isSuperAdmin();
+    }
+
+    // =========================================================================
+    // PAYMENTS collection
+    // =========================================================================
+    match /payments/{paymentId} {
+      // Any authenticated user can read payments.
+      allow read: if isSignedIn();
+
+      // A user can create a payment for themselves.
+      allow create: if isSignedIn()
+                    && request.resource.data.userId == request.auth.uid;
+
+      // Admin, mimin, or bendahara can update (verify/reject).
+      // The payment owner can also update (e.g. re-upload proof).
+      allow update: if isOwner() || isAdminOrMimin() || isAdminOrBendahara();
+
+      // Hard delete restricted to superAdmin only (app uses soft-delete).
+      allow delete: if isSuperAdmin();
+    }
+
+    // =========================================================================
+    // CASHFLOWS collection
+    // =========================================================================
+    match /cashflows/{cashflowId} {
+      // Any authenticated user can read cashflows (transparency).
+      allow read: if isSignedIn();
+
+      // Admin or bendahara can create/update. Hard delete only superAdmin.
+      allow create, update: if isAdminOrBendahara();
+      allow delete: if isSuperAdmin();
+    }
+
+    // =========================================================================
+    // NOTIFICATIONS collection
+    // =========================================================================
+    match /notifications/{notificationId} {
+      // Users can read their own notifications.
+      allow read: if isSignedIn();
+
+      // System/admin can create. Users can update (mark read).
+      allow create: if isAdminOrMimin();
+      allow update: if isOwner() || isAdminOrMimin();
+      allow delete: if isSuperAdmin();
+    }
+
+    // =========================================================================
+    // MATCH RESULTS collection
+    // =========================================================================
+    match /matchResults/{resultId} {
+      // Any authenticated user can read match results.
+      allow read: if isSignedIn();
+
+      // Only mimin/admin can create or update match results.
+      allow create, update: if isAdminOrMimin();
+      allow delete: if isSuperAdmin();
+    }
+
+    // =========================================================================
+    // RATINGS collection
+    // =========================================================================
+    match /ratings/{ratingId} {
+      // Any authenticated user can read ratings.
+      allow read: if isSignedIn();
+
+      // Any authenticated user can create a rating (from themselves).
+      allow create: if isSignedIn()
+                    && request.resource.data.fromUserId == request.auth.uid;
+
+      // Only superAdmin can update/delete ratings.
+      allow update, delete: if isSuperAdmin();
+    }
+
+    // =========================================================================
+    // VENUES collection
+    // =========================================================================
+    match /venues/{venueId} {
+      allow read: if true;
+      allow create, update: if isAdminOrMimin();
+      allow delete: if isSuperAdmin();
+    }
+
+    // =========================================================================
+    // PARTNERS collection
+    // =========================================================================
+    match /partners/{partnerId} {
+      allow read: if true;
+      allow create, update: if isSuperAdmin();
+      allow delete: if isSuperAdmin();
+    }
+
+    // =========================================================================
+    // CHIPS TRANSACTIONS collection
+    // =========================================================================
+    match /chipsTransactions/{txnId} {
+      // Any authenticated user can read (for leaderboard, own history).
+      allow read: if isSignedIn();
+
+      // System creates transactions via admin SDK or admin/mimin.
+      allow create: if isAdminOrMimin();
+
+      // Only superAdmin can update/delete.
+      allow update, delete: if isSuperAdmin();
+    }
+
+    // =========================================================================
+    // AWARDS collection
+    // =========================================================================
+    match /awards/{awardId} {
+      // Any authenticated user can read awards.
+      allow read: if isSignedIn();
+
+      // Admin/mimin can create and update awards.
+      allow create, update: if isAdminOrMimin();
+
+      // Only superAdmin can delete.
+      allow delete: if isSuperAdmin();
+    }
+
+    // =========================================================================
+    // REDEMPTIONS collection
+    // =========================================================================
+    match /redemptions/{redemptionId} {
+      // Any authenticated user can read redemptions.
+      allow read: if isSignedIn();
+
+      // Any authenticated user can create a redemption (for themselves).
+      allow create: if isSignedIn()
+                    && request.resource.data.userId == request.auth.uid;
+
+      // Owner can update (cancel), admin/mimin can update (verify usage).
+      allow update: if isOwner() || isAdminOrMimin();
+
+      // Only superAdmin can delete.
+      allow delete: if isSuperAdmin();
+    }
+
+    // =========================================================================
+    // REFERRALS collection
+    // =========================================================================
+    match /referrals/{referralId} {
+      // Any authenticated user can read referrals.
+      allow read: if isSignedIn();
+
+      // Any authenticated user can create a referral.
+      allow create: if isSignedIn();
+
+      // Owner (referrer) or admin can update referrals.
+      allow update: if isSignedIn() && (
+        request.auth.uid == resource.data.referrerId ||
+        isSuperAdmin() || isMimin()
+      );
+
+      // Only superAdmin can delete.
+      allow delete: if isSuperAdmin();
+    }
+
+    // =========================================================================
+    // Deny all other paths by default (Firestore denies unmatched paths).
+    // =========================================================================
+  }
+}

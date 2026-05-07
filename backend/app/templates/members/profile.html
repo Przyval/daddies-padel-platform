@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}{{ member.display_name }} — Daddies Padel{% endblock %}
+
+{% block header_left %}
+<a href="{{ url_for('main.members') }}" class="hover:opacity-80 transition-opacity text-primary-container">
+    <span class="material-symbols-outlined">arrow_back</span>
+</a>
+<h1 class="font-headline font-bold tracking-tight text-xl text-primary-container">Profil</h1>
+{% endblock %}
+
+{% block content %}
+<!-- Profile header -->
+<section class="text-center space-y-3">
+    <div class="w-20 h-20 rounded-full bg-primary-container flex items-center justify-center mx-auto shadow-lg">
+        <span class="text-2xl font-extrabold text-surface">{{ member.initials }}</span>
+    </div>
+    <div>
+        <h2 class="text-xl font-extrabold text-on-surface">{{ member.display_name }}</h2>
+        {% if member.nickname and member.nickname != member.username %}
+        <p class="text-sm text-on-surface-variant">{{ member.username }}</p>
+        {% endif %}
+        {% if member.bio %}
+        <p class="text-sm text-on-surface-variant mt-1">{{ member.bio }}</p>
+        {% endif %}
+    </div>
+    <div class="flex justify-center gap-2">
+        <span class="badge badge-{{ member.role }}">{{ member.role | upper }}</span>
+        <span class="badge" style="background: rgba(74,124,89,0.1); color: #4A7C59;">
+            {{ member.kta_tier | upper }}
+        </span>
+    </div>
+</section>
+
+<!-- Stats -->
+<section class="grid grid-cols-3 gap-3">
+    <div class="stat-card text-center">
+        <p class="text-2xl font-extrabold text-primary">{{ member.sessions_played }}</p>
+        <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mt-1">Sesi</p>
+    </div>
+    <div class="stat-card text-center">
+        <p class="text-2xl font-extrabold text-primary">{{ member.chips_balance }}</p>
+        <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mt-1">Chips</p>
+    </div>
+    <div class="stat-card text-center">
+        <p class="text-2xl font-extrabold text-primary">
+            {% if member.kta_number %}{{ member.kta_number }}{% else %}—{% endif %}
+        </p>
+        <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mt-1">KTA</p>
+    </div>
+</section>
+
+<!-- Contact -->
+{% if member.phone %}
+<section class="card !p-4">
+    <a href="https://wa.me/{{ member.phone }}" target="_blank"
+       class="flex items-center gap-3 text-success">
+        <span class="material-symbols-outlined">chat</span>
+        <div>
+            <p class="font-semibold text-sm">WhatsApp</p>
+            <p class="text-xs text-on-surface-variant">{{ member.phone }}</p>
+        </div>
+    </a>
+</section>
+{% endif %}
+
+<!-- Recent sessions -->
+<section>
+    <h3 class="text-lg font-bold tracking-tight mb-4">Sesi Terakhir</h3>
+    <div class="space-y-3">
+        {% for booking in recent_bookings %}
+        <div class="card !p-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-surface-container-low flex flex-col items-center justify-center">
+                    <span class="text-[9px] font-bold text-on-surface-variant uppercase">{{ booking.match.date_time.strftime('%b') }}</span>
+                    <span class="text-sm font-extrabold text-primary leading-tight">{{ booking.match.date_time.strftime('%d') }}</span>
+                </div>
+                <div>
+                    <p class="font-semibold text-on-surface text-sm">{{ booking.match.title }}</p>
+                    <p class="text-xs text-on-surface-variant">{{ booking.match.location }}</p>
+                </div>
+            </div>
+            <span class="badge badge-{{ booking.status }}">{{ booking.status | upper }}</span>
+        </div>
+        {% else %}
+        <p class="text-sm text-on-surface-variant text-center py-4">Belum ada sesi.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

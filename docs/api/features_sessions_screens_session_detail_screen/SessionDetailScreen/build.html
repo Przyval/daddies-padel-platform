@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="API docs for the build method from the SessionDetailScreen class, for the Dart programming language.">
+  <title>build method - SessionDetailScreen class - session_detail_screen library - Dart API</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../static-assets/github.css?v1">
+  <link rel="stylesheet" href="../../static-assets/styles.css?v1">
+  <link rel="icon" href="../../static-assets/favicon.png?v1">
+  
+</head>
+
+<body data-base-href="../../" data-using-base-href="false" class="light-theme">
+<div id="overlay-under-drawer"></div>
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../../index.html">daddies_app</a></li>
+    <li><a href="../../features_sessions_screens_session_detail_screen/">features&#47;sessions&#47;screens&#47;session_detail_screen.dart</a></li>
+    <li><a href="../../features_sessions_screens_session_detail_screen/SessionDetailScreen-class.html">SessionDetailScreen</a></li>
+    <li class="self-crumb">build method</li>
+  </ol>
+  <div class="self-name">build</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <button class="toggle" id="theme-button" title="Toggle between light and dark mode" aria-label="Light and dark mode toggle">
+    <span id="dark-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      dark_mode
+    </span>
+    <span id="light-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      light_mode
+    </span>
+  </button>
+</header>
+<main>
+<div
+    id="dartdoc-main-content"
+    class="main-content"
+    data-above-sidebar="features_sessions_screens_session_detail_screen&#47;SessionDetailScreen-class-sidebar.html"
+    data-below-sidebar="">
+    <div>
+<h1><span class="kind-method">build</span> method 
+</h1></div>
+
+    <section class="multi-line-signature">
+      
+  <div>
+    <ol class="annotation-list">
+        <li>@<a href="https://api.flutter.dev/flutter/dart-core/override-constant.html">override</a></li>
+    </ol>
+  </div>
+<span class="returntype"><a href="https://api.flutter.dev/flutter/widgets/Widget-class.html">Widget</a></span>
+<span class="name ">build</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="build-param-context"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/widgets/BuildContext-class.html">BuildContext</a></span> <span class="parameter-name">context</span></span></li>
+</ol>)
+
+      <div class="features"><span class="feature">override</span></div>
+
+    </section>
+    
+<section class="desc markdown">
+  <p>Describes the part of the user interface represented by this widget.</p>
+<p>The framework calls this method when this widget is inserted into the tree
+in a given <a href="https://api.flutter.dev/flutter/widgets/BuildContext-class.html">BuildContext</a> and when the dependencies of this widget change
+(e.g., an <a href="https://api.flutter.dev/flutter/widgets/InheritedWidget-class.html">InheritedWidget</a> referenced by this widget changes). This
+method can potentially be called in every frame and should not have any side
+effects beyond building a widget.</p>
+<p>The framework replaces the subtree below this widget with the widget
+returned by this method, either by updating the existing subtree or by
+removing the subtree and inflating a new subtree, depending on whether the
+widget returned by this method can update the root of the existing
+subtree, as determined by calling <a href="https://api.flutter.dev/flutter/widgets/Widget/canUpdate.html">Widget.canUpdate</a>.</p>
+<p>Typically implementations return a newly created constellation of widgets
+that are configured with information from this widget's constructor and
+from the given <a href="https://api.flutter.dev/flutter/widgets/BuildContext-class.html">BuildContext</a>.</p>
+<p>The given <a href="https://api.flutter.dev/flutter/widgets/BuildContext-class.html">BuildContext</a> contains information about the location in the
+tree at which this widget is being built. For example, the context
+provides the set of inherited widgets for this location in the tree. A
+given widget might be built with multiple different <a href="https://api.flutter.dev/flutter/widgets/BuildContext-class.html">BuildContext</a>
+arguments over time if the widget is moved around the tree or if the
+widget is inserted into the tree in multiple places at once.</p>
+<p>The implementation of this method must only depend on:</p>
+<ul>
+<li>the fields of the widget, which themselves must not change over time,
+and</li>
+<li>any ambient state obtained from the <code>context</code> using
+<a href="https://api.flutter.dev/flutter/widgets/BuildContext/dependOnInheritedWidgetOfExactType.html">BuildContext.dependOnInheritedWidgetOfExactType</a>.</li>
+</ul>
+<p>If a widget's <a href="../../features_sessions_screens_session_detail_screen/SessionDetailScreen/build.html">build</a> method is to depend on anything else, use a
+<a href="https://api.flutter.dev/flutter/widgets/StatefulWidget-class.html">StatefulWidget</a> instead.</p>
+<p>See also:</p>
+<ul>
+<li><a href="https://api.flutter.dev/flutter/widgets/StatelessWidget-class.html">StatelessWidget</a>, which contains the discussion on performance considerations.</li>
+</ul>
+</section>
+
+
+    
+<section class="summary source-code" id="source">
+  <h2><span>Implementation</span></h2>
+  <pre class="language-dart"><code class="language-dart">@override
+Widget build(BuildContext context) {
+  final sessionProvider = context.watch&lt;SessionProvider&gt;();
+  final authProvider = context.watch&lt;AuthProvider&gt;();
+  final session = sessionProvider.getSessionById(sessionId);
+
+  if (session == null) {
+    return Scaffold(
+      backgroundColor: AppColors.sagePaper,
+      appBar: AppBar(
+        title: const Text(&#39;Sesi Tidak Ditemukan&#39;),
+        backgroundColor: AppColors.forestInk,
+        foregroundColor: AppColors.agedLinen,
+        elevation: 0,
+      ),
+      body: const Center(
+        child: Text(
+          &#39;Sesi ini tidak ditemukan atau sudah dihapus.&#39;,
+          style: TextStyle(
+            fontSize: 15,
+            color: AppColors.textSecondary,
+          ),
+        ),
+      ),
+    );
+  }
+
+  final slots = sessionProvider.getSlotsForSession(sessionId);
+  final payments = sessionProvider.getPaymentsForSession(sessionId);
+  final confirmedCount = sessionProvider.getConfirmedCount(sessionId);
+  final paidCount = sessionProvider.getPaidCount(sessionId);
+  final canJoin = sessionProvider.canUserJoin(sessionId);
+  final isMimin = authProvider.canManageSessions;
+  final currentUser = authProvider.currentUser;
+
+  final bool userIsInSession =
+      currentUser != null &amp;&amp; slots.any((s) =&gt; s.userId == currentUser.id);
+  final bool isSessionMimin =
+      currentUser != null &amp;&amp; session.miminId == currentUser.id;
+
+  final rupiahFormat =
+      NumberFormat.currency(locale: &#39;id_ID&#39;, symbol: &#39;Rp &#39;, decimalDigits: 0);
+  final dateFormatted =
+      DateFormat(&#39;EEEE, d MMM yyyy&#39;, &#39;id_ID&#39;).format(session.date);
+
+  final int totalCollected = payments
+      .where((p) =&gt; p.status == PaymentStatus.verified)
+      .fold&lt;int&gt;(0, (sum, p) =&gt; sum + p.amount);
+  final int totalExpected = confirmedCount * session.pricePerPlayer;
+
+  return Scaffold(
+    backgroundColor: AppColors.sagePaper,
+    appBar: AppBar(
+      title: Text(
+        session.title,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+      backgroundColor: AppColors.forestInk,
+      foregroundColor: AppColors.agedLinen,
+      elevation: 0,
+      actions: [
+        IconButton(
+          onPressed: () =&gt; _shareSession(context, session, rupiahFormat),
+          icon: const Icon(Icons.share_outlined, size: 22),
+          tooltip: &#39;Bagikan&#39;,
+        ),
+        IconButton(
+          onPressed: () =&gt; _showQrCode(context, session),
+          icon: const Icon(Icons.qr_code, size: 22),
+          tooltip: &#39;QR Code&#39;,
+        ),
+        if ((isMimin || isSessionMimin) &amp;&amp;
+            (session.status == SessionStatus.draft ||
+                session.status == SessionStatus.open ||
+                session.status == SessionStatus.full))
+          IconButton(
+            onPressed: () {
+              context.push(
+                AppRoutes.sessionEditPath(session.id),
+                extra: session,
+              );
+            },
+            icon: const Icon(Icons.edit_outlined, size: 22),
+            tooltip: &#39;Edit Sesi&#39;,
+          ),
+      ],
+    ),
+    bottomNavigationBar: _buildBottomBar(
+      context: context,
+      session: session,
+      slots: slots,
+      canJoin: canJoin,
+      userIsInSession: userIsInSession,
+      isMimin: isMimin,
+      isSessionMimin: isSessionMimin,
+      sessionProvider: sessionProvider,
+    ),
+    body: LoadingOverlay(
+      isLoading: sessionProvider.isBusy,
+      child: RefreshIndicator(
+      color: AppColors.forestInk,
+      onRefresh: () =&gt; DataService().refresh(),
+      child: SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          &#47;&#47; -----------------------------------------------------------------
+          &#47;&#47; Header card
+          &#47;&#47; -----------------------------------------------------------------
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.agedLinen,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                &#47;&#47; Status chip
+                _SessionStatusChip(status: session.status),
+                const SizedBox(height: 12),
+
+                &#47;&#47; Venue
+                GestureDetector(
+                  onTap: () =&gt; navigateToVenue(context, session.venue),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.location_on_outlined,
+                          size: 18, color: AppColors.mossAccent),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          session.venue,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: AppColors.deepCharcoal,
+                            decoration: TextDecoration.underline,
+                            decorationColor: AppColors.mossAccent,
+                          ),
+                        ),
+                      ),
+                      const Icon(Icons.chevron_right,
+                          size: 16, color: AppColors.textTertiary),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+
+                &#47;&#47; Date
+                Row(
+                  children: [
+                    const Icon(Icons.calendar_today_outlined,
+                        size: 18, color: AppColors.mossAccent),
+                    const SizedBox(width: 6),
+                    Text(
+                      dateFormatted,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: AppColors.deepCharcoal,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+
+                &#47;&#47; Time
+                Row(
+                  children: [
+                    const Icon(Icons.access_time_outlined,
+                        size: 18, color: AppColors.mossAccent),
+                    const SizedBox(width: 6),
+                    Text(
+                      &#39;${session.timeStart} - ${session.timeEnd}&#39;,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: AppColors.deepCharcoal,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+
+                &#47;&#47; Price
+                Row(
+                  children: [
+                    const Icon(Icons.payments_outlined,
+                        size: 18, color: AppColors.mossAccent),
+                    const SizedBox(width: 6),
+                    Text(
+                      &#39;${rupiahFormat.format(session.pricePerPlayer)} &#47; orang&#39;,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.clayRed,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+
+                &#47;&#47; Mimin
+                Row(
+                  children: [
+                    const Icon(Icons.person_outline,
+                        size: 18, color: AppColors.mossAccent),
+                    const SizedBox(width: 6),
+                    Text(
+                      &#39;Mimin: ${session.miminName}&#39;,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+
+                &#47;&#47; Court number
+                if (session.courtNumber != null) ...[
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Icon(Icons.grid_view_rounded,
+                          size: 18, color: AppColors.mossAccent),
+                      const SizedBox(width: 6),
+                      Text(
+                        &#39;Court ${session.courtNumber}&#39;,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: AppColors.deepCharcoal,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+                const SizedBox(height: 12),
+
+                &#47;&#47; Player count summary
+                Row(
+                  children: [
+                    const Icon(Icons.group_outlined,
+                        size: 18, color: AppColors.mossAccent),
+                    const SizedBox(width: 6),
+                    Text(
+                      &#39;$confirmedCount&#47;${session.maxPlayers} pemain&#39;,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.deepCharcoal,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Text(
+                      &#39;($paidCount sudah bayar)&#39;,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: AppColors.textTertiary,
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 12),
+                const Divider(color: AppColors.divider, height: 1),
+                const SizedBox(height: 12),
+
+                &#47;&#47; Total collected
+                Row(
+                  children: [
+                    const Text(
+                      &#39;Total terkumpul: &#39;,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                    Text(
+                      &#39;${rupiahFormat.format(totalCollected)} &#47; ${rupiahFormat.format(totalExpected)}&#39;,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.forestInk,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          &#47;&#47; Notes
+          if (session.notes != null &amp;&amp; session.notes!.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: AppColors.warning.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: AppColors.warning.withValues(alpha: 0.2),
+                ),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(Icons.sticky_note_2_outlined,
+                      size: 18, color: AppColors.warning),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          &#39;Catatan Mimin&#39;,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.warning,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          session.notes!,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: AppColors.deepCharcoal,
+                            height: 1.4,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+
+          &#47;&#47; Cancellation reason
+          if (session.status == SessionStatus.cancelled &amp;&amp;
+              session.cancellationReason != null &amp;&amp;
+              session.cancellationReason!.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: AppColors.clayRed.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: AppColors.clayRed.withValues(alpha: 0.2),
+                ),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(Icons.info_outline,
+                      size: 18, color: AppColors.clayRed),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          &#39;Alasan Pembatalan&#39;,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.clayRed,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          session.cancellationReason!,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: AppColors.deepCharcoal,
+                            height: 1.4,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+
+          const SizedBox(height: 24),
+
+          &#47;&#47; -----------------------------------------------------------------
+          &#47;&#47; Section: Pemain (Players &#47; Slots)
+          &#47;&#47; -----------------------------------------------------------------
+          const Text(
+            &#39;Pemain&#39;,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: AppColors.deepCharcoal,
+              letterSpacing: -0.3,
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          if (slots.isEmpty)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: AppColors.agedLinen,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: const Text(
+                &#39;Belum ada pemain yang bergabung.&#39;,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: AppColors.textTertiary,
+                ),
+              ),
+            )
+          else
+            Container(
+              decoration: BoxDecoration(
+                color: AppColors.agedLinen,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: ListView.separated(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                itemCount: slots.length,
+                separatorBuilder: (context, index) =&gt;
+                    const Divider(color: AppColors.divider, height: 1, indent: 16, endIndent: 16),
+                itemBuilder: (context, index) {
+                  final slot = slots[index];
+                  return _SlotRow(
+                    slot: slot,
+                    isMimin: isMimin || isSessionMimin,
+                    payments: payments,
+                    sessionProvider: sessionProvider,
+                  );
+                },
+              ),
+            ),
+
+          const SizedBox(height: 24),
+
+          &#47;&#47; -----------------------------------------------------------------
+          &#47;&#47; Section: Pembayaran (Payments)
+          &#47;&#47; -----------------------------------------------------------------
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                &#39;Pembayaran&#39;,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.deepCharcoal,
+                  letterSpacing: -0.3,
+                ),
+              ),
+              if ((isMimin || isSessionMimin) &amp;&amp; slots.isNotEmpty)
+                TextButton.icon(
+                  onPressed: () {
+                    &#47;&#47; Find unpaid players
+                    final unpaidNames = &lt;String&gt;[];
+                    for (final slot in slots) {
+                      final hasPaid = payments.any(
+                        (p) =&gt; p.userId == slot.userId &amp;&amp; p.status != PaymentStatus.rejected,
+                      );
+                      if (!hasPaid) unpaidNames.add(slot.userName);
+                    }
+
+                    if (unpaidNames.isEmpty) {
+                      SnackbarHelper.showSuccess(context, &#39;Semua pemain sudah bayar!&#39;);
+                      return;
+                    }
+
+                    final message = StringBuffer()
+                      ..writeln(&#39;Pengingat Pembayaran&#39;)
+                      ..writeln(&#39;Sesi: ${session.title}&#39;)
+                      ..writeln(&#39;Tanggal: $dateFormatted&#39;)
+                      ..writeln(&#39;Nominal: ${rupiahFormat.format(session.pricePerPlayer)}&#47;orang&#39;)
+                      ..writeln()
+                      ..writeln(&#39;Belum bayar:&#39;)
+                      ..writeAll(unpaidNames.map((n) =&gt; &#39;- $n&#39;), &#39;\n&#39;)
+                      ..writeln()
+                      ..writeln()
+                      ..writeln(&#39;Mohon segera transfer. Terima kasih!&#39;);
+
+                    HapticHelper.light();
+                    Share.share(message.toString());
+                  },
+                  icon: const Icon(Icons.notifications_active_outlined, size: 16),
+                  label: const Text(&#39;Ingatkan&#39;, style: TextStyle(fontSize: 12)),
+                  style: TextButton.styleFrom(
+                    foregroundColor: AppColors.warning,
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    visualDensity: VisualDensity.compact,
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          if (payments.isEmpty)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: AppColors.agedLinen,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: const Text(
+                &#39;Belum ada pembayaran.&#39;,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: AppColors.textTertiary,
+                ),
+              ),
+            )
+          else
+            Container(
+              decoration: BoxDecoration(
+                color: AppColors.agedLinen,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: ListView.separated(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                itemCount: payments.length,
+                separatorBuilder: (context, index) =&gt;
+                    const Divider(color: AppColors.divider, height: 1, indent: 16, endIndent: 16),
+                itemBuilder: (context, index) {
+                  final payment = payments[index];
+                  return _PaymentRow(
+                    payment: payment,
+                    isMimin: isMimin || isSessionMimin,
+                    sessionProvider: sessionProvider,
+                    rupiahFormat: rupiahFormat,
+                  );
+                },
+              ),
+            ),
+
+          &#47;&#47; -----------------------------------------------------------------
+          &#47;&#47; Section: Galeri Foto
+          &#47;&#47; -----------------------------------------------------------------
+          const SizedBox(height: 24),
+          _PhotoGallerySection(
+            sessionId: sessionId,
+            sessionProvider: sessionProvider,
+            isMimin: isMimin || isSessionMimin,
+          ),
+
+          &#47;&#47; -----------------------------------------------------------------
+          &#47;&#47; Section: Rating Pemain
+          &#47;&#47; -----------------------------------------------------------------
+          if (session.status == SessionStatus.completed) ...[
+            const SizedBox(height: 24),
+            const Text(
+              &#39;Rating Pemain&#39;,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: AppColors.deepCharcoal,
+                letterSpacing: -0.3,
+              ),
+            ),
+            const SizedBox(height: 12),
+            _RatingSection(
+              sessionId: sessionId,
+              slots: slots,
+              sessionProvider: sessionProvider,
+              currentUserId: currentUser?.id,
+            ),
+            const SizedBox(height: 8),
+          ],
+
+          &#47;&#47; -----------------------------------------------------------------
+          &#47;&#47; Section: Match Results (Americano Scoring)
+          &#47;&#47; -----------------------------------------------------------------
+          if (session.status == SessionStatus.completed ||
+              session.status == SessionStatus.locked) ...[
+            const SizedBox(height: 24),
+            _MatchResultsSection(
+              sessionId: sessionId,
+              isMimin: isMimin || isSessionMimin,
+            ),
+          ],
+
+          &#47;&#47; -----------------------------------------------------------------
+          &#47;&#47; Section: Attendance (Absensi)
+          &#47;&#47; -----------------------------------------------------------------
+          if ((isMimin || isSessionMimin) &amp;&amp;
+              (session.status == SessionStatus.locked ||
+               session.status == SessionStatus.completed)) ...[
+            const SizedBox(height: 24),
+            _AttendanceSection(sessionId: sessionId, slots: slots),
+          ],
+
+          const SizedBox(height: 32),
+        ],
+      ),
+    ),
+    ),
+    ),
+  );
+}</code></pre>
+</section>
+
+
+  </div> <!-- /.main-content -->
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
+<header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+    <li><a href="../../index.html">daddies_app</a></li>
+    <li><a href="../../features_sessions_screens_session_detail_screen/">session_detail_screen</a></li>
+    <li><a href="../../features_sessions_screens_session_detail_screen/SessionDetailScreen-class.html">SessionDetailScreen</a></li>
+    <li class="self-crumb">build method</li>
+</ol>
+
+    <h5>SessionDetailScreen class</h5>
+    <div id="dartdoc-sidebar-left-content"></div>
+  </div><!--/.sidebar-offcanvas-->
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+</div><!--/.sidebar-offcanvas-->
+</main>
+<footer>
+  <span class="no-break">
+    daddies_app
+      1.0.0+1
+  </span>
+  
+</footer>
+
+
+<script src="../../static-assets/highlight.pack.js?v1"></script>
+<script src="../../static-assets/docs.dart.js"></script>
+
+</body>
+</html>
+

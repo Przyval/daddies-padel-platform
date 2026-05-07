@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+{% block title %}Pemain — {{ tournament.name }}{% endblock %}
+
+{% block header_left %}
+<a href="{{ url_for('tournament.v2_create_step', tournament_id=tournament.id, step=2) }}" class="text-primary-container">
+    <span class="material-symbols-outlined">arrow_back</span>
+</a>
+<h1 class="font-headline font-bold tracking-tight text-xl text-primary-container">Pemain</h1>
+{% endblock %}
+
+{% block content %}
+{% set current_step = 3 %}
+{% include "tournament/wizard_v2/_step_bar.html" %}
+
+{% set is_mix = tournament.format in ('mixicano', 'mix_americano') %}
+{% set is_team = tournament.format == 'team_mexicano' %}
+{% set m_count = participants|selectattr('gender', 'equalto', 'M')|list|length %}
+{% set f_count = participants|selectattr('gender', 'equalto', 'F')|list|length %}
+{% set total = participants|length %}
+{% set need = 4 - (total % 4) if total % 4 != 0 else 0 %}
+{% set ready = total >= 4 and need == 0 %}
+
+{# ═══ BIG VISUAL COUNTER ═══ #}
+<section class="text-center py-4">
+    <div class="inline-flex items-center justify-center relative mb-3">
+        {# Progress ring #}
+        {% set pct = ([total / 8 * 100, 100] | min) | int %}
+        <svg class="w-24 h-24 -rotate-90" viewBox="0 0 96 96">
+            <circle cx="48" cy="48" r="40" fill="none" stroke-width="6"
+                    class="stroke-surface-container-high"/>
+            <circle cx="48" cy="48" r="40" fill="none" stroke-width="6"
+                    stroke-dasharray="251" stroke-dashoffset="{{ 251 - (251 * pct / 100) }}"
+                    stroke-linecap="round"
+                    class="{{ 'stroke-success' if ready else 'stroke-primary' }}"/>
+        </svg>
+        <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <span class="text-3xl font-extrabold {{ 'text-success' if ready else 'text-primary' }}">{{ total }}</span>
+        </div>
+    </div>
+    <p class="text-base font-bold text-on-surface">
+        {% if ready %}✅ Siap mulai!
+        {% elif total > 0 %}Perlu {{ need }} pemain lagi
+        {% else %}Tambahkan minimal 4 pemain{% endif %}
+    </p>
+    {% if is_mix %}
+    <p class="text-sm mt-1 {{ 'text-success font-bold' if m_count == f_count and m_count > 0 else 'text-warning font-semibold' }}">
+        ♂ {{ m_count }} Pria + ♀ {{ f_count }} Wanita
+        {% if m_count != f_count %} — harus sama!{% endif %}
+    </p>
+    {% endif %}
+</section>
+
+{# Team hint #}
+{% if is_team %}
+<div class="card !p-4 bg-warning/5 flex items-center gap-3 mb-2">
+    <span class="text-2xl">👥</span>
+    <p class="text-sm text-on-surface leading-snug">
+        <strong>Team:</strong> Pemain #1 &amp; #2 jadi tim, #3 &amp; #4 jadi tim, dst.
+    </p>
+</div>
+{% endif %}
+
+{# ═══ ADD PLAYER — Big, obvious, one action ═══ #}
+<section class="card !p-5 space-y-4">
+    <form method="post" id="addForm" class="space-y-3">
+        <input type="hidden" name="action" value="add_guest">
+
+        {# Big input with integrated button #}
+        <div class="flex gap-2">
+            <input name="guest_name" id="nameInput"
+                   class="input-field flex-1 !py-4 text-lg !rounded-2xl"
+                   placeholder="Nama pemain..."
+                   required autocomplete="off"
+                   oninput="filterSuggestions(this.value)"
+                   style="min-height:56px">
+            <button type="submit"
+                    class="btn-primary !px-6 !rounded-2xl active:scale-[0.90] transition-transform"
+                    style="min-height:56px">
+                <span class="material-symbols-outlined text-2xl">add</span>
+            </button>
+        </div>
+
+        {# Gender — big visible toggle (mix formats) #}
+        {% if is_mix %}
+        <div class="grid grid-cols-2 gap-2">
+            <label class="cursor-pointer">
+                <input type="radio" name="gender" value="M" checked class="sr-only peer">
+                <div class="flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-surface-container-low
+                            text-base font-bold peer-checked:bg-info/15 peer-checked:text-info peer-checked:ring-2 peer-checked:ring-info/30
+                            transition-all active:scale-[0.97]" style="min-height:52px">
+                    ♂ Pria
+                </div>
+            </label>
+            <label class="cursor-pointer">
+                <input type="radio" name="gender" value="F" class="sr-only peer">
+                <div class="flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-surface-container-low
+                            text-base font-bold peer-checked:bg-error/15 peer-checked:text-error peer-checked:ring-2 peer-checked:ring-error/30
+                            transition-all active:scale-[0.97]" style="min-height:52px">
+                    ♀ Wanita
+                </div>
+            </label>
+        </div>
+        {% endif %}
+    </form>
+
+    {# Quick member chips — appears when typing #}
+    {% if available_users|length > 0 %}
+    <div id="suggestions" class="hidden">
+        <p class="text-xs font-bold text-on-surface-variant mb-2">👋 Tap untuk tambah anggota</p>
+        <div class="flex flex-wrap gap-2" id="memberChips">
+            {% for u in available_users %}
+            <button type="button" onclick="addMember({{ u.id }}, '{{ u.username }}')"
+                    class="member-chip inline-flex items-center gap-2 px-4 py-3 rounded-2xl
+                           bg-surface-container-low text-sm font-bold text-on-surface
+                           hover:bg-primary hover:text-on-primary active:scale-[0.93] transition-all"
+                    data-name="{{ u.username|lower }}" style="min-height:48px">
+                <span class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center
+                             text-xs font-bold text-on-primary-container">{{ u.initials }}</span>
+                {{ u.first_name }}
+            </button>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {# Bulk add — simple toggle #}
+    <details class="group">
+        <summary class="text-sm font-semibold text-primary flex items-center gap-1 py-2 cursor-pointer
+                        list-none active:scale-[0.97]" style="min-height:44px">
+            <span class="material-symbols-outlined text-base">playlist_add</span>
+            Tambah banyak sekaligus
+            <span class="material-symbols-outlined text-sm transition-transform group-open:rotate-180 ml-auto">expand_more</span>
+        </summary>
+        <form method="post" class="space-y-2 pt-2">
+            <input type="hidden" name="action" value="bulk_add">
+            <input name="bulk_names" class="input-field !py-3.5 text-base"
+                   placeholder="Andi, Budi, Citra, Dewi" style="min-height:52px">
+            <button type="submit" class="btn-ghost w-full py-3 text-sm font-bold" style="min-height:48px">
+                Tambah Semua
+            </button>
+        </form>
+    </details>
+</section>
+
+{# Hidden form for members #}
+<form method="post" id="memberForm" class="hidden">
+    <input type="hidden" name="action" value="add_member">
+    <input type="hidden" name="user_id" id="memberUserId">
+    <input type="hidden" name="gender" id="memberGender" value="M">
+</form>
+
+{# ═══ PLAYER LIST — visual, spacious ═══ #}
+{% if total > 0 %}
+<section>
+    <h3 class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-3">
+        Daftar Pemain ({{ total }})
+    </h3>
+    <div class="space-y-2">
+        {% set colors = ['bg-primary', 'bg-success', 'bg-info', 'bg-warning', 'bg-error', 'bg-tertiary',
+                         'bg-primary-container', 'bg-secondary'] %}
+        {% for p in participants %}
+        {% if is_team and loop.index is odd %}
+        <div class="flex items-center gap-2 {{ 'mt-5' if not loop.first }} mb-1">
+            <span class="text-lg">👥</span>
+            <span class="text-xs font-bold uppercase tracking-widest text-warning">Tim {{ ((loop.index - 1) // 2) + 1 }}</span>
+        </div>
+        {% endif %}
+        <div class="flex items-center justify-between py-3 px-4 rounded-2xl bg-surface-container-lowest
+                    active:bg-surface-container-low transition-colors" style="min-height:60px">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full {{ colors[(loop.index0) % 8] }} flex items-center justify-center flex-shrink-0">
+                    <span class="text-sm font-extrabold text-white">{{ loop.index }}</span>
+                </div>
+                <div>
+                    <p class="text-base font-bold text-on-surface">{{ p.name }}</p>
+                    <div class="flex items-center gap-1.5 mt-0.5">
+                        {% if p.gender %}
+                        <span class="text-xs font-bold {{ 'text-info' if p.gender == 'M' else 'text-error' }}">
+                            {{ '♂ Pria' if p.gender == 'M' else '♀ Wanita' }}
+                        </span>
+                        {% endif %}
+                        {% if p.user %}
+                        <span class="text-xs text-on-surface-variant">· member</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <form method="post" class="contents">
+                <input type="hidden" name="action" value="remove">
+                <input type="hidden" name="participant_id" value="{{ p.id }}">
+                <button type="submit"
+                        class="w-12 h-12 flex items-center justify-center rounded-full
+                               hover:bg-error/10 active:bg-error/20 transition-colors">
+                    <span class="material-symbols-outlined text-error/50 text-2xl">close</span>
+                </button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+{# ═══ BIG NAV ═══ #}
+<div class="space-y-2 pt-4">
+    {% if ready %}
+    <a href="{{ url_for('tournament.v2_create_step', tournament_id=tournament.id, step=4) }}"
+       class="btn-primary w-full py-5 text-lg gap-2 font-extrabold active:scale-[0.97] block text-center"
+       style="min-height:60px">
+        Review &amp; Mulai
+        <span class="material-symbols-outlined text-xl">arrow_forward</span>
+    </a>
+    {% else %}
+    <div class="w-full py-5 text-lg text-center font-extrabold opacity-20 bg-primary rounded-full text-on-primary"
+         style="min-height:60px">
+        Perlu {{ need if need > 0 else 4 - total }} pemain lagi
+    </div>
+    {% endif %}
+    <a href="{{ url_for('tournament.v2_create_step', tournament_id=tournament.id, step=2) }}"
+       class="btn-ghost w-full py-3 text-sm active:scale-[0.97]" style="min-height:48px">
+        <span class="material-symbols-outlined text-lg">arrow_back</span> Kembali
+    </a>
+</div>
+
+<script>
+document.getElementById('nameInput').focus();
+const suggestions = document.getElementById('suggestions');
+const chips = document.querySelectorAll('.member-chip');
+
+function filterSuggestions(q) {
+    if (!suggestions) return;
+    q = q.toLowerCase().trim();
+    if (!q) { suggestions.classList.add('hidden'); return; }
+    suggestions.classList.remove('hidden');
+    let n = 0;
+    chips.forEach(c => { const m = c.dataset.name.includes(q); c.style.display = m ? '' : 'none'; if(m) n++; });
+    if (!n) suggestions.classList.add('hidden');
+}
+
+function addMember(id, name) {
+    document.getElementById('memberUserId').value = id;
+    {% if is_mix %}
+    document.getElementById('memberGender').value =
+        document.querySelector('input[name="gender"]:checked')?.value || 'M';
+    {% endif %}
+    document.getElementById('memberForm').submit();
+}
+
+document.getElementById('nameInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); document.getElementById('addForm').submit(); }
+});
+</script>
+{% endblock %}

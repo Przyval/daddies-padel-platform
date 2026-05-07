@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>New Tournament — Daddies Padel</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Plus Jakarta Sans',system-ui,-apple-system,sans-serif;background:#fff;color:#1B1C1A;
+     min-height:100vh;min-height:100dvh;-webkit-tap-highlight-color:transparent}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;border:none;cursor:pointer;background:none}
+
+.page{padding:0 24px;padding-bottom:40px;max-width:480px;margin:0 auto}
+
+/* ═══ Top bar (hidden in step 0, shown in step 1+) ═══ */
+.topbar{display:flex;align-items:center;height:56px;gap:8px;
+        padding-top:env(safe-area-inset-top,0)}
+.topbar-back{width:32px;height:32px;display:flex;align-items:center;justify-content:center;
+             font-size:22px;color:#1B1C1A;flex-shrink:0}
+.topbar-title{font-size:20px;font-weight:800;color:#3F3D99;flex:1}
+
+/* ═══ Step 0: Name input — centered on page ═══ */
+.name-wrap{padding-top:30vh;padding-bottom:20px}
+.name-label{font-weight:600;font-size:17px;color:#1B1C1A;margin-bottom:12px}
+.name-input{width:100%;border:none;border-bottom:1px solid #e0e0e0;outline:none;
+            font-size:15px;font-weight:400;font-family:inherit;color:#1B1C1A;
+            padding:10px 0;background:transparent}
+.name-input::placeholder{color:#bbb}
+.name-input:focus{border-bottom-color:#3F3D99}
+
+/* ═══ Config chips ═══ */
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.chip{display:inline-flex;align-items:center;padding:8px 14px;border-radius:6px;
+      background:#f0f0f0;font-weight:400;font-size:14px;color:#1B1C1A}
+
+/* ═══ Dropdown ═══ */
+.dropdown{background:#fff;border-radius:10px;padding:6px 0;
+          box-shadow:0 1px 12px rgba(0,0,0,.1);max-height:55vh;overflow-y:auto;margin-top:4px}
+.dd-head{padding:12px 20px 6px;font-size:13px;font-weight:400;color:#888}
+.dd-item{padding:14px 20px;font-weight:400;font-size:15px;color:#1B1C1A;cursor:pointer}
+.dd-item:active{background:#f5f5f5}
+
+/* ═══ Format cards ═══ */
+.fmt-card{background:#fff;border-radius:10px;padding:16px 20px;margin-bottom:6px;cursor:pointer;
+          box-shadow:0 1px 4px rgba(0,0,0,.05);transition:transform .1s}
+.fmt-card:active{transform:scale(.98);background:#fafafa}
+.fmt-title{font-weight:800;font-size:15px;color:#3F3D99}
+.fmt-desc{font-size:12px;color:#888;line-height:1.5;margin-top:2px}
+
+/* ═══ Player list ═══ */
+.pl-hint{font-size:14px;font-weight:400;color:#888;text-align:center;padding:32px 0 16px}
+.pl-row{display:flex;align-items:center;padding:12px 0;border-bottom:1px solid #f0f0f0}
+.pl-name{flex:1;font-weight:400;font-size:15px;color:#1B1C1A}
+.pl-del{width:26px;height:26px;border-radius:50%;background:#E86830;display:flex;align-items:center;
+        justify-content:center;cursor:pointer;flex-shrink:0;border:none;color:#fff;font-size:16px;
+        font-weight:700;line-height:1}
+.pl-del:active{background:#c62828}
+.pl-count{font-size:13px;font-weight:400;color:#888;text-align:right;padding:8px 0}
+
+.pl-input-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #f0f0f0}
+.pl-input{flex:1;border:none;outline:none;font-size:14px;font-weight:400;font-family:inherit;
+          color:#1B1C1A;padding:8px 0;background:transparent}
+.pl-input::placeholder{color:#ccc}
+.pl-add{width:26px;height:26px;border-radius:50%;background:#6B7FC6;display:flex;align-items:center;
+        justify-content:center;cursor:pointer;flex-shrink:0;border:none;color:#fff;font-size:16px;
+        font-weight:700;line-height:1}
+.pl-add:active{background:#5268B0}
+
+/* ═══ START GAME button ═══ */
+.start-btn{width:100%;padding:16px;border-radius:10px;font-weight:800;font-size:15px;
+           text-align:center;text-transform:uppercase;letter-spacing:.02em;margin-top:16px;
+           transition:all .2s;border:none;font-family:inherit}
+.start-btn.off{background:#e8e8e8;color:#ccc;cursor:not-allowed}
+.start-btn.on{background:#1B1C1A;color:#fff;cursor:pointer}
+.start-btn.on:active{transform:scale(.97);background:#333}
+
+/* Phases */
+.phase{display:none}
+.phase.show{display:block;animation:fadeIn .25s ease-out}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<div class="page">
+
+{# ═══ Top bar — hidden in step 0 ═══ #}
+<div class="topbar" id="topbar" style="display:none">
+    <a href="/tournament/" class="topbar-back">←</a>
+    <span class="topbar-title" id="topTitle"></span>
+</div>
+
+{# ═══ PHASE 0: Name input — no topbar, vertically centered ═══ #}
+<div id="ph0" class="phase show">
+    <div class="name-wrap">
+        <p class="name-label">The name of this tournament</p>
+        <input id="nameInput" type="text" class="name-input" placeholder="Start typing."
+               autocomplete="off" autofocus>
+    </div>
+</div>
+
+{# ═══ PHASE 1: Format selection ═══ #}
+<div id="ph1" class="phase">
+    {% for key, fmt in formats.items() %}
+    <div class="fmt-card" onclick="pickFormat('{{ key }}','{{ fmt.label }}')">
+        <p class="fmt-title">{{ fmt.label }}</p>
+        <p class="fmt-desc">{{ fmt.desc }}</p>
+    </div>
+    {% endfor %}
+</div>
+
+{# ═══ PHASE 2: Config + Players ═══ #}
+<div id="ph2" class="phase">
+    <div id="chipRow" class="chips"></div>
+    <div id="configArea"></div>
+
+    <div id="playerSection" style="display:none">
+        <p class="pl-hint" id="plHint">Add at least 4 players<br><span style="font-size:12px;color:#aaa">Tip: "Yanto, Wish" (with comma) = fixed team</span></p>
+        <div id="playerList"></div>
+        <div class="pl-input-row">
+            <input id="playerInput" class="pl-input" type="text" placeholder="Type a player name"
+                   autocomplete="off" onkeydown="if(event.key==='Enter'&&this.value.trim())addPlayer()">
+            <button type="button" class="pl-add" onclick="addPlayer()">+</button>
+        </div>
+        <p id="plCount" class="pl-count"></p>
+        <button type="button" id="startBtn" class="start-btn off" onclick="startGame()">
+            START GAME!
+        </button>
+    </div>
+</div>
+
+</div>
+
+<script>
+const S = { name:'', format:'americano', courts:0, scoring:'', players:[] };
+
+const courtsOpts = Array.from({length:12},(_,i)=>({v:i+1, l:(i+1)+' court'+(i>0?'s':'')}));
+const scoreOpts = [
+    {v:'sets',l:'Games & Sets'},{v:'16',l:'16 points'},{v:'21',l:'21 points'},
+    {v:'24',l:'24 points'},{v:'32',l:'32 points'},{v:'undefined',l:'Undefined amount'}
+];
+
+/* ── Phase 0→1: show formats on type ── */
+const nameEl = document.getElementById('nameInput');
+let fmtShown = false;
+
+function checkName(){
+    const has = nameEl.value.trim().length > 0;
+    const ph1 = document.getElementById('ph1');
+    if(has && !fmtShown){ fmtShown=true; ph1.classList.add('show'); }
+    else if(!has && fmtShown){ fmtShown=false; ph1.classList.remove('show'); }
+}
+nameEl.addEventListener('input', checkName);
+
+/* ── Phase 1→2: pick format ── */
+function pickFormat(key, label){
+    S.name = nameEl.value.trim();
+    S.format = key;
+
+    // Show topbar with tournament name
+    document.getElementById('topbar').style.display = 'flex';
+    document.getElementById('topTitle').textContent = S.name;
+
+    document.getElementById('ph0').classList.remove('show');
+    document.getElementById('ph1').classList.remove('show');
+    document.getElementById('ph2').classList.add('show');
+    showConfig(0);
+}
+
+/* ── Config: courts → scoring → players ── */
+function showConfig(step){
+    const area = document.getElementById('configArea');
+    if(step===0){
+        area.innerHTML = '<div class="dropdown">' +
+            '<p class="dd-head">How many courts will you play?</p>' +
+            courtsOpts.map(o=>'<div class="dd-item" onclick="pickCourts('+o.v+')">'+o.l+'</div>').join('') +
+            '</div>';
+    } else if(step===1){
+        area.innerHTML = '<div class="dropdown">' +
+            '<p class="dd-head">Points to play</p>' +
+            scoreOpts.map(o=>'<div class="dd-item" onclick="pickScore(\''+o.v+'\',\''+o.l+'\')">'+o.l+'</div>').join('') +
+            '</div>';
+    } else {
+        area.innerHTML = '';
+        document.getElementById('playerSection').style.display = 'block';
+        document.getElementById('playerSection').style.animation = 'fadeIn .25s ease-out';
+        if(S.format.includes('team')) document.getElementById('playerInput').placeholder = 'Name, Name (comma = team)';
+        setTimeout(()=>document.getElementById('playerInput').focus(), 100);
+    }
+}
+
+function pickCourts(v){
+    S.courts = v;
+    addChip(v+' court'+(v>1?'s':''));
+    showConfig(1);
+}
+
+function pickScore(v, label){
+    S.scoring = v;
+    addChip(label);
+    showConfig(2);
+}
+
+function addChip(text){
+    const el = document.createElement('span');
+    el.className = 'chip';
+    el.textContent = text;
+    document.getElementById('chipRow').appendChild(el);
+}
+
+/* ── Players ──
+   S.players stores objects: {name, partner?}
+   "Yanto, Wish" → {name:"Yanto", partner:"Wish"} (fixed team)
+   "Adi"         → {name:"Adi"}                    (solo)
+*/
+function allNames(){
+    const out = [];
+    S.players.forEach(p => { out.push(p.name); if(p.partner) out.push(p.partner); });
+    return out;
+}
+
+function addPlayer(){
+    const inp = document.getElementById('playerInput');
+    const raw = inp.value.trim();
+    if(!raw) return;
+
+    const existing = allNames().map(n => n.toLowerCase());
+
+    if(raw.includes(',')){
+        // Team pair: "Yanto, Wish"
+        const parts = raw.split(',').map(s => s.trim()).filter(Boolean);
+        if(parts.length < 2){ inp.select(); return; }
+        const a = parts[0], b = parts[1];
+        if(existing.includes(a.toLowerCase()) || existing.includes(b.toLowerCase())){ inp.select(); return; }
+        if(a.toLowerCase() === b.toLowerCase()){ inp.select(); return; }
+        S.players.push({name: a, partner: b});
+    } else {
+        if(existing.includes(raw.toLowerCase())){ inp.select(); return; }
+        S.players.push({name: raw});
+    }
+    inp.value = '';
+    inp.focus();
+    renderPlayers();
+}
+
+function removePlayer(i){
+    S.players.splice(i, 1);
+    renderPlayers();
+}
+
+function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
+
+function renderPlayers(){
+    const list = document.getElementById('playerList');
+    const isTeamFmt = S.format.includes('team');
+    list.innerHTML = S.players.map((p,i)=>{
+        const display = p.partner ? esc(p.name) + ' & ' + esc(p.partner) : esc(p.name);
+        const tag = p.partner ? '<span style="font-size:11px;color:#6B7FC6;font-weight:600;margin-left:6px">TEAM</span>' : '';
+        return '<div class="pl-row">' +
+            '<span class="pl-name">' + display + tag + '</span>' +
+            '<button type="button" class="pl-del" onclick="removePlayer('+i+')">−</button>' +
+            '</div>';
+    }).join('');
+
+    const names = allNames();
+    const n = names.length;
+    document.getElementById('plCount').textContent = n > 0 ? n+' players' : '';
+    document.getElementById('plHint').style.display = n > 0 ? 'none' : '';
+    if(isTeamFmt){
+        document.getElementById('playerInput').placeholder = 'Name, Name (comma = team)';
+    }
+
+    const btn = document.getElementById('startBtn');
+    const ready = n >= 4;
+    btn.className = 'start-btn ' + (ready ? 'on' : 'off');
+}
+
+/* ── Start game ── */
+function startGame(){
+    const names = allNames();
+    if(names.length < 4){
+        alert('Minimal 4 pemain');
+        return;
+    }
+
+    const b = new FormData();
+    b.append('name', S.name);
+    b.append('format', S.format);
+    b.append('courts', S.courts);
+    b.append('scoring', S.scoring);
+    b.append('players', JSON.stringify(names));
+
+    fetch('/tournament/v1/create/submit', {method:'POST', body:b})
+        .then(r=>r.json())
+        .then(d=>{
+            if(d.ok) window.location.href='/tournament/'+d.tournament_id;
+            else alert(d.error||'Failed to create tournament');
+        })
+        .catch(e=>alert('Error: '+e));
+}
+
+nameEl.focus();
+</script>
+</body>
+</html>

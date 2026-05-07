@@ -1,0 +1,561 @@
+{% extends "base.html" %}
+{% block title %}{{ tournament.name }} — Daddies Padel{% endblock %}
+
+{% block header_left %}
+<a href="{{ url_for('tournament.tournament_list') }}" class="text-primary-container">
+    <span class="material-symbols-outlined">arrow_back</span>
+</a>
+<h1 class="font-headline font-bold tracking-tight text-xl text-primary-container truncate">{{ tournament.name }}</h1>
+{% endblock %}
+
+{% block header_right %}
+<a href="{{ url_for('tournament.share', tournament_id=tournament.id) }}" class="text-primary-container">
+    <span class="material-symbols-outlined">share</span>
+</a>
+{% endblock %}
+
+{% block content %}
+
+{# ═══ HERO — emoji + big title + key info ═══ #}
+<section class="text-center pb-2">
+    <div class="text-4xl mb-2">
+        {% if tournament.status == 'completed' %}🏆{% else %}🎾{% endif %}
+    </div>
+    <h2 class="text-xl font-extrabold text-on-surface">{{ tournament.name }}</h2>
+    <p class="text-sm text-on-surface-variant mt-1">
+        {{ tournament.format_label }} · {{ tournament.participants.count() }} pemain · {{ tournament.venue }}
+    </p>
+</section>
+
+{# ═══ STATS — simple, large, 3 items only ═══ #}
+<section class="grid grid-cols-3 gap-3 mb-2">
+    <div class="card text-center !p-4" style="min-height:72px">
+        <p class="text-2xl font-extrabold text-primary">{{ rounds|length }}</p>
+        <p class="text-xs font-bold text-on-surface-variant mt-1">Ronde</p>
+    </div>
+    <div class="card text-center !p-4" style="min-height:72px">
+        <p class="text-2xl font-extrabold text-success">{{ tournament.completed_matches }}</p>
+        <p class="text-xs font-bold text-on-surface-variant mt-1">Selesai</p>
+    </div>
+    <div class="card text-center !p-4" style="min-height:72px">
+        <p class="text-2xl font-extrabold text-primary">{{ tournament.num_courts }}</p>
+        <p class="text-xs font-bold text-on-surface-variant mt-1">Court</p>
+    </div>
+</section>
+
+{# ═══ TIMER (if any) ═══ #}
+{% if tournament.minutes_to_play > 0 and tournament.status == 'playing' %}
+<section class="card !p-4 flex items-center justify-between" id="timerSection">
+    <div class="flex items-center gap-3">
+        <span class="text-2xl">⏱️</span>
+        <span id="timerDisplay" class="text-3xl font-extrabold text-primary tabular-nums">
+            {{ '%02d:%02d'|format(tournament.minutes_to_play, 0) }}
+        </span>
+    </div>
+    <div class="flex items-center gap-2">
+        <button onclick="toggleTimer()" id="timerBtn"
+                class="btn-primary !px-5 !py-3 text-sm gap-1 active:scale-[0.95]" style="min-height:48px">
+            <span class="material-symbols-outlined text-lg" id="timerIcon">play_arrow</span>
+            <span id="timerLabel">Start</span>
+        </button>
+        <button onclick="resetTimer()" class="btn-ghost !px-4 !py-3 active:scale-[0.95]" style="min-height:48px">
+            <span class="material-symbols-outlined text-lg">restart_alt</span>
+        </button>
+    </div>
+</section>
+{% endif %}
+
+{# ═══ TAB BAR — big, obvious ═══ #}
+<section>
+    <div class="flex gap-1 bg-surface-container-low rounded-full p-1.5">
+        {% set tabs = [
+            ('rounds', 'round=' ~ current_round, '🎾', 'Ronde'),
+            ('standing', '', '📊', 'Ranking'),
+            ('playoff', '', '🏆', 'Playoff'),
+        ] %}
+        {% for id, extra, emoji, label in tabs %}
+        <a href="?tab={{ id }}{{ '&' ~ extra if extra }}&v=2"
+           class="flex-1 text-center py-3 text-sm font-extrabold rounded-full transition-all flex items-center justify-center gap-1.5
+                  {{ 'bg-primary text-on-primary shadow-lg' if tab == id else 'text-on-surface-variant active:bg-surface-container-high' }}"
+           style="min-height:48px">
+            <span class="text-base">{{ emoji }}</span> {{ label }}
+        </a>
+        {% endfor %}
+    </div>
+</section>
+
+{# ═══════════ TAB: ROUNDS ═══════════ #}
+{% if tab == 'rounds' %}
+<section class="space-y-4">
+    {% if rounds %}
+    {# Round selector — big pills #}
+    <div class="flex items-center justify-between">
+        {% if current_round > 1 %}
+        <a href="?tab=rounds&round={{ current_round - 1 }}&v=2"
+           class="w-12 h-12 flex items-center justify-center rounded-full bg-surface-container-low active:scale-[0.90] transition-transform">
+            <span class="material-symbols-outlined text-xl">chevron_left</span>
+        </a>
+        {% else %}<div class="w-12"></div>{% endif %}
+
+        <div class="text-center">
+            <p class="text-xl font-extrabold text-primary">Ronde {{ current_round }}</p>
+            {% if round_obj %}
+            <p class="text-sm font-bold {{ 'text-success' if round_obj.is_complete else 'text-on-surface-variant' }}">
+                {% if round_obj.is_complete %}✅ Selesai{% else %}{{ round_obj.completed_count }}/{{ round_obj.total_matches }} match{% endif %}
+            </p>
+            {% endif %}
+        </div>
+
+        {% if current_round < rounds|length %}
+        <a href="?tab=rounds&round={{ current_round + 1 }}&v=2"
+           class="w-12 h-12 flex items-center justify-center rounded-full bg-surface-container-low active:scale-[0.90] transition-transform">
+            <span class="material-symbols-outlined text-xl">chevron_right</span>
+        </a>
+        {% else %}<div class="w-12"></div>{% endif %}
+    </div>
+
+    {# Round pills #}
+    <div class="flex gap-2 justify-center flex-wrap">
+        {% for r in rounds %}
+        <a href="?tab=rounds&round={{ r.round_number }}&v=2"
+           class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-extrabold transition-all active:scale-[0.90]
+                  {% if r.round_number == current_round %}bg-primary text-on-primary shadow-lg
+                  {% elif r.is_complete %}bg-success/15 text-success
+                  {% else %}bg-surface-container-high text-on-surface-variant{% endif %}"
+           style="min-height:40px">
+            {% if r.is_complete and r.round_number != current_round %}✓{% else %}{{ r.round_number }}{% endif %}
+        </a>
+        {% endfor %}
+    </div>
+
+    {# Progress bar #}
+    {% if round_obj and round_obj.total_matches > 0 %}
+    {% set pct = (round_obj.completed_count / round_obj.total_matches * 100)|int %}
+    <div class="w-full bg-surface-container-high rounded-full h-2">
+        <div class="h-2 rounded-full transition-all {{ 'bg-success' if round_obj.is_complete else 'bg-primary' }}"
+             style="width: {{ pct }}%"></div>
+    </div>
+    {% endif %}
+    {% endif %}
+
+    {# ═══ MATCH CARDS — super simple, big inputs ═══ #}
+    {% if round_obj %}
+    <div class="space-y-5">
+        {% for match in round_obj.matches %}
+        <div class="card !p-0 overflow-hidden {{ 'ring-2 ring-success/30' if match.status == 'completed' }}">
+
+            {# Court header #}
+            <div class="flex items-center justify-between px-5 py-3 bg-surface-container-lowest">
+                <span class="text-sm font-extrabold text-on-surface">🏟️ Court {{ match.court }}</span>
+                {% if match.status == 'completed' %}
+                <span class="text-xs font-bold text-success">✅ Selesai</span>
+                {% elif match.status == 'canceled' %}
+                <span class="text-xs font-bold text-error">❌ Batal</span>
+                {% else %}
+                <span class="text-xs font-bold text-warning">⏳ Belum</span>
+                {% endif %}
+            </div>
+
+            {% if match.status != 'canceled' %}
+            <form id="sf-{{ match.id }}" action="{{ url_for('tournament.update_score', tournament_id=tournament.id, match_id=match.id) }}" method="post">
+            <div class="px-5 py-4">
+
+                {# Team names: LEFT vs RIGHT #}
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex-1 {{ 'opacity-40' if match.status == 'completed' and match.winner == 'team2' }}">
+                        {% if match.status == 'completed' and match.winner == 'team1' %}
+                        <span class="text-sm">🏆</span>
+                        {% endif %}
+                        <p class="text-base font-extrabold text-on-surface">{{ match.team1_p1.first_name if match.team1_p1 else '?' }}</p>
+                        <p class="text-base font-bold text-on-surface">{{ match.team1_p2.first_name if match.team1_p2 else '?' }}</p>
+                    </div>
+                    <div class="px-4">
+                        <span class="text-sm font-extrabold text-on-surface-variant/50">VS</span>
+                    </div>
+                    <div class="flex-1 text-right {{ 'opacity-40' if match.status == 'completed' and match.winner == 'team1' }}">
+                        {% if match.status == 'completed' and match.winner == 'team2' %}
+                        <span class="text-sm">🏆</span>
+                        {% endif %}
+                        <p class="text-base font-extrabold text-on-surface">{{ match.team2_p1.first_name if match.team2_p1 else '?' }}</p>
+                        <p class="text-base font-bold text-on-surface">{{ match.team2_p2.first_name if match.team2_p2 else '?' }}</p>
+                    </div>
+                </div>
+
+                {# SCORE INPUT — big, obvious, easy to tap #}
+                {% if tournament.scoring_mode == 'points' %}
+                <div class="flex justify-center gap-6 mb-2">
+                    <div class="text-center">
+                        <div class="bg-inverse-surface rounded-2xl flex items-center justify-center" style="width:80px;height:80px">
+                            <input name="points_t1" type="number" min="0" max="99" inputmode="numeric"
+                                   value="{{ match.score_team1 if match.status == 'completed' else '' }}"
+                                   placeholder="0"
+                                   class="w-full h-full text-center text-4xl font-extrabold bg-transparent text-white outline-none
+                                          [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none
+                                          placeholder:text-white/20">
+                        </div>
+                        <p class="text-[11px] font-bold text-on-surface-variant mt-1.5">Kiri</p>
+                    </div>
+                    <div class="flex items-center text-xl font-extrabold text-on-surface-variant/30">:</div>
+                    <div class="text-center">
+                        <div class="bg-inverse-surface rounded-2xl flex items-center justify-center" style="width:80px;height:80px">
+                            <input name="points_t2" type="number" min="0" max="99" inputmode="numeric"
+                                   value="{{ match.score_team2 if match.status == 'completed' else '' }}"
+                                   placeholder="0"
+                                   class="w-full h-full text-center text-4xl font-extrabold bg-transparent text-white outline-none
+                                          [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none
+                                          placeholder:text-white/20">
+                        </div>
+                        <p class="text-[11px] font-bold text-on-surface-variant mt-1.5">Kanan</p>
+                    </div>
+                </div>
+
+                {% else %}
+                {# SETS — 3 columns, each with 2 big inputs #}
+                <div class="grid grid-cols-3 gap-4 mb-2">
+                    {% for si in range(1, 4) %}
+                    <div class="text-center">
+                        <p class="text-xs font-bold text-on-surface-variant mb-2">Set {{ si }}</p>
+                        <div class="space-y-2">
+                            <div class="bg-inverse-surface rounded-2xl flex items-center justify-center" style="min-height:56px">
+                                <input name="set{{ si }}_t1" type="number" min="0" max="10" inputmode="numeric"
+                                       value="{{ match.sets[si-1][0] if match.sets|length >= si else '' }}"
+                                       placeholder="·" {{ 'required' if si == 1 }}
+                                       class="w-full py-3.5 text-center text-2xl font-extrabold bg-transparent text-white outline-none
+                                              [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none
+                                              placeholder:text-white/20">
+                            </div>
+                            <div class="bg-inverse-surface rounded-2xl flex items-center justify-center" style="min-height:56px">
+                                <input name="set{{ si }}_t2" type="number" min="0" max="10" inputmode="numeric"
+                                       value="{{ match.sets[si-1][1] if match.sets|length >= si else '' }}"
+                                       placeholder="·" {{ 'required' if si == 1 }}
+                                       class="w-full py-3.5 text-center text-2xl font-extrabold bg-transparent text-white outline-none
+                                              [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none
+                                              placeholder:text-white/20">
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="flex items-center justify-between text-xs font-bold text-on-surface-variant/50 px-1 mb-2">
+                    <span>⬆ Kiri</span>
+                    <span>Kanan ⬆</span>
+                </div>
+                {% endif %}
+
+                {# SAVE — full width, huge #}
+                <button type="submit"
+                        class="btn-primary w-full py-4 text-base gap-2 font-extrabold active:scale-[0.97] mt-2"
+                        style="min-height:56px">
+                    {{ '✅ Update Skor' if match.status == 'completed' else '💾 Simpan Skor' }}
+                </button>
+            </div>
+            </form>
+            {% else %}
+            <div class="px-5 py-6 text-center">
+                <p class="text-sm text-error/60">❌ Match dibatalkan</p>
+            </div>
+            {% endif %}
+
+            {# Winner display #}
+            {% if match.status == 'completed' %}
+            <div class="px-5 pb-3 text-center">
+                <p class="text-xs font-bold {{ 'text-success' if match.winner != 'draw' else 'text-warning' }}">
+                    {% if match.winner == 'team1' %}🏆 {{ match.team1_p1.first_name if match.team1_p1 else '?' }} &amp; {{ match.team1_p2.first_name if match.team1_p2 else '?' }} menang
+                    {% elif match.winner == 'team2' %}🏆 {{ match.team2_p1.first_name if match.team2_p1 else '?' }} &amp; {{ match.team2_p2.first_name if match.team2_p2 else '?' }} menang
+                    {% else %}🤝 Seri{% endif %}
+                </p>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {# ═══ ROUND ACTIONS ═══ #}
+    {% if tournament.status == 'playing' %}
+    <div class="space-y-3">
+        <div class="flex gap-2">
+            {% if tournament.format in ('mexicano','team_mexicano','super_mexicano','mixicano','club_mexicano') %}
+            <form action="{{ url_for('tournament.next_round', tournament_id=tournament.id) }}" method="post" class="flex-1">
+                <button type="submit" class="btn-primary w-full py-4 text-base gap-2 font-bold active:scale-[0.97]
+                        {{ 'opacity-30 pointer-events-none' if round_obj and not round_obj.is_complete }}"
+                        style="min-height:56px">
+                    ➕ Ronde Baru
+                </button>
+            </form>
+            {% elif current_round < rounds|length %}
+            <form action="{{ url_for('tournament.next_round', tournament_id=tournament.id) }}" method="post" class="flex-1">
+                <button type="submit" class="btn-primary w-full py-4 text-base gap-2 font-bold active:scale-[0.97]
+                        {{ 'opacity-30 pointer-events-none' if round_obj and not round_obj.is_complete }}"
+                        style="min-height:56px">
+                    ▶️ Ronde {{ current_round + 1 }}
+                </button>
+            </form>
+            {% elif round_obj and round_obj.is_complete %}
+            <div class="flex-1 text-center py-4 text-base font-bold text-success" style="min-height:56px">
+                ✅ Semua ronde selesai!
+            </div>
+            {% endif %}
+
+            <form action="{{ url_for('tournament.complete_tournament', tournament_id=tournament.id) }}" method="post">
+                <button type="submit" class="btn-ghost py-4 px-6 text-base font-bold active:scale-[0.97]"
+                        onclick="return confirm('Selesaikan turnamen?')"
+                        style="min-height:56px">
+                    🏁
+                </button>
+            </form>
+        </div>
+
+        {% if round_obj and not round_obj.is_complete %}
+        <p class="text-sm text-center text-on-surface-variant">
+            ☝️ Isi semua skor dulu sebelum lanjut
+        </p>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {% if not rounds %}
+    <div class="card text-center py-8">
+        <span class="text-4xl">🎾</span>
+        <p class="text-sm text-on-surface-variant mt-3">Belum ada ronde.</p>
+    </div>
+    {% endif %}
+</section>
+{% endif %}
+
+{# ═══════════ TAB: STANDING ═══════════ #}
+{% if tab == 'standing' %}
+<section class="space-y-3">
+    {% for s in leaderboard %}
+    <div class="card !p-4 flex items-center gap-3 {{ 'ring-1 ring-warning/20 shadow-md' if loop.index <= 3 }}
+                cursor-pointer active:scale-[0.98] transition-transform"
+         onclick="document.getElementById('d2-{{ loop.index }}').classList.toggle('hidden')"
+         style="min-height:64px">
+        {# Rank #}
+        <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0
+                    {{ 'bg-yellow-100' if loop.index == 1 else 'bg-gray-100' if loop.index == 2 else 'bg-orange-100' if loop.index == 3 else 'bg-surface-container-high' }}">
+            {% if loop.index == 1 %}<span class="text-xl">🥇</span>
+            {% elif loop.index == 2 %}<span class="text-xl">🥈</span>
+            {% elif loop.index == 3 %}<span class="text-xl">🥉</span>
+            {% else %}<span class="text-base font-extrabold text-on-surface-variant">{{ loop.index }}</span>{% endif %}
+        </div>
+
+        {# Name #}
+        <div class="flex-1 min-w-0">
+            <p class="text-base font-extrabold text-on-surface truncate">{{ s.participant.first_name }}</p>
+            <p class="text-xs text-on-surface-variant">
+                <span class="text-success font-bold">{{ s.wins }}W</span> ·
+                <span class="text-error font-bold">{{ s.losses }}L</span> ·
+                <span class="font-bold">{{ s.ties }}T</span>
+            </p>
+        </div>
+
+        {# Score + diff #}
+        <div class="text-right flex-shrink-0">
+            <p class="text-xl font-extrabold text-primary">{{ s.points }}</p>
+            {% set diff = s.games_won - s.games_lost %}
+            <p class="text-xs font-bold {{ 'text-success' if diff > 0 else 'text-error' if diff < 0 else 'text-on-surface-variant' }}">
+                {{ '+' if diff > 0 }}{{ diff }} diff
+            </p>
+        </div>
+    </div>
+
+    {# Expandable detail #}
+    <div id="d2-{{ loop.index }}" class="hidden card !p-4 !-mt-1 space-y-4">
+        <div class="grid grid-cols-5 gap-2 text-center">
+            {% for val, label, color in [(s.wins, 'W', 'success'), (s.losses, 'L', 'error'), (s.ties, 'T', 'warning'), (s.matches_played, 'Game', 'on-surface')] %}
+            <div>
+                <p class="text-xl font-extrabold text-{{ color }}">{{ val }}</p>
+                <p class="text-[10px] font-bold uppercase text-on-surface-variant">{{ label }}</p>
+            </div>
+            {% endfor %}
+            <div>
+                {% set gd = s.games_won - s.games_lost %}
+                <p class="text-xl font-extrabold {{ 'text-success' if gd > 0 else 'text-error' if gd < 0 else 'text-on-surface-variant' }}">{{ '+' if gd > 0 }}{{ gd }}</p>
+                <p class="text-[10px] font-bold uppercase text-on-surface-variant">Diff</p>
+            </div>
+        </div>
+
+        {% if s.teammates %}
+        <div>
+            <p class="text-xs font-bold text-on-surface-variant mb-2">👥 Teammates</p>
+            <div class="flex flex-wrap gap-2">
+                {% for name, cnt in s.teammates %}
+                <span class="px-3 py-2 rounded-full bg-surface-container-low text-xs font-bold" style="min-height:36px">
+                    {{ name }} · {{ cnt }}x
+                </span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if s.h2h %}
+        <div>
+            <p class="text-xs font-bold text-on-surface-variant mb-2">⚔️ Head-to-Head</p>
+            <div class="space-y-1.5">
+                {% for name, delta in s.h2h %}
+                <div class="flex items-center justify-between py-1.5">
+                    <span class="text-sm text-on-surface">{{ name }}</span>
+                    <span class="text-sm font-extrabold {{ 'text-success' if delta > 0 else 'text-error' if delta < 0 else 'text-on-surface-variant' }}">
+                        {{ '+' if delta > 0 }}{{ delta }}
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% else %}
+    <div class="card text-center py-8">
+        <span class="text-4xl">📊</span>
+        <p class="text-sm text-on-surface-variant mt-3">Belum ada data.</p>
+    </div>
+    {% endfor %}
+
+    {# Playoff button #}
+    {% if leaderboard|length >= 4 and tournament.status == 'playing' %}
+    <div class="space-y-2 pt-4">
+        <p class="text-sm font-bold text-center text-on-surface-variant">Buat Playoff Bracket</p>
+        <div class="flex gap-3">
+            <form action="{{ url_for('tournament.generate_playoff', tournament_id=tournament.id) }}" method="post" class="flex-1">
+                <input type="hidden" name="bracket_size" value="4">
+                <button type="submit" class="btn-primary w-full py-4 text-base font-bold active:scale-[0.97]" style="min-height:52px">🏆 Top 4</button>
+            </form>
+            {% if leaderboard|length >= 8 %}
+            <form action="{{ url_for('tournament.generate_playoff', tournament_id=tournament.id) }}" method="post" class="flex-1">
+                <input type="hidden" name="bracket_size" value="8">
+                <button type="submit" class="btn-secondary w-full py-4 text-base font-bold active:scale-[0.97]" style="min-height:52px">Top 8</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</section>
+{% endif %}
+
+{# ═══════════ TAB: PLAYOFF ═══════════ #}
+{% if tab == 'playoff' %}
+<section class="space-y-4">
+    {% if playoffs %}
+    <div class="overflow-x-auto no-scrollbar -mx-6 px-6">
+        <div class="flex gap-6 min-w-[600px] items-center py-4">
+            {% set bracket_rounds = {} %}
+            {% for p in playoffs %}
+                {% if p.bracket_round not in bracket_rounds %}{% set _ = bracket_rounds.update({p.bracket_round: []}) %}{% endif %}
+                {% set _ = bracket_rounds[p.bracket_round].append(p) %}
+            {% endfor %}
+
+            {% for rnd_num in bracket_rounds|sort %}
+            <div class="flex-1 space-y-{{ 2 ** rnd_num * 2 }}">
+                <p class="text-xs font-extrabold uppercase tracking-widest text-on-surface-variant text-center mb-3">
+                    {% if rnd_num == bracket_rounds|length %}🏆 Final
+                    {% elif rnd_num == bracket_rounds|length - 1 %}⚔️ Semi
+                    {% else %}Ronde {{ rnd_num }}{% endif %}
+                </p>
+                {% for match in bracket_rounds[rnd_num] %}
+                <div class="card !p-4 space-y-2 min-w-[180px]">
+                    {% for team, winner_key in [('team1', 'team1'), ('team2', 'team2')] %}
+                    <div class="flex items-center justify-between py-2 px-3 rounded-xl
+                                {{ 'bg-success/10 ring-1 ring-success/30' if match.status == 'completed' and match.winner == winner_key else 'bg-surface-container-low' }}"
+                         style="min-height:44px">
+                        <span class="text-sm font-bold text-on-surface truncate">
+                            {% if team == 'team1' %}
+                            {{ match.team1_p1.first_name if match.team1_p1 else 'TBD' }}{% if match.team1_p2 %} &amp; {{ match.team1_p2.first_name }}{% endif %}
+                            {% else %}
+                            {{ match.team2_p1.first_name if match.team2_p1 else 'TBD' }}{% if match.team2_p2 %} &amp; {{ match.team2_p2.first_name }}{% endif %}
+                            {% endif %}
+                        </span>
+                        {% if match.status == 'completed' %}
+                        <span class="text-base font-extrabold {{ 'text-success' if match.winner == winner_key else 'text-on-surface-variant/50' }}">
+                            {% if team == 'team1' %}{{ match.sets|map('first')|sum if match.sets else '-' }}
+                            {% else %}{{ match.sets|map('last')|sum if match.sets else '-' }}{% endif %}
+                        </span>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+
+                    {% if match.status == "pending" and match.team1_p1 and match.team2_p1 %}
+                    <form action="{{ url_for('tournament.playoff_score', tournament_id=tournament.id, playoff_id=match.id) }}" method="post" class="space-y-2 pt-2">
+                        {% for i in range(1, 4) %}
+                        <div class="grid grid-cols-3 gap-2 items-center">
+                            <span class="text-xs font-bold text-on-surface-variant text-center">S{{ i }}</span>
+                            <input name="set{{ i }}_t1" type="number" min="0" max="10" inputmode="numeric"
+                                   class="input-field !py-2 text-center text-base font-bold !rounded-xl" {{ 'required' if i == 1 }}
+                                   style="min-height:44px">
+                            <input name="set{{ i }}_t2" type="number" min="0" max="10" inputmode="numeric"
+                                   class="input-field !py-2 text-center text-base font-bold !rounded-xl" {{ 'required' if i == 1 }}
+                                   style="min-height:44px">
+                        </div>
+                        {% endfor %}
+                        <button type="submit" class="btn-primary w-full py-3 text-sm font-bold active:scale-[0.97]" style="min-height:48px">
+                            💾 Simpan
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <div class="card text-center py-8">
+        <span class="text-4xl">🏆</span>
+        <h3 class="text-base font-extrabold text-on-surface mt-3">Playoff</h3>
+        <p class="text-sm text-on-surface-variant mt-1">Buat bracket dari tab Ranking</p>
+    </div>
+    {% endif %}
+</section>
+{% endif %}
+
+{# ═══ Version switcher (small, at bottom) ═══ #}
+<section class="pt-4 text-center">
+    <div class="flex gap-2 justify-center">
+        <a href="{{ url_for('tournament.v2_detail', tournament_id=tournament.id) }}?tab={{ tab }}&v=2"
+           class="text-xs font-bold px-3 py-1.5 rounded-full {{ 'bg-primary text-on-primary' if request.args.get('v') == '2' else 'bg-surface-container-high text-on-surface-variant' }}">V2</a>
+        <a href="{{ url_for('tournament.detail', tournament_id=tournament.id) }}?tab={{ tab }}"
+           class="text-xs font-bold px-3 py-1.5 rounded-full {{ 'bg-primary text-on-primary' if not request.args.get('v') else 'bg-surface-container-high text-on-surface-variant' }}">V3</a>
+    </div>
+</section>
+
+{# Timer script #}
+{% if tournament.minutes_to_play > 0 and tournament.status == 'playing' %}
+<script>
+let totalSeconds = {{ tournament.minutes_to_play }} * 60;
+let remaining = totalSeconds;
+let timerInterval = null;
+const display = document.getElementById('timerDisplay');
+const btn = document.getElementById('timerBtn');
+const icon = document.getElementById('timerIcon');
+const label = document.getElementById('timerLabel');
+
+function updateDisplay() {
+    const m = Math.floor(remaining / 60);
+    const s = remaining % 60;
+    display.textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+    if (remaining <= 60) display.classList.add('text-error');
+    else display.classList.remove('text-error');
+}
+
+function toggleTimer() {
+    if (timerInterval) {
+        clearInterval(timerInterval); timerInterval = null;
+        icon.textContent = 'play_arrow'; label.textContent = 'Start';
+    } else {
+        timerInterval = setInterval(() => {
+            if (remaining <= 0) { clearInterval(timerInterval); timerInterval = null; alert("⏰ Waktu habis!"); return; }
+            remaining--; updateDisplay();
+        }, 1000);
+        icon.textContent = 'pause'; label.textContent = 'Pause';
+    }
+}
+
+function resetTimer() {
+    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+    remaining = totalSeconds; updateDisplay();
+    icon.textContent = 'play_arrow'; label.textContent = 'Start';
+}
+</script>
+{% endif %}
+
+{% endblock %}

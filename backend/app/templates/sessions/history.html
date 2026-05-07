@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Riwayat Sesi — Daddies Padel{% endblock %}
+
+{% block header_left %}
+<a href="{{ url_for('member.index') }}" class="hover:opacity-80 transition-opacity text-primary-container">
+    <span class="material-symbols-outlined">arrow_back</span>
+</a>
+<h1 class="font-headline font-bold tracking-tight text-xl text-primary-container">Riwayat Sesi</h1>
+{% endblock %}
+
+{% block content %}
+<section class="space-y-3">
+    {% for booking in bookings %}
+    <a href="{{ url_for('main.session_detail', match_id=booking.match.id) }}"
+       class="card !p-4 flex items-center justify-between block active:scale-[0.98] transition-transform">
+        <div class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-full bg-surface-container-low flex flex-col items-center justify-center">
+                <span class="text-[9px] font-bold text-on-surface-variant uppercase">{{ booking.match.date_time.strftime('%b') }}</span>
+                <span class="text-base font-extrabold text-primary leading-tight">{{ booking.match.date_time.strftime('%d') }}</span>
+            </div>
+            <div>
+                <p class="font-bold text-on-surface text-sm">{{ booking.match.title }}</p>
+                <p class="text-xs text-on-surface-variant">{{ booking.match.date_time.strftime('%H:%M') }} · {{ booking.match.location }}</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="badge badge-{{ booking.status }}">{{ booking.status | upper }}</span>
+            <span class="material-symbols-outlined text-on-surface-variant/50 text-base">chevron_right</span>
+        </div>
+    </a>
+    {% else %}
+    <div class="card text-center py-12">
+        <span class="material-symbols-outlined text-4xl text-on-surface-variant/30 mb-2">history</span>
+        <h3 class="font-bold text-on-surface">Belum ada riwayat</h3>
+        <p class="text-sm text-on-surface-variant mt-1">Mulai join sesi untuk melihat riwayat.</p>
+    </div>
+    {% endfor %}
+</section>
+{% endblock %}

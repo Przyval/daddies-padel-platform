@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}{{ venue.name }} — Daddies Padel{% endblock %}
+
+{% block header_left %}
+<a href="{{ url_for('main.venues') }}" class="hover:opacity-80 transition-opacity text-primary-container">
+    <span class="material-symbols-outlined">arrow_back</span>
+</a>
+<h1 class="font-headline font-bold tracking-tight text-xl text-primary-container">Venue</h1>
+{% endblock %}
+
+{% block content %}
+<!-- Heritage badge + name -->
+<section class="flex items-center justify-between">
+    <div class="space-y-1">
+        <p class="text-[0.75rem] font-bold uppercase tracking-widest text-on-surface-variant">Venue</p>
+        <h2 class="text-xl font-extrabold tracking-tight text-primary">{{ venue.name }}</h2>
+    </div>
+    <div class="w-14 h-14 bg-primary-container rounded-full flex items-center justify-center text-surface shadow-lg">
+        <span class="material-symbols-outlined filled">sports_tennis</span>
+    </div>
+</section>
+
+<!-- Info cards -->
+<section class="space-y-3">
+    <div class="card !p-4 flex items-center gap-3">
+        <span class="material-symbols-outlined text-on-surface-variant">location_on</span>
+        <div>
+            <p class="text-[10px] uppercase tracking-wider text-on-surface-variant font-bold">Alamat</p>
+            <p class="text-sm font-semibold text-on-surface">{{ venue.address }}</p>
+        </div>
+    </div>
+    <div class="grid grid-cols-2 gap-3">
+        <div class="card !p-4 text-center">
+            <span class="material-symbols-outlined text-primary mb-1">grid_view</span>
+            <p class="text-xl font-extrabold text-primary">{{ venue.courts }}</p>
+            <p class="text-[10px] uppercase tracking-wider text-on-surface-variant font-bold">Courts</p>
+        </div>
+        <div class="card !p-4 text-center">
+            <span class="material-symbols-outlined text-primary mb-1">schedule</span>
+            <p class="text-sm font-extrabold text-primary mt-1">{{ venue.hours }}</p>
+            <p class="text-[10px] uppercase tracking-wider text-on-surface-variant font-bold mt-1">Jam Buka</p>
+        </div>
+    </div>
+    {% if venue.phone %}
+    <a href="https://wa.me/{{ venue.phone }}" target="_blank"
+       class="card !p-4 flex items-center gap-3 text-success">
+        <span class="material-symbols-outlined">chat</span>
+        <div>
+            <p class="text-[10px] uppercase tracking-wider text-on-surface-variant font-bold">Kontak</p>
+            <p class="text-sm font-semibold">{{ venue.phone }}</p>
+        </div>
+    </a>
+    {% endif %}
+</section>
+
+<!-- Recent sessions at this venue -->
+{% if sessions %}
+<section>
+    <h3 class="text-lg font-bold tracking-tight mb-4">Sesi di Venue Ini</h3>
+    <div class="space-y-3">
+        {% for s in sessions %}
+        <a href="{{ url_for('main.session_detail', match_id=s.id) }}"
+           class="card !p-4 flex items-center justify-between active:scale-[0.98] transition-transform">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-surface-container-low flex flex-col items-center justify-center">
+                    <span class="text-[9px] font-bold text-on-surface-variant uppercase">{{ s.date_time.strftime('%b') }}</span>
+                    <span class="text-sm font-extrabold text-primary leading-tight">{{ s.date_time.strftime('%d') }}</span>
+                </div>
+                <div>
+                    <p class="font-semibold text-on-surface text-sm">{{ s.title }}</p>
+                    <p class="text-xs text-on-surface-variant">{{ s.date_time.strftime('%H:%M') }}</p>
+                </div>
+            </div>
+            <span class="badge badge-{{ s.status }}">{{ s.status | upper }}</span>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+{% endblock %}

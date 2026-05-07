@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Sesi — Daddies Padel{% endblock %}
+
+{% block header_left %}
+<a href="{{ url_for('member.index') }}" class="hover:opacity-80 transition-opacity text-primary-container">
+    <span class="material-symbols-outlined">arrow_back</span>
+</a>
+<h1 class="font-headline font-extrabold tracking-tight text-2xl text-primary-container">Sesi</h1>
+{% endblock %}
+
+{% block header_right %}
+{% if current_user.is_authenticated and current_user.role == 'admin' %}
+<a href="{{ url_for('ops.create_session') }}" class="hover:opacity-80 transition-opacity text-primary-container">
+    <span class="material-symbols-outlined">add_circle</span>
+</a>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<!-- Filter chips -->
+<section class="flex gap-2 overflow-x-auto no-scrollbar pb-2">
+    {% set filters = [('all', 'Semua'), ('upcoming', 'Mendatang'), ('open', 'Buka'), ('completed', 'Selesai')] %}
+    {% for val, label in filters %}
+    <a href="{{ url_for('main.sessions', status=val) }}"
+       class="px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all
+              {% if status_filter == val %}bg-primary text-on-primary shadow-lg{% else %}bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high{% endif %}">
+        {{ label }}
+    </a>
+    {% endfor %}
+</section>
+
+<!-- Session list -->
+<section class="space-y-4">
+    {% for match in matches %}
+    <a href="{{ url_for('main.session_detail', match_id=match.id) }}"
+       class="card !p-5 block active:scale-[0.98] transition-transform">
+        <div class="flex justify-between items-start mb-3">
+            <div>
+                <p class="text-[0.65rem] font-bold uppercase tracking-widest text-on-surface-variant">
+                    {{ match.date_time.strftime('%a, %d %b') }} · {{ match.date_time.strftime('%H:%M') }}
+                </p>
+                <h3 class="text-lg font-extrabold text-on-surface mt-1">{{ match.title }}</h3>
+                <p class="text-xs text-on-surface-variant mt-0.5 flex items-center gap-1">
+                    <span class="material-symbols-outlined text-sm">location_on</span>
+                    {{ match.location }}
+                </p>
+            </div>
+            <div class="text-right">
+                <span class="text-lg font-extrabold text-on-surface">IDR {{ "{:,.0f}".format(match.price) }}</span>
+                <span class="block text-[10px] text-on-surface-variant uppercase tracking-wider">per orang</span>
+            </div>
+        </div>
+
+        <div class="flex items-center justify-between py-2.5 px-4 rounded-full bg-surface-container-low">
+            <div class="flex items-center gap-2 text-sm">
+                <span class="material-symbols-outlined text-base text-on-surface-variant">group</span>
+                <span class="font-semibold text-on-surface">{{ match.confirmed_count }}/{{ match.max_players }}</span>
+                {% if match.waitlist_count > 0 %}
+                <span class="text-xs text-on-surface-variant">+{{ match.waitlist_count }} WL</span>
+                {% endif %}
+            </div>
+            <span class="badge badge-{{ match.status }}">{{ match.status | upper }}</span>
+        </div>
+
+        {% if current_user.is_authenticated and match.id in user_bookings %}
+        <div class="mt-3 flex items-center gap-2">
+            <span class="material-symbols-outlined text-sm text-success">check_circle</span>
+            <span class="text-xs font-semibold text-success">Kamu: {{ user_bookings[match.id] | capitalize }}</span>
+        </div>
+        {% endif %}
+    </a>
+    {% else %}
+    <div class="card text-center py-12">
+        <span class="material-symbols-outlined text-4xl text-on-surface-variant/30 mb-2">event_busy</span>
+        <h3 class="font-bold text-on-surface">Tidak ada sesi</h3>
+        <p class="text-sm text-on-surface-variant mt-1">Coba filter lain atau buat sesi baru.</p>
+    </div>
+    {% endfor %}
+</section>
+{% endblock %}

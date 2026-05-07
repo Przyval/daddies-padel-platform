@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}{{ match.title }} — Daddies Padel{% endblock %}
+
+{% block header_left %}
+<a href="{{ url_for('ops.dashboard') }}" class="hover:opacity-80 transition-opacity text-primary-container">
+    <span class="material-symbols-outlined">arrow_back</span>
+</a>
+<h1 class="font-headline font-bold tracking-tight text-xl text-primary-container">Kelola Sesi</h1>
+{% endblock %}
+
+{% block header_right %}
+<a href="{{ url_for('main.session_edit', match_id=match.id) }}" class="hover:opacity-80 text-primary-container">
+    <span class="material-symbols-outlined">edit</span>
+</a>
+{% endblock %}
+
+{% block content %}
+<!-- Session info -->
+<section class="flex items-center justify-between">
+    <div class="space-y-1">
+        <p class="text-[0.75rem] font-bold uppercase tracking-widest text-on-surface-variant">
+            {{ match.date_time.strftime('%A, %d %b %Y') }}
+        </p>
+        <h2 class="text-xl font-extrabold tracking-tight text-primary">{{ match.title }}</h2>
+        <p class="text-sm text-on-surface-variant">{{ match.date_time.strftime('%H:%M') }} · {{ match.location }}</p>
+    </div>
+    <div class="w-14 h-14 bg-primary-container rounded-full flex items-center justify-center text-surface shadow-lg">
+        <span class="material-symbols-outlined filled">sports_tennis</span>
+    </div>
+</section>
+
+<!-- Stats -->
+<section class="grid grid-cols-2 gap-3">
+    <div class="stat-card text-center">
+        <p class="text-2xl font-extrabold text-success">{{ match.confirmed_count }} / {{ match.max_players }}</p>
+        <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mt-1">Confirmed</p>
+    </div>
+    <div class="stat-card text-center">
+        <p class="text-2xl font-extrabold text-warning">{{ match.waitlist_count }}</p>
+        <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mt-1">Waitlist</p>
+    </div>
+</section>
+
+<!-- Player roster -->
+<section>
+    <h3 class="text-lg font-bold tracking-tight mb-4">Daftar Pemain</h3>
+    <div class="space-y-3">
+        {% for booking in bookings %}
+        <div class="card !p-4">
+            <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-surface-container-low flex items-center justify-center">
+                        <span class="text-sm font-bold text-on-surface-variant">{{ booking.player.initials }}</span>
+                    </div>
+                    <div>
+                        <p class="font-bold text-on-surface text-sm">{{ booking.player.username }}</p>
+                        <a href="https://wa.me/{{ booking.player.phone }}" target="_blank"
+                           class="text-xs text-success flex items-center gap-0.5">
+                            <span class="material-symbols-outlined text-xs">chat</span>
+                            {{ booking.player.phone }}
+                        </a>
+                    </div>
+                </div>
+                <span class="badge badge-{{ booking.status }}">{{ booking.status | upper }}</span>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-center gap-2 ml-13 flex-wrap">
+                {% if booking.payment_proof %}
+                <a href="{{ url_for('static', filename=booking.payment_proof) }}" target="_blank"
+                   class="btn-ghost px-3 py-1.5 text-xs">
+                    <span class="material-symbols-outlined text-xs mr-0.5">receipt</span>
+                    Bukti
+                </a>
+                {% endif %}
+
+                {% if booking.status == 'waitlist' %}
+                <a href="{{ url_for('ops.update_booking_status', booking_id=booking.id, new_status='approved') }}"
+                   class="btn-primary px-4 py-1.5 text-xs">Approve</a>
+                {% elif booking.status == 'approved' %}
+                <a href="{{ url_for('ops.update_booking_status', booking_id=booking.id, new_status='waitlist') }}"
+                   class="btn-ghost px-3 py-1.5 text-xs">Ke Waitlist</a>
+                {% elif booking.status == 'paid' %}
+                <a href="{{ url_for('ops.update_booking_status', booking_id=booking.id, new_status='confirmed') }}"
+                   class="btn-primary px-4 py-1.5 text-xs">Confirm</a>
+                <a href="{{ url_for('ops.update_booking_status', booking_id=booking.id, new_status='approved') }}"
+                   class="text-xs font-semibold text-error px-2">Reject</a>
+                {% endif %}
+
+                <a href="{{ url_for('ops.update_booking_status', booking_id=booking.id, new_status='removed') }}"
+                   class="text-xs font-semibold text-on-surface-variant/50 hover:text-error ml-auto"
+                   onclick="return confirm('Hapus pemain ini?')">
+                    <span class="material-symbols-outlined text-sm">delete</span>
+                </a>
+            </div>
+        </div>
+        {% else %}
+        <div class="card text-center py-8">
+            <span class="material-symbols-outlined text-3xl text-on-surface-variant/30 mb-2">group_off</span>
+            <p class="text-sm text-on-surface-variant">Belum ada pemain mendaftar.</p>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

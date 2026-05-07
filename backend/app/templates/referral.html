@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Referral — Daddies Padel{% endblock %}
+
+{% block header_left %}
+<a href="{{ url_for('main.profile') }}" class="hover:opacity-80 transition-opacity text-primary-container">
+    <span class="material-symbols-outlined">arrow_back</span>
+</a>
+<h1 class="font-headline font-bold tracking-tight text-xl text-primary-container">Referral</h1>
+{% endblock %}
+
+{% block content %}
+<!-- Referral code card -->
+<section class="card text-center space-y-4">
+    <div class="w-14 h-14 bg-primary-fixed rounded-full flex items-center justify-center mx-auto">
+        <span class="material-symbols-outlined text-primary text-2xl">share</span>
+    </div>
+    <div>
+        <h2 class="text-lg font-extrabold text-on-surface">Undang Teman Main</h2>
+        <p class="text-sm text-on-surface-variant mt-1">Bagikan kode referral dan dapatkan chips bonus</p>
+    </div>
+
+    <!-- Code display -->
+    <div class="bg-surface-container-low rounded-lg py-4 px-6">
+        <p class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-1">Kode Referral Kamu</p>
+        <p class="text-2xl font-extrabold tracking-widest text-primary" id="ref-code">
+            {{ user.referral_code or 'DPC%04d' | format(user.id) }}
+        </p>
+    </div>
+
+    <button onclick="navigator.clipboard.writeText(document.getElementById('ref-code').textContent.trim())"
+            class="btn-ghost px-6 py-2.5 text-sm w-full">
+        <span class="material-symbols-outlined text-base mr-1">content_copy</span>
+        Salin Kode
+    </button>
+</section>
+
+<!-- Stats -->
+<section class="grid grid-cols-2 gap-3">
+    <div class="stat-card text-center">
+        <p class="text-2xl font-extrabold text-primary">{{ referred | length }}</p>
+        <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mt-1">Diundang</p>
+    </div>
+    <div class="stat-card text-center">
+        <p class="text-2xl font-extrabold text-success">{{ (referred | length) * 50 }}</p>
+        <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mt-1">Chips Bonus</p>
+    </div>
+</section>
+
+<!-- Referred users -->
+{% if referred %}
+<section>
+    <h3 class="text-lg font-bold tracking-tight mb-4">Teman yang Bergabung</h3>
+    <div class="space-y-3">
+        {% for r in referred %}
+        <div class="card !p-4 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-surface-container-low flex items-center justify-center">
+                <span class="text-sm font-bold text-on-surface-variant">{{ r.initials }}</span>
+            </div>
+            <div>
+                <p class="font-bold text-on-surface text-sm">{{ r.display_name }}</p>
+                <p class="text-xs text-on-surface-variant">{{ r.created_at.strftime('%d %b %Y') if r.created_at else '' }}</p>
+            </div>
+            <span class="badge badge-confirmed ml-auto">+50 CHIPS</span>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+{% endblock %}

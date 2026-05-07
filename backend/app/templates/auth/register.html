@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Daftar — Daddies Padel{% endblock %}
+
+{% block bottom_nav %}{% endblock %}
+
+{% block content %}
+<div class="flex flex-col items-center justify-center min-h-[60vh]">
+    <div class="w-full space-y-8">
+        <!-- Logo -->
+        <div class="text-center space-y-4">
+            <div class="w-20 h-20 bg-primary-container rounded-full flex items-center justify-center mx-auto shadow-lg">
+                <span class="material-symbols-outlined filled text-surface text-3xl">pets</span>
+            </div>
+            <div>
+                <h1 class="text-2xl font-extrabold tracking-tight text-on-surface">Gabung Daddies</h1>
+                <p class="text-sm text-on-surface-variant mt-1">Daftar dan mulai main padel bareng</p>
+            </div>
+        </div>
+
+        <!-- Form -->
+        <form action="{{ url_for('auth.register') }}" method="POST" class="space-y-4">
+            <div>
+                <label class="label-overline mb-2 block" for="username">Nama Lengkap</label>
+                <input class="input-field" id="username" name="username" type="text"
+                       placeholder="Nama kamu" required autocomplete="name">
+            </div>
+            <div>
+                <label class="label-overline mb-2 block" for="email">Email</label>
+                <input class="input-field" id="email" name="email" type="email"
+                       placeholder="nama@email.com" required autocomplete="email">
+            </div>
+            <div>
+                <label class="label-overline mb-2 block" for="phone">WhatsApp</label>
+                <input class="input-field" id="phone" name="phone" type="tel"
+                       placeholder="08123456789" required autocomplete="tel">
+            </div>
+            <div>
+                <label class="label-overline mb-2 block" for="password">Password</label>
+                <input class="input-field" id="password" name="password" type="password"
+                       placeholder="Buat password" required autocomplete="new-password">
+            </div>
+            <div class="pt-2">
+                <button type="submit" class="btn-primary w-full py-4 text-base">Daftar</button>
+            </div>
+        </form>
+
+        <!-- Divider -->
+        <div class="flex items-center gap-4">
+            <div class="flex-1 h-px bg-outline-variant/20"></div>
+            <span class="text-xs text-on-surface-variant font-medium">atau</span>
+            <div class="flex-1 h-px bg-outline-variant/20"></div>
+        </div>
+
+        <a href="{{ url_for('auth.login') }}" class="btn-ghost w-full py-3.5 text-sm block text-center">
+            Sudah punya akun? Masuk
+        </a>
+    </div>
+</div>
+{% endblock %}

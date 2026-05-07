@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Demo Wizard — Daddies Padel{% endblock %}
+
+{% block header_left %}
+<a href="{{ url_for('tournament.tournament_list') }}" class="text-primary-container">
+    <span class="material-symbols-outlined">arrow_back</span>
+</a>
+<h1 class="font-headline font-bold tracking-tight text-xl text-primary-container">Demo Wizard</h1>
+{% endblock %}
+
+{% block content %}
+<section class="space-y-4">
+    <div class="text-center space-y-2 pt-2">
+        <h2 class="text-xl font-extrabold tracking-tight text-on-surface">Pilih Versi Wizard</h2>
+        <p class="text-sm text-on-surface-variant">Bandingkan 3 versi pembuatan turnamen</p>
+    </div>
+
+    {# V2 — Claude UX (Recommended) #}
+    <a href="{{ url_for('tournament.v2_create') }}"
+       class="card !p-5 block active:scale-[0.97] transition-transform ring-2 ring-primary">
+        <div class="flex items-center gap-4">
+            <div class="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center flex-shrink-0">
+                <span class="material-symbols-outlined text-on-primary text-2xl">auto_awesome</span>
+            </div>
+            <div class="flex-1">
+                <div class="flex items-center gap-2">
+                    <p class="text-base font-extrabold text-on-surface">V2 — Daddies UX</p>
+                    <span class="badge badge-open text-[9px]">RECOMMENDED</span>
+                </div>
+                <p class="text-xs text-on-surface-variant mt-0.5 leading-snug">
+                    Optimized untuk mobile. Touch targets 44px+, no scroll, sticky nav.
+                </p>
+            </div>
+            <span class="material-symbols-outlined text-primary text-xl">chevron_right</span>
+        </div>
+        <div class="mt-3 flex flex-wrap gap-1.5">
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-success/10 text-success font-bold">44px targets</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-info/10 text-info font-bold">No scroll</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-warning/10 text-warning font-bold">+/- stepper</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">Gender toggle</span>
+        </div>
+    </a>
+
+    {# V3 — Current #}
+    <a href="{{ url_for('tournament.create') }}"
+       class="card !p-5 block active:scale-[0.97] transition-transform">
+        <div class="flex items-center gap-4">
+            <div class="w-14 h-14 rounded-2xl bg-surface-container-high flex items-center justify-center flex-shrink-0">
+                <span class="material-symbols-outlined text-on-surface-variant text-2xl">sports_tennis</span>
+            </div>
+            <div class="flex-1">
+                <p class="text-base font-extrabold text-on-surface">V3 — Current</p>
+                <p class="text-xs text-on-surface-variant mt-0.5 leading-snug">
+                    Versi yang sudah berjalan. Baseline untuk perbandingan.
+                </p>
+            </div>
+            <span class="material-symbols-outlined text-on-surface-variant/30 text-xl">chevron_right</span>
+        </div>
+    </a>
+
+    {# V1 — Americano Clone #}
+    <a href="{{ url_for('tournament.v1_create') }}"
+       class="card !p-5 block active:scale-[0.97] transition-transform">
+        <div class="flex items-center gap-4">
+            <div class="w-14 h-14 rounded-2xl bg-primary-container/20 flex items-center justify-center flex-shrink-0">
+                <span class="material-symbols-outlined text-primary-container text-2xl">content_copy</span>
+            </div>
+            <div class="flex-1">
+                <p class="text-base font-extrabold text-on-surface">V1 — Americano Clone</p>
+                <p class="text-xs text-on-surface-variant mt-0.5 leading-snug">
+                    Satu halaman, conversational flow. Persis Americano Padel app.
+                </p>
+            </div>
+            <span class="material-symbols-outlined text-on-surface-variant/30 text-xl">chevron_right</span>
+        </div>
+        <div class="mt-3 flex flex-wrap gap-1.5">
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">1 halaman</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-warning/10 text-warning font-bold">Tap = instant</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-info/10 text-info font-bold">Score pad</span>
+        </div>
+    </a>
+</section>
+{% endblock %}

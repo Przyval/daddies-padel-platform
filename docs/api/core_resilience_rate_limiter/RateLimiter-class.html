@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="API docs for the RateLimiter class from the rate_limiter library, for the Dart programming language.">
+  <title>RateLimiter class - rate_limiter library - Dart API</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../static-assets/github.css?v1">
+  <link rel="stylesheet" href="../static-assets/styles.css?v1">
+  <link rel="icon" href="../static-assets/favicon.png?v1">
+  
+</head>
+
+<body data-base-href="../" data-using-base-href="false" class="light-theme">
+<div id="overlay-under-drawer"></div>
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../index.html">daddies_app</a></li>
+    <li><a href="../core_resilience_rate_limiter/">core&#47;resilience&#47;rate_limiter.dart</a></li>
+    <li class="self-crumb">RateLimiter class</li>
+  </ol>
+  <div class="self-name">RateLimiter</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <button class="toggle" id="theme-button" title="Toggle between light and dark mode" aria-label="Light and dark mode toggle">
+    <span id="dark-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      dark_mode
+    </span>
+    <span id="light-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      light_mode
+    </span>
+  </button>
+</header>
+<main>
+<div
+    id="dartdoc-main-content"
+    class="main-content"
+    data-above-sidebar="core_resilience_rate_limiter&#47;core_resilience_rate_limiter-library-sidebar.html"
+    data-below-sidebar="core_resilience_rate_limiter&#47;RateLimiter-class-sidebar.html">
+    <div>
+<h1><span class="kind-class">RateLimiter</span> class 
+ 
+</h1></div>
+
+    
+<section class="desc markdown">
+  <p>Governor / rate limiter for user actions.</p>
+<p>Prevents abuse and self-denial attacks by limiting how frequently
+a user can perform certain actions (Release It! Ch.5 — Governor pattern).</p>
+<p>Uses a sliding-window token bucket approach:</p>
+<ul>
+<li>Each action type has a max count within a time window.</li>
+<li>If exceeded, the action is rejected until the window slides forward.</li>
+</ul>
+</section>
+
+
+
+    
+  <section class="summary offset-anchor" id="constructors">
+    <h2>Constructors</h2>
+    <dl class="constructor-summary-list">
+        <dt id="RateLimiter.new" class="callable">
+          <span class="name"><a href="../core_resilience_rate_limiter/RateLimiter/RateLimiter.html">RateLimiter</a></span><span class="signature">({<span class="parameter" id="-param-maxActions"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">maxActions</span>, </span><span class="parameter" id="-param-window"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Duration-class.html">Duration</a></span> <span class="parameter-name">window</span></span>})</span>
+        </dt>
+        <dd>
+          
+        </dd>
+    </dl>
+  </section>
+    
+  <section
+      class="summary offset-anchor"
+      id="instance-properties">
+    <h2>Properties</h2>
+    <dl class="properties">
+        <dt id="hashCode" class="property inherited">
+  <span class="name"><a href="https://api.flutter.dev/flutter/dart-core/Object/hashCode.html">hashCode</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span>
+  
+
+</dt>
+<dd class="inherited">
+  The hash code for this object.
+  <div class="features"><span class="feature">no setter</span><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="maxActions" class="property">
+  <span class="name"><a href="../core_resilience_rate_limiter/RateLimiter/maxActions.html">maxActions</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
+        <dt id="remaining" class="property">
+  <span class="name"><a href="../core_resilience_rate_limiter/RateLimiter/remaining.html">remaining</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span>
+  
+
+</dt>
+<dd>
+  Number of remaining actions in the current window.
+  <div class="features"><span class="feature">no setter</span></div>
+
+</dd>
+
+        <dt id="runtimeType" class="property inherited">
+  <span class="name"><a href="https://api.flutter.dev/flutter/dart-core/Object/runtimeType.html">runtimeType</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span>
+  
+
+</dt>
+<dd class="inherited">
+  A representation of the runtime type of the object.
+  <div class="features"><span class="feature">no setter</span><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="timeUntilAllowed" class="property">
+  <span class="name"><a href="../core_resilience_rate_limiter/RateLimiter/timeUntilAllowed.html">timeUntilAllowed</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Duration-class.html">Duration</a></span>
+  
+
+</dt>
+<dd>
+  How long until the next action is allowed (Duration.zero if allowed now).
+  <div class="features"><span class="feature">no setter</span></div>
+
+</dd>
+
+        <dt id="window" class="property">
+  <span class="name"><a href="../core_resilience_rate_limiter/RateLimiter/window.html">window</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Duration-class.html">Duration</a></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
+    </dl>
+  </section>
+
+    
+  <section
+      class="summary offset-anchor"
+      id="instance-methods">
+    <h2>Methods</h2>
+    <dl class="callables">
+        <dt id="noSuchMethod" class="callable inherited">
+  <span class="name"><a href="https://api.flutter.dev/flutter/dart-core/Object/noSuchMethod.html">noSuchMethod</a></span><span class="signature">(<wbr><span class="parameter" id="noSuchMethod-param-invocation"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Invocation-class.html">Invocation</a></span> <span class="parameter-name">invocation</span></span>)
+    <span class="returntype parameter">&#8594; dynamic</span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  Invoked when a nonexistent method or property is accessed.
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="reset" class="callable">
+  <span class="name"><a href="../core_resilience_rate_limiter/RateLimiter/reset.html">reset</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="toString" class="callable inherited">
+  <span class="name"><a href="https://api.flutter.dev/flutter/dart-core/Object/toString.html">toString</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  A string representation of this object.
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="tryAcquire" class="callable">
+  <span class="name"><a href="../core_resilience_rate_limiter/RateLimiter/tryAcquire.html">tryAcquire</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Returns true if the action is allowed, false if rate-limited.
+  
+
+</dd>
+
+    </dl>
+  </section>
+    
+  <section
+      class="summary offset-anchor inherited"
+      id="operators">
+    <h2>Operators</h2>
+    <dl class="callables">
+        <dt id="operator ==" class="callable inherited">
+  <span class="name"><a href="https://api.flutter.dev/flutter/dart-core/Object/operator_equals.html">operator ==</a></span><span class="signature">(<wbr><span class="parameter" id="==-param-other"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Object-class.html">Object</a></span> <span class="parameter-name">other</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  The equality operator.
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+    </dl>
+  </section>
+    
+    
+    
+
+  </div> <!-- /.main-content -->
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
+<header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+    <li><a href="../index.html">daddies_app</a></li>
+    <li><a href="../core_resilience_rate_limiter/">rate_limiter</a></li>
+    <li class="self-crumb">RateLimiter class</li>
+</ol>
+
+    <h5>rate_limiter library</h5>
+    <div id="dartdoc-sidebar-left-content"></div>
+  </div>
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  </div><!--/.sidebar-offcanvas-->
+</main>
+<footer>
+  <span class="no-break">
+    daddies_app
+      1.0.0+1
+  </span>
+  
+</footer>
+
+
+<script src="../static-assets/highlight.pack.js?v1"></script>
+<script src="../static-assets/docs.dart.js"></script>
+
+</body>
+</html>
+

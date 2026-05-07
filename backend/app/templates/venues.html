@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Venue — Daddies Padel{% endblock %}
+
+{% block header_left %}
+<a href="{{ url_for('main.sessions') }}" class="hover:opacity-80 transition-opacity text-primary-container">
+    <span class="material-symbols-outlined">arrow_back</span>
+</a>
+<h1 class="font-headline font-bold tracking-tight text-xl text-primary-container">Venue</h1>
+{% endblock %}
+
+{% block content %}
+<section class="space-y-4">
+    {% for venue in venues %}
+    <a href="{{ url_for('main.venue_detail', venue_id=venue.id) }}"
+       class="card !p-5 block active:scale-[0.98] transition-transform">
+        <div class="flex items-center gap-4">
+            <div class="w-14 h-14 rounded-lg bg-surface-container-low flex items-center justify-center flex-shrink-0">
+                <span class="material-symbols-outlined text-primary text-2xl">sports_tennis</span>
+            </div>
+            <div class="flex-1">
+                <p class="font-extrabold text-on-surface">{{ venue.name }}</p>
+                <p class="text-xs text-on-surface-variant mt-0.5 flex items-center gap-1">
+                    <span class="material-symbols-outlined text-xs">location_on</span>
+                    {{ venue.address }}
+                </p>
+                <div class="flex items-center gap-3 mt-2">
+                    <span class="badge badge-open">{{ venue.courts }} Court{{ 's' if venue.courts > 1 }}</span>
+                    <span class="text-xs text-on-surface-variant">{{ venue.hours }}</span>
+                </div>
+            </div>
+            <span class="material-symbols-outlined text-on-surface-variant/50">chevron_right</span>
+        </div>
+    </a>
+    {% else %}
+    <div class="card text-center py-12">
+        <span class="material-symbols-outlined text-4xl text-on-surface-variant/30 mb-2">location_off</span>
+        <h3 class="font-bold text-on-surface">Belum ada venue</h3>
+    </div>
+    {% endfor %}
+</section>
+{% endblock %}

@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>{{ tournament.name }}</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Plus Jakarta Sans',system-ui,-apple-system,sans-serif;background:#fff;color:#1B1C1A;
+     min-height:100vh;min-height:100dvh;-webkit-tap-highlight-color:transparent;overflow-x:hidden;
+     max-width:480px;margin:0 auto}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;border:none;cursor:pointer;background:none}
+
+/* ═══ HEADER ═══ */
+.hdr{background:linear-gradient(180deg,#3d3d78 0%,#6b5b95 50%,#9b85bd 100%);
+     padding:0 16px;padding-top:env(safe-area-inset-top,44px);position:relative;z-index:100}
+.hdr-top{display:flex;align-items:center;height:52px}
+.hdr-back{width:36px;height:36px;display:flex;align-items:center;justify-content:center;
+          color:#fff;font-size:22px;flex-shrink:0}
+.hdr-title{flex:1;margin-left:4px;color:#fff}
+.hdr-title .sub{font-size:12px;font-weight:400;opacity:.7;line-height:1.2}
+.hdr-title .main{font-size:20px;font-weight:800;line-height:1.3}
+.hdr-dots{width:36px;height:36px;display:flex;align-items:center;justify-content:center;
+          color:#fff;font-size:20px;opacity:.7;flex-shrink:0;position:relative}
+
+/* Overflow */
+.overflow{position:absolute;right:0;top:42px;background:#fff;border-radius:8px;
+          box-shadow:0 4px 20px rgba(0,0,0,.25);min-width:180px;z-index:9999;display:none;overflow:hidden}
+.overflow.show{display:block}
+.ov-item{display:flex;align-items:center;gap:10px;padding:13px 18px;
+         font-size:14px;font-weight:400;color:#1B1C1A;white-space:nowrap}
+.ov-item:active{background:#f5f5f5}
+.ov-icon{font-size:16px;width:22px;text-align:center}
+
+/* ═══ TROPHY ═══ */
+.trophy{text-align:center;padding:8px 0 16px}
+.trophy-icon{font-size:48px;line-height:1;color:#D4A843}
+.trophy-name{font-size:14px;font-weight:600;color:#fff;margin-top:2px}
+.hdr-pad{height:16px}
+
+/* ═══ CONTENT ═══ */
+.content{background:#fff;border-radius:16px 16px 0 0;margin-top:-8px;position:relative;z-index:11;
+         padding:14px 16px 110px;min-height:60vh}
+
+/* ═══ ROUND NAV ═══ */
+.rnav{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.rnav-arrow{width:36px;height:36px;display:flex;align-items:center;justify-content:center;
+            font-size:18px;color:#1B1C1A}
+.rnav-arrow:active{opacity:.4}
+.rnav-pill{background:#f0f0f0;border-radius:18px;padding:7px 18px;font-weight:700;font-size:13px;color:#1B1C1A}
+.rnav-more{font-weight:700;font-size:11px;color:#1B1C1A;text-transform:uppercase;letter-spacing:.02em;
+           display:inline-flex;align-items:center;gap:3px;padding:7px 0}
+.rnav-more:active{opacity:.4}
+
+/* ═══ MATCH CARD ═══ */
+.mc{background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:10px;
+    box-shadow:0 1px 6px rgba(0,0,0,.06)}
+.mc-court{text-align:right;font-weight:600;font-size:12px;color:#1B1C1A;margin-bottom:6px}
+
+/* Flip-clock digits */
+.mc-scores{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px}
+.mc-pair{display:flex;gap:2px;cursor:pointer;-webkit-user-select:none;user-select:none}
+.mc-pair:active .mc-d{opacity:.7}
+.mc-d{width:34px;height:44px;background:#2a2a2a;border-radius:6px;display:flex;align-items:center;
+      justify-content:center;font-weight:800;font-size:20px;color:#fff;position:relative;overflow:hidden}
+.mc-d::after{content:'';position:absolute;left:2px;right:2px;top:50%;height:1px;
+             background:rgba(0,0,0,.4)}
+
+/* Teams */
+.mc-teams{display:flex;align-items:flex-start}
+.mc-team{flex:1}
+.mc-team p{font-weight:400;font-size:13px;line-height:1.7;color:#1B1C1A}
+.mc-team.r{text-align:right}
+.mc-vs{padding:0 10px;font-weight:500;color:#ccc;font-size:12px;padding-top:3px}
+
+/* ═══ LEADERBOARD ═══ */
+.lb-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;padding:0 2px}
+.lb-eye{width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;
+        color:#888}
+.lb-eye svg{width:22px;height:22px}
+.lb-eye:active{opacity:.4}
+.lb-run{display:inline-flex;align-items:center;gap:4px;background:#D4A843;color:#fff;
+        border-radius:18px;padding:6px 12px;font-size:10px;font-weight:700;
+        text-transform:uppercase;letter-spacing:.03em}
+.lb-run:active{transform:scale(.96)}
+.lb-run svg{width:14px;height:14px}
+
+/* Column headers */
+.lb-cols{display:flex;align-items:center;padding:4px 14px;font-size:10px;font-weight:600;color:#bbb}
+.lb-cols .c-name{flex:1}
+.lb-cols .c-wlt{width:52px;text-align:center}
+.lb-cols .c-diff{width:36px;text-align:center}
+.lb-cols .c-pts{width:32px;text-align:right}
+
+/* Rows */
+.lb-row{display:flex;align-items:center;padding:11px 14px;border-bottom:1px solid #f0f0f0;
+        min-height:44px;cursor:pointer}
+.lb-row:active{background:#fafafa}
+.lb-row:last-of-type{border-bottom:none}
+.lb-row.gold{background:#D4A843;border-bottom-color:rgba(255,255,255,.15)}
+.lb-row.gold:active{background:#c9a03e}
+.lb-row.sitting-out{opacity:.4}
+.lb-row.sitting-out .lb-name::after{content:' (out)';font-size:11px;color:#E86830;font-weight:600}
+
+.lb-rank{font-weight:500;font-size:14px;color:#888;width:26px;flex-shrink:0}
+.lb-name{font-weight:500;font-size:15px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-wlt{width:52px;text-align:center;font-size:12px;font-weight:400;color:#888}
+.lb-diff{width:36px;text-align:center;font-size:12px;font-weight:600}
+.lb-diff.pos{color:#2d8a4e}
+.lb-diff.neg{color:#c62828}
+.lb-pts{width:32px;text-align:right;font-weight:800;font-size:15px;color:#3F3D99}
+
+.lb-row.gold .lb-rank,.lb-row.gold .lb-name,.lb-row.gold .lb-wlt,
+.lb-row.gold .lb-diff,.lb-row.gold .lb-pts{color:#fff}
+
+/* Detail columns hidden by default */
+.lb-wlt,.lb-diff,.c-wlt,.c-diff{display:none}
+body.lb-detail .lb-wlt,body.lb-detail .lb-diff,
+body.lb-detail .c-wlt,body.lb-detail .c-diff{display:block}
+
+/* ═══ SETTINGS ═══ */
+.stg{padding:20px 0 0;margin-top:12px}
+.stg-title{font-weight:700;font-size:15px;margin-bottom:14px}
+.stg-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;
+         border-bottom:1px solid #f0f0f0}
+.stg-label{font-weight:400;font-size:15px}
+.stg-val{font-weight:500;font-size:14px;color:#3F3D99}
+.stg-edit{font-size:16px;cursor:pointer;padding:4px;color:#888}
+.stg-check{display:flex;align-items:center;gap:10px;padding:14px 0;
+           border-bottom:1px solid #f0f0f0;cursor:pointer;font-size:14px;font-weight:400}
+.stg-check input{width:16px;height:16px;accent-color:#D4A843;flex-shrink:0}
+.stg-pts-opt{padding:12px 0;font-size:14px;color:#555;cursor:pointer;border-bottom:1px solid #f0f0f0}
+.stg-pts-opt:active{background:#f5f5f5}
+.stg-pts-opt.active{color:#3F3D99;font-weight:600}
+
+/* ═══ RENAME MODAL ═══ */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:100;
+          display:none;align-items:flex-end;justify-content:center}
+.modal-bg.show{display:flex}
+.modal-sheet{background:#fff;border-radius:14px 14px 0 0;padding:20px 20px;
+             padding-bottom:calc(20px + env(safe-area-inset-bottom,8px));
+             width:100%;max-width:480px;animation:sheetUp .2s ease-out}
+.modal-title{font-weight:400;font-size:15px;color:#1B1C1A;margin-bottom:14px}
+.modal-input{width:100%;border:1px solid #e0e0e0;border-radius:6px;padding:12px 14px;
+             font-size:15px;font-weight:400;font-family:inherit;outline:none;color:#1B1C1A}
+.modal-input:focus{border-color:#D4A843}
+.modal-ok{width:100%;padding:14px;border-radius:6px;background:#D4A843;color:#fff;
+          font-weight:700;font-size:15px;margin-top:14px;text-align:center}
+.modal-ok:active{background:#c9a03e}
+
+/* ═══ SCORE PAD ═══ */
+.pad-bg{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:100;
+        display:none;align-items:center;justify-content:center}
+.pad-bg.show{display:flex}
+.pad{background:#fff;border-radius:14px;padding:14px;width:88%;max-width:320px;animation:sheetUp .15s ease-out}
+.pad-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:4px}
+.pad-btn{background:#2a2a2a;color:#fff;border-radius:6px;padding:9px 0;font-weight:700;
+         font-size:12px;text-align:center;min-height:36px;display:flex;align-items:center;
+         justify-content:center;-webkit-user-select:none;user-select:none}
+.pad-btn:active{background:#555;transform:scale(.9)}
+.pad-reset{background:#2a2a2a;color:#fff;border-radius:6px;padding:9px;font-weight:700;
+           font-size:11px;text-transform:uppercase;letter-spacing:.05em;margin:6px auto 0;
+           text-align:center;width:auto;display:inline-block;padding:9px 28px}
+.pad-reset:active{background:#555}
+.pad-reset-wrap{text-align:center}
+
+/* ═══ PLAYOFFS ═══ */
+.bracket{overflow-x:auto;-webkit-overflow-scrolling:touch;padding:6px 0}
+.bracket-inner{display:flex;gap:18px;min-width:max-content;padding:0 2px}
+.bracket-round{display:flex;flex-direction:column;gap:10px;min-width:160px}
+.br-title{font-weight:800;font-size:13px;color:#1B1C1A;margin-bottom:2px}
+.br-match{background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.br-team{display:flex;justify-content:space-between;padding:11px 12px;font-size:13px;
+         font-weight:400;border-bottom:1px solid #f0f0f0}
+.br-team:last-child{border-bottom:none}
+.br-team.win{background:#D4A843;color:#fff;font-weight:600}
+.br-team span:last-child{font-weight:700}
+
+/* ═══ BOTTOM NAV ═══ */
+.bnav{position:fixed;bottom:0;left:0;right:0;z-index:50;background:#3d3d78;
+      display:flex;justify-content:center;border-radius:14px 14px 0 0;
+      padding-bottom:env(safe-area-inset-bottom,6px)}
+.bnav a{color:rgba(255,255,255,.3);display:flex;flex-direction:column;align-items:center;
+        gap:2px;padding:14px 0;flex:1;text-align:center;transition:color .15s}
+.bnav a.on{color:#fff}
+.bnav a:active{transform:scale(.85)}
+.bnav a svg{width:24px;height:24px}
+
+/* ═══ Post-game ═══ */
+.pg-actions{margin-top:14px;display:flex;flex-direction:column;gap:6px}
+.pg-btn{display:flex;align-items:center;justify-content:center;padding:11px;border-radius:8px;
+        font-weight:600;font-size:12px;text-align:center}
+.pg-primary{background:#3d3d78;color:#fff}
+.pg-secondary{background:#f0f0f0;color:#1B1C1A}
+
+@keyframes sheetUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+</style>
+</head>
+<body>
+
+{# ═══ HEADER ═══ #}
+<div class="hdr">
+    <div class="hdr-top">
+        <a href="/tournament/" class="hdr-back">←</a>
+        <div class="hdr-title">
+            <div class="sub">{{ tournament.name }}</div>
+            <div class="main">{{ 'Rounds' if tab == 'rounds' else 'Playoffs' if tab == 'playoff' else 'Leaderboard' }}</div>
+        </div>
+        <button class="hdr-dots" onclick="toggleOverflow(event)">⋮</button>
+        <div class="overflow" id="overflowMenu">
+            <a class="ov-item" href="/tournament/{{ tournament.id }}/share">
+                <span class="ov-icon">📤</span> Share result
+            </a>
+            <a class="ov-item" href="?tab=standing#stg" onclick="event.preventDefault();goToSettings()">
+                <span class="ov-icon">⚙️</span> Settings
+            </a>
+            {% if tournament.status == 'playing' %}
+            <form action="/tournament/{{ tournament.id }}/complete" method="post" style="margin:0">
+                <button type="submit" class="ov-item" style="width:100%;text-align:left"
+                        onclick="return confirm('Selesaikan turnamen?')">
+                    <span class="ov-icon">✓</span> Selesaikan
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if leaderboard and leaderboard[0].points > 0 and (tournament.status == 'completed' or (rounds and rounds|length > 0 and rounds[-1].is_complete)) %}
+    <div class="trophy">
+        <div class="trophy-icon">🏆</div>
+        <p class="trophy-name">{{ leaderboard[0].participant.first_name }}</p>
+    </div>
+    {% else %}
+    <div class="hdr-pad"></div>
+    {% endif %}
+</div>
+
+{# ═══ CONTENT ═══ #}
+<div class="content">
+
+{# ── ROUNDS TAB ── #}
+{% if tab == 'rounds' %}
+{% if rounds %}
+<div class="rnav">
+    {% if current_round > 1 %}
+    <a href="?tab=rounds&round={{ current_round - 1 }}" class="rnav-arrow">←</a>
+    {% else %}<div style="width:36px"></div>{% endif %}
+
+    <span class="rnav-pill">Round #{{ current_round }}</span>
+
+    {% if current_round < rounds|length %}
+    <a href="?tab=rounds&round={{ current_round + 1 }}" class="rnav-arrow">→</a>
+    {% elif tournament.status == 'playing' %}
+    <form action="/tournament/{{ tournament.id }}/next_round" method="post" style="margin:0">
+        <button type="submit" class="rnav-more">→ MORE ROUNDS</button>
+    </form>
+    {% else %}<div style="width:36px"></div>{% endif %}
+</div>
+
+{% if round_obj %}
+{% for match in round_obj.matches %}
+{% if match.status != 'canceled' %}
+{% set s1 = match.score_team1 if match.status == 'completed' else 0 %}
+{% set s2 = match.score_team2 if match.status == 'completed' else 0 %}
+<div class="mc">
+    <p class="mc-court">Court {{ match.court }}</p>
+    <div class="mc-scores">
+        <div class="mc-pair" id="d-{{ match.id }}-1"{% if tournament.status != 'completed' %} onclick="openPad({{ match.id }},1)"{% endif %}>
+            <span class="mc-d">{{ (s1 // 10)|string }}</span>
+            <span class="mc-d">{{ (s1 % 10)|string }}</span>
+        </div>
+        <div class="mc-pair" id="d-{{ match.id }}-2"{% if tournament.status != 'completed' %} onclick="openPad({{ match.id }},2)"{% endif %}>
+            <span class="mc-d">{{ (s2 // 10)|string }}</span>
+            <span class="mc-d">{{ (s2 % 10)|string }}</span>
+        </div>
+    </div>
+    <div class="mc-teams">
+        <div class="mc-team">
+            <p>{{ match.team1_p1.first_name if match.team1_p1 else '?' }}</p>
+            <p>{{ match.team1_p2.first_name if match.team1_p2 else '?' }}</p>
+        </div>
+        <span class="mc-vs">vs</span>
+        <div class="mc-team r">
+            <p>{{ match.team2_p1.first_name if match.team2_p1 else '?' }}</p>
+            <p>{{ match.team2_p2.first_name if match.team2_p2 else '?' }}</p>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endfor %}
+{% endif %}
+{% else %}
+<div style="text-align:center;padding:60px 0;color:#bbb;font-size:14px">Belum ada ronde.</div>
+{% endif %}
+{% endif %}
+
+{# ── LEADERBOARD TAB ── #}
+{% if tab == 'standing' %}
+<section>
+    <div class="lb-bar">
+        <button class="lb-eye" id="lbEye" onclick="toggleLbDetail()">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/></svg>
+        </button>
+        {% if leaderboard|length >= 4 and not playoffs %}
+        <a href="?tab=playoff" class="lb-run">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+            RUN PLAYOFFS
+        </a>
+        {% elif playoffs %}
+        <a href="?tab=playoff" class="lb-run">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+            PLAYOFFS
+        </a>
+        {% endif %}
+    </div>
+
+    <div class="lb-cols">
+        <span style="width:26px"></span>
+        <span class="c-name"></span>
+        <span class="c-wlt">W-L-T</span>
+        <span class="c-diff">Diff</span>
+        <span class="c-pts" style="width:32px;text-align:right">P</span>
+    </div>
+
+    {% for s in leaderboard %}
+    <div class="lb-row {{ 'gold' if loop.index == 1 }}{{ ' sitting-out' if s.participant.sitting_out_permanent }}"
+         data-pid="{{ s.participant.id }}" data-pname="{{ s.participant.name }}" data-sitting="{{ 'true' if s.participant.sitting_out_permanent else 'false' }}"
+         onclick="openRename(parseInt(this.dataset.pid),this.dataset.pname,this.dataset.sitting==='true')">
+        <span class="lb-rank">{{ loop.index }}.</span>
+        <span class="lb-name">{{ s.participant.first_name }}</span>
+        <span class="lb-wlt">{{ s.wins }}-{{ s.losses }}-{{ s.ties }}</span>
+        {% set diff = s.games_won - s.games_lost %}
+        <span class="lb-diff {{ 'pos' if diff > 0 and loop.index != 1 else 'neg' if diff < 0 and loop.index != 1 else '' }}">
+            {{ ('+' ~ diff) if diff > 0 else diff }}
+        </span>
+        <span class="lb-pts">{{ s.points|int }}</span>
+    </div>
+    {% else %}
+    <div style="text-align:center;padding:48px 0;color:#bbb">Belum ada data.</div>
+    {% endfor %}
+
+    {% if tournament.status == 'completed' %}
+    <div class="pg-actions">
+        <form action="/tournament/{{ tournament.id }}/verify" method="post">
+            <button class="pg-btn pg-secondary" style="width:100%">✓ Verifikasi Peserta</button>
+        </form>
+        <a href="/tournament/{{ tournament.id }}/champion-share" target="_blank" class="pg-btn pg-primary">📤 Share Juara</a>
+        <a href="/tournament/{{ tournament.id }}/claim-streak" class="pg-btn pg-secondary">📱 QR Claim Streak</a>
+    </div>
+    {% endif %}
+
+    <div class="stg" id="stg">
+        <p class="stg-title">Settings</p>
+        <div class="stg-row">
+            <span class="stg-label" id="stgNameLabel">{{ tournament.name }}</span>
+            <span class="stg-edit" onclick="toggleNameEdit()">✏️</span>
+        </div>
+        <div id="stgName" style="display:none;padding:8px 0">
+            <input type="text" id="stgNameInput" value="{{ tournament.name }}" class="modal-input"
+                   onblur="saveSettings()" onkeydown="if(event.key==='Enter'){this.blur()}">
+        </div>
+        <div class="stg-row" onclick="togglePointsEdit()" style="cursor:pointer">
+            <span class="stg-label">Points</span>
+            <span class="stg-val" id="stgPointsLabel">{{ tournament.points_per_game }} points</span>
+        </div>
+        <div id="stgPoints" style="display:none;padding:4px 0">
+            {% for opt in [16, 21, 24, 32] %}
+            <div class="stg-pts-opt{{ ' active' if tournament.points_per_game == opt }}"
+                 onclick="pickPoints({{ opt }},this)">{{ opt }} points</div>
+            {% endfor %}
+        </div>
+        <label class="stg-check">
+            <input type="checkbox" id="stgSortWins" {{ 'checked' if tournament.sort_by_wins }} onchange="saveSettings()">
+            Sort by wins before points
+        </label>
+        <label class="stg-check">
+            <input type="checkbox" id="stgH2H" {{ 'checked' if tournament.h2h_tiebreaker }} onchange="saveSettings()">
+            Sort head to head after wins
+        </label>
+    </div>
+</section>
+{% endif %}
+
+{# ── PLAYOFFS TAB ── #}
+{% if tab == 'playoff' %}
+<section>
+    {% if playoffs %}
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <h3 style="font-weight:800;font-size:15px">Playoffs</h3>
+        <form action="/tournament/{{ tournament.id }}/delete_playoffs" method="post">
+            <button type="submit" onclick="return confirm('Hapus bracket?')"
+                    style="font-size:16px;color:#c62828;padding:6px">🗑️</button>
+        </form>
+    </div>
+    <div class="bracket">
+        <div class="bracket-inner">
+            {% set ns = namespace(rounds_seen=[]) %}
+            {% for p in playoffs %}
+                {% if p.bracket_round not in ns.rounds_seen %}
+                    {% set ns.rounds_seen = ns.rounds_seen + [p.bracket_round] %}
+                {% endif %}
+            {% endfor %}
+            {% for br in ns.rounds_seen %}
+            <div class="bracket-round">
+                <p class="br-title">{% if loop.last %}Final{% elif ns.rounds_seen|length - loop.index == 1 %}Semifinals{% else %}Quarterfinals{% endif %}</p>
+                {% for p in playoffs if p.bracket_round == br %}
+                <div class="br-match" id="po-{{ p.id }}" {% if p.status != 'completed' and p.team1_p1 and tournament.status != 'completed' %}onclick="openPlayoffPad({{ p.id }})"{% endif %} style="cursor:pointer">
+                    <div class="br-team {{ 'win' if p.status == 'completed' and p.winner == 'team1' }}">
+                        <span>{{ p.team1_p1.first_name if p.team1_p1 else 'TBD' }}{% if p.team1_p2 %} & {{ p.team1_p2.first_name }}{% endif %}</span>
+                        <span class="po-s1">{{ p.score_team1 if p.status == 'completed' else '-' }}</span>
+                    </div>
+                    <div class="br-team {{ 'win' if p.status == 'completed' and p.winner == 'team2' }}">
+                        <span>{{ p.team2_p1.first_name if p.team2_p1 else 'TBD' }}{% if p.team2_p2 %} & {{ p.team2_p2.first_name }}{% endif %}</span>
+                        <span class="po-s2">{{ p.score_team2 if p.status == 'completed' else '-' }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <div style="text-align:center;padding:36px 0">
+        <div style="font-size:48px;opacity:.1;margin-bottom:10px">🏆</div>
+        <h3 style="font-weight:800;font-size:15px;margin-bottom:3px">Playoffs</h3>
+        <p style="font-size:12px;color:#999;margin-bottom:18px">Create a playoff bracket from standings</p>
+        {% if leaderboard|length >= 4 %}
+        <div style="display:flex;gap:8px;justify-content:center">
+            <form action="/tournament/{{ tournament.id }}/generate_playoff" method="post">
+                <input type="hidden" name="bracket_size" value="4">
+                <button class="pg-btn pg-primary" style="padding:10px 22px">Top 4</button>
+            </form>
+            {% if leaderboard|length >= 8 %}
+            <form action="/tournament/{{ tournament.id }}/generate_playoff" method="post">
+                <input type="hidden" name="bracket_size" value="8">
+                <button class="pg-btn pg-secondary" style="padding:10px 22px">Top 8</button>
+            </form>
+            {% endif %}
+        </div>
+        {% else %}
+        <p style="font-size:11px;color:#ccc">Butuh minimal 4 pemain</p>
+        {% endif %}
+    </div>
+    {% endif %}
+</section>
+{% endif %}
+
+</div>
+
+{# ═══ RENAME MODAL ═══ #}
+<div class="modal-bg" id="renameModal" onclick="if(event.target===this)closeRename()">
+    <div class="modal-sheet">
+        <p class="modal-title">Change player name</p>
+        <form id="renameForm" method="post">
+            <input type="text" id="renameInput" name="new_name" class="modal-input" placeholder="Player name">
+            <input type="hidden" name="sitting_out_present" value="1">
+            <label style="display:flex;align-items:center;gap:10px;padding:12px 0;font-size:14px;color:#666">
+                <input type="checkbox" id="sittingOutCb" name="sitting_out" style="width:20px;height:20px;accent-color:#E86830">
+                Sitting out (tidak ikut ronde berikutnya)
+            </label>
+            <button type="submit" class="modal-ok">OK</button>
+        </form>
+    </div>
+</div>
+
+{# ═══ SCORE PAD ═══ #}
+<div class="pad-bg" id="padM" onclick="if(event.target===this)closePad()">
+    <div class="pad">
+        <div class="pad-grid">
+            {% set max_score = tournament.points_per_game or 21 %}
+            {% for i in range(max_score + 1) %}
+            <div class="pad-btn" onclick="pickScore({{ i }})">{{ '%02d'|format(i) }}</div>
+            {% endfor %}
+        </div>
+        <div class="pad-reset-wrap">
+            <div class="pad-reset" onclick="pickScore(0)">RESET</div>
+        </div>
+    </div>
+</div>
+
+{# ═══ BOTTOM NAV — SVG icons matching reference ═══ #}
+<div class="bnav">
+    <a href="?tab=rounds&round={{ current_round }}" class="{{ 'on' if tab == 'rounds' }}">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+    </a>
+    <a href="?tab=standing" class="{{ 'on' if tab == 'standing' }}">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
+    </a>
+    {% if playoffs %}
+    <a href="?tab=playoff" class="{{ 'on' if tab == 'playoff' }}">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+    </a>
+    {% endif %}
+</div>
+
+<script>
+const TID = {{ tournament.id }};
+
+/* Score pad — round matches */
+let cM=0, cT=0;
+function openPad(m,t){ cM=m; cT=t; padMode='match'; document.getElementById('padM').classList.add('show'); }
+function closePad(){ document.getElementById('padM').classList.remove('show'); }
+
+let padMode='match'; // 'match' or 'playoff'
+let poId=0, poStep=0, poS1=0;
+
+function pickScore(v){
+    if(padMode==='playoff') return pickPlayoffScore(v);
+
+    const pair = document.getElementById('d-'+cM+'-'+cT);
+    if(pair){
+        const str = String(v).padStart(2,'0');
+        pair.children[0].textContent = str[0];
+        pair.children[1].textContent = str[1];
+    }
+    closePad();
+    const p1 = document.getElementById('d-'+cM+'-1');
+    const p2 = document.getElementById('d-'+cM+'-2');
+    if(!p1||!p2) return;
+    const s1 = parseInt(p1.children[0].textContent + p1.children[1].textContent);
+    const s2 = parseInt(p2.children[0].textContent + p2.children[1].textContent);
+    const b = new FormData();
+    b.append('points_t1', s1);
+    b.append('points_t2', s2);
+    fetch('/tournament/'+TID+'/score/'+cM, {method:'POST', body:b})
+        .then(r=>{ if(!r.ok) throw new Error(r.status); })
+        .catch(()=>{ alert('Score gagal disimpan — coba lagi'); location.reload(); });
+}
+
+/* Score pad — playoff matches (2-step: team1 score → team2 score → submit) */
+function openPlayoffPad(id){
+    poId=id; poStep=1; padMode='playoff';
+    document.getElementById('padM').classList.add('show');
+}
+function pickPlayoffScore(v){
+    if(poStep===1){
+        poS1=v; poStep=2;
+        closePad();
+        setTimeout(()=>{ document.getElementById('padM').classList.add('show'); }, 200);
+        return;
+    }
+    closePad();
+    const b = new FormData();
+    b.append('set1_t1', poS1);
+    b.append('set1_t2', v);
+    fetch('/tournament/'+TID+'/playoff_score/'+poId, {method:'POST', body:b})
+        .then(r=>{ if(!r.ok) throw new Error(r.status); location.reload(); })
+        .catch(()=>{ alert('Score gagal disimpan'); location.reload(); });
+    padMode='match';
+}
+
+/* Rename */
+function openRename(pid, name, sittingOut){
+    document.getElementById('renameInput').value = name;
+    document.getElementById('sittingOutCb').checked = !!sittingOut;
+    document.getElementById('renameForm').action = '/tournament/'+TID+'/rename/'+pid;
+    document.getElementById('renameModal').classList.add('show');
+    setTimeout(()=> document.getElementById('renameInput').focus(), 150);
+}
+function closeRename(){ document.getElementById('renameModal').classList.remove('show'); }
+
+/* Overflow */
+function toggleOverflow(e){
+    e.stopPropagation();
+    document.getElementById('overflowMenu').classList.toggle('show');
+}
+document.addEventListener('click', ()=> document.getElementById('overflowMenu').classList.remove('show'));
+
+/* Eye toggle */
+let lbDetail = false;
+function toggleLbDetail(){
+    lbDetail = !lbDetail;
+    document.body.classList.toggle('lb-detail', lbDetail);
+    document.getElementById('lbEye').innerHTML = lbDetail
+        ? '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>'
+        : '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/></svg>';
+}
+
+/* Go to settings — navigate to standing tab if not there, then scroll */
+function goToSettings(){
+    document.getElementById('overflowMenu').classList.remove('show');
+    var el = document.getElementById('stg');
+    if(el){
+        el.scrollIntoView({behavior:'smooth'});
+    } else {
+        window.location.href = '?tab=standing#stg';
+    }
+}
+
+/* Auto-scroll to settings if #stg in URL */
+if(window.location.hash === '#stg'){
+    setTimeout(function(){ var el=document.getElementById('stg'); if(el) el.scrollIntoView({behavior:'smooth'}); }, 300);
+}
+
+/* Points setting */
+function togglePointsEdit(){
+    var box = document.getElementById('stgPoints');
+    box.style.display = box.style.display === 'none' ? 'block' : 'none';
+}
+function pickPoints(v, el){
+    var opts = document.querySelectorAll('.stg-pts-opt');
+    for(var i=0;i<opts.length;i++) opts[i].classList.remove('active');
+    if(el) el.classList.add('active');
+    document.getElementById('stgPointsLabel').textContent = v + ' points';
+    document.getElementById('stgPoints').style.display = 'none';
+    // Save and reload to update score pad
+    var b = new FormData();
+    b.append('name', document.getElementById('stgNameInput').value.trim());
+    b.append('points_per_game', v);
+    if(document.getElementById('stgSortWins').checked) b.append('sort_by_wins', 'on');
+    if(document.getElementById('stgH2H').checked) b.append('h2h_tiebreaker', 'on');
+    fetch('/tournament/'+TID+'/settings', {method:'POST', body:b, headers:{'X-Requested-With':'fetch'}})
+        .then(()=> location.reload())
+        .catch(()=> alert('Gagal menyimpan'));
+}
+
+/* Settings auto-save */
+function toggleNameEdit(){
+    const box = document.getElementById('stgName');
+    const inp = document.getElementById('stgNameInput');
+    if(box.style.display === 'none'){
+        box.style.display = 'block';
+        inp.focus(); inp.select();
+    } else {
+        box.style.display = 'none';
+    }
+}
+function saveSettings(){
+    const b = new FormData();
+    const nameVal = document.getElementById('stgNameInput').value.trim();
+    b.append('name', nameVal || '{{ tournament.name }}');
+    if(document.getElementById('stgSortWins').checked) b.append('sort_by_wins', 'on');
+    if(document.getElementById('stgH2H').checked) b.append('h2h_tiebreaker', 'on');
+    fetch('/tournament/'+TID+'/settings', {method:'POST', body:b, headers:{'X-Requested-With':'fetch'}})
+        .then(r=>{ if(!r.ok) throw new Error(r.status); })
+        .then(()=>{
+            document.getElementById('stgNameLabel').textContent = nameVal;
+            document.getElementById('stgName').style.display = 'none';
+        })
+        .catch(()=>{ alert('Gagal menyimpan — coba lagi'); });
+}
+</script>
+</body>
+</html>

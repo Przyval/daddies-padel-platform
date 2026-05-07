@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Pengaturan — {{ tournament.name }}{% endblock %}
+
+{% block header_left %}
+<a href="{{ url_for('tournament.detail', tournament_id=tournament.id) }}" class="text-primary-container">
+    <span class="material-symbols-outlined">arrow_back</span>
+</a>
+<h1 class="font-headline font-bold tracking-tight text-xl text-primary-container">Pengaturan</h1>
+{% endblock %}
+
+{% block content %}
+<form method="post" class="space-y-6">
+    <section class="card space-y-4">
+        <h2 class="text-sm font-bold">Turnamen</h2>
+        <div>
+            <label class="label-overline mb-2 block">Nama</label>
+            <input class="input-field" name="name" type="text" value="{{ tournament.name }}">
+        </div>
+        <div class="flex items-center justify-between">
+            <span class="text-sm text-on-surface-variant">Format</span>
+            <span class="badge badge-{{ tournament.format_color }}">{{ tournament.format_label }}</span>
+        </div>
+    </section>
+
+    <section class="card space-y-4">
+        <h2 class="text-sm font-bold">Sistem Poin</h2>
+        <div class="grid grid-cols-3 gap-3">
+            <div class="text-center">
+                <label class="label-overline mb-2 block">Menang</label>
+                <input class="input-field text-center font-bold" name="win_points" type="number" value="{{ tournament.win_points }}" min="0" max="10">
+            </div>
+            <div class="text-center">
+                <label class="label-overline mb-2 block">Seri</label>
+                <input class="input-field text-center font-bold" name="draw_points" type="number" value="{{ tournament.draw_points }}" min="0" max="10">
+            </div>
+            <div class="text-center">
+                <label class="label-overline mb-2 block">Kalah</label>
+                <input class="input-field text-center font-bold" name="loss_points" type="number" value="{{ tournament.loss_points }}" min="0" max="10">
+            </div>
+        </div>
+    </section>
+
+    <section class="card space-y-4">
+        <h2 class="text-sm font-bold">Lanjutan</h2>
+        <label class="flex items-center justify-between cursor-pointer">
+            <span class="text-sm text-on-surface">Sort by Wins</span>
+            <input type="checkbox" name="sort_by_wins" {{ 'checked' if tournament.sort_by_wins }} class="w-5 h-5 accent-primary">
+        </label>
+        <label class="flex items-center justify-between cursor-pointer">
+            <span class="text-sm text-on-surface">H2H Tiebreaker</span>
+            <input type="checkbox" name="h2h_tiebreaker" {{ 'checked' if tournament.h2h_tiebreaker }} class="w-5 h-5 accent-primary">
+        </label>
+        <div>
+            <label class="label-overline mb-2 block">Court Bonus dari Ronde</label>
+            <input class="input-field text-center font-bold w-20" name="court_bonus_round" type="number" value="{{ tournament.court_bonus_round }}" min="0" max="20">
+        </div>
+    </section>
+
+    <button type="submit" class="btn-primary w-full py-4 text-base gap-2">
+        <span class="material-symbols-outlined text-lg">save</span> Simpan
+    </button>
+</form>
+{% endblock %}

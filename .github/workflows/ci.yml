@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analyze-and-test:
+    name: Analyze & Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.41.0'
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze --no-fatal-infos
+
+      - name: Run tests
+        run: flutter test
+
+      - name: Build web
+        run: flutter build web --release
+
+      - name: Check bundle size budget
+        run: |
+          # Inline budget check (works on ubuntu-latest without bc)
+          MAX_MAIN_JS=6291456    # 6 MB
+          MAX_CANVASKIT=8388608  # 8 MB
+          FAILED=0
+          echo "=== Web Bundle Size Budget Check ==="
+          if [ -f build/web/main.dart.js ]; then
+            SIZE=$(stat -c%s build/web/main.dart.js)
+            echo "  main.dart.js: $(( SIZE / 1024 / 1024 )) MB ($SIZE bytes, budget: 6 MB)"
+            [ "$SIZE" -gt "$MAX_MAIN_JS" ] && echo "  OVER BUDGET!" && FAILED=1
+          fi
+          if [ -f build/web/canvaskit/canvaskit.wasm ]; then
+            SIZE=$(stat -c%s build/web/canvaskit/canvaskit.wasm)
+            echo "  canvaskit.wasm: $(( SIZE / 1024 / 1024 )) MB ($SIZE bytes, budget: 8 MB)"
+            [ "$SIZE" -gt "$MAX_CANVASKIT" ] && echo "  OVER BUDGET!" && FAILED=1
+          fi
+          exit $FAILED

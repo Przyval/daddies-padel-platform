@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1080">
+    <title>{{ tournament.name }} — Card</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: #082217;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 40px;
+        }
+        .card {
+            width: 1080px;
+            background: #FAF9F5;
+            border-radius: 48px;
+            padding: 80px;
+            position: relative;
+            overflow: hidden;
+        }
+        /* Watermark fox */
+        .card::before {
+            content: '🦊';
+            position: absolute;
+            right: -20px;
+            bottom: -40px;
+            font-size: 300px;
+            opacity: 0.03;
+            transform: rotate(-15deg);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 8px 24px;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+        .badge-format { background: rgba(8,34,23,0.08); color: #082217; }
+        .club-name {
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: #424844;
+            margin-bottom: 8px;
+        }
+        .tournament-name {
+            font-size: 48px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: #082217;
+            margin-bottom: 12px;
+        }
+        .meta {
+            font-size: 16px;
+            color: #424844;
+        }
+        /* Stats row */
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 48px;
+            margin: 32px 0 48px;
+        }
+        .stat { text-align: center; }
+        .stat-num { font-size: 32px; font-weight: 800; color: #082217; }
+        .stat-label {
+            font-size: 10px; font-weight: 700;
+            letter-spacing: 0.1em; text-transform: uppercase;
+            color: #727974; margin-top: 4px;
+        }
+        /* Leaderboard */
+        .leaderboard { width: 100%; }
+        .lb-header {
+            display: flex;
+            padding: 12px 16px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #727974;
+        }
+        .lb-row {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            border-radius: 16px;
+            margin-bottom: 8px;
+        }
+        .lb-row.top3 { background: rgba(8,34,23,0.03); }
+        .lb-rank { width: 48px; text-align: center; font-size: 24px; flex-shrink: 0; }
+        .lb-rank-num { font-size: 18px; font-weight: 700; color: #727974; }
+        .lb-name { flex: 1; font-size: 20px; font-weight: 700; color: #1B1C1A; }
+        .lb-wlt { width: 100px; text-align: center; font-size: 16px; font-weight: 700; }
+        .lb-wlt .w { color: #4A7C59; }
+        .lb-wlt .l { color: #BA1A1A; }
+        .lb-wlt .t { color: #727974; }
+        .lb-diff { width: 80px; text-align: center; font-size: 16px; font-weight: 700; }
+        .lb-diff.pos { color: #4A7C59; }
+        .lb-diff.neg { color: #BA1A1A; }
+        .lb-pts { width: 60px; text-align: center; font-size: 24px; font-weight: 800; color: #082217; }
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 48px;
+            padding-top: 32px;
+            border-top: 1px solid rgba(194,200,194,0.2);
+        }
+        .footer-text {
+            font-size: 14px; font-weight: 600;
+            letter-spacing: 0.05em; text-transform: uppercase;
+            color: #727974;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <!-- Header -->
+    <div class="header">
+        <p class="club-name">Daddies Padel Club</p>
+        <h1 class="tournament-name">{{ tournament.name }}</h1>
+        <div style="display: flex; justify-content: center; gap: 12px; align-items: center; flex-wrap: wrap;">
+            <span class="badge badge-format">{{ tournament.format_label }}</span>
+            <span class="meta">{{ tournament.venue }} · {{ tournament.date.strftime('%d %b %Y') }}</span>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats">
+        <div class="stat">
+            <div class="stat-num">{{ tournament.participants.count() }}</div>
+            <div class="stat-label">Pemain</div>
+        </div>
+        <div class="stat">
+            <div class="stat-num">{{ tournament.total_rounds }}</div>
+            <div class="stat-label">Ronde</div>
+        </div>
+        <div class="stat">
+            <div class="stat-num">{{ tournament.completed_matches }}</div>
+            <div class="stat-label">Match</div>
+        </div>
+    </div>
+
+    <!-- Leaderboard -->
+    <div class="leaderboard">
+        <div class="lb-header">
+            <span style="width:48px; text-align:center">#</span>
+            <span style="flex:1">Pemain</span>
+            <span style="width:100px; text-align:center">W-L-T</span>
+            <span style="width:80px; text-align:center">Diff</span>
+            <span style="width:60px; text-align:center">Pts</span>
+        </div>
+        {% for s in leaderboard[:8] %}
+        <div class="lb-row {{ 'top3' if loop.index <= 3 }}">
+            <div class="lb-rank">
+                {% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% elif loop.index == 3 %}🥉
+                {% else %}<span class="lb-rank-num">{{ loop.index }}</span>{% endif %}
+            </div>
+            <div class="lb-name">{{ s.participant.name }}</div>
+            <div class="lb-wlt">
+                <span class="w">{{ s.wins }}</span>-<span class="l">{{ s.losses }}</span>-<span class="t">{{ s.ties }}</span>
+            </div>
+            <div class="lb-diff {{ 'pos' if s.games_won - s.games_lost > 0 else 'neg' if s.games_won - s.games_lost < 0 else '' }}">
+                {% set d = s.games_won - s.games_lost %}{{ '+' if d > 0 }}{{ d }}
+            </div>
+            <div class="lb-pts">{{ s.points }}</div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p class="footer-text">daddiespadel.com</p>
+    </div>
+</div>
+</body>
+</html>

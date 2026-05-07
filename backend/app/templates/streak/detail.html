@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% block title %}Streak — Daddies Padel{% endblock %}
+
+{% block header_left %}
+<a href="{{ url_for('main.profile') }}" class="text-primary-container">
+    <span class="material-symbols-outlined">arrow_back</span>
+</a>
+<h1 class="font-headline font-bold tracking-tight text-xl text-primary-container">Streak</h1>
+{% endblock %}
+
+{% block content %}
+<!-- Hero streak card -->
+<section class="card text-center space-y-4 py-8 {{ 'ring-2 ring-error/30' if streak.at_risk }}">
+    <!-- Flame icon by tier -->
+    <div class="text-5xl">
+        {% if streak.tier == 'diamond' %}💎
+        {% elif streak.tier == 'gold' %}🔥
+        {% elif streak.tier == 'silver' %}🔥
+        {% elif streak.tier == 'bronze' %}🔥
+        {% else %}⚡{% endif %}
+    </div>
+
+    <div>
+        <p class="text-6xl font-extrabold tracking-tight
+                  {% if streak.tier == 'diamond' %}text-info
+                  {% elif streak.tier == 'gold' %}text-warning
+                  {% elif streak.tier == 'silver' %}text-primary
+                  {% else %}text-on-surface{% endif %}">
+            {{ streak.current }}
+        </p>
+        <p class="text-lg font-bold text-on-surface mt-1">minggu berturut-turut</p>
+        <p class="text-sm text-on-surface-variant">main padel!</p>
+    </div>
+
+    {% if streak.at_risk %}
+    <div class="bg-error/10 rounded-full px-5 py-2 inline-flex items-center gap-2">
+        <span class="material-symbols-outlined text-error text-sm">warning</span>
+        <span class="text-xs font-bold text-error">Streak kamu akan hilang! Main hari ini.</span>
+    </div>
+    {% endif %}
+
+    {% if streak.current >= 4 %}
+    <div class="flex gap-2 justify-center pt-2">
+        <a href="{{ url_for('main.streak_share_card') }}"
+           class="btn-primary px-6 py-3 text-sm gap-2">
+            <span class="material-symbols-outlined text-lg">share</span>
+            Share Card
+        </a>
+        <a href="{{ url_for('main.streak_whatsapp') }}"
+           class="btn-secondary px-6 py-3 text-sm gap-2">
+            <span class="material-symbols-outlined text-lg">chat</span>
+            WhatsApp
+        </a>
+    </div>
+    {% endif %}
+</section>
+
+<!-- Stats -->
+<section class="grid grid-cols-3 gap-3">
+    <div class="stat-card text-center">
+        <p class="text-2xl font-extrabold text-primary">{{ streak.current }}</p>
+        <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mt-1">Current</p>
+    </div>
+    <div class="stat-card text-center">
+        <p class="text-2xl font-extrabold text-warning">{{ streak.longest }}</p>
+        <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mt-1">Terpanjang</p>
+    </div>
+    <div class="stat-card text-center">
+        <p class="text-2xl font-extrabold text-success">{{ streak.total_weeks }}</p>
+        <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mt-1">Total Minggu</p>
+    </div>
+</section>
+
+<!-- Next milestone -->
+{% if next_milestone %}
+<section class="card !p-5 space-y-3">
+    <h3 class="text-sm font-bold">Milestone Berikutnya</h3>
+    <div class="flex items-center gap-4">
+        <div class="w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0
+                    {% if next_milestone.tier == 'gold' %}bg-warning/10
+                    {% elif next_milestone.tier == 'silver' %}bg-primary/10
+                    {% elif next_milestone.tier == 'diamond' %}bg-info/10
+                    {% else %}bg-success/10{% endif %}">
+            <span class="text-xl font-extrabold
+                         {% if next_milestone.tier == 'gold' %}text-warning
+                         {% elif next_milestone.tier == 'silver' %}text-primary
+                         {% elif next_milestone.tier == 'diamond' %}text-info
+                         {% else %}text-success{% endif %}">
+                {{ next_milestone.title }}
+            </span>
+        </div>
+        <div class="flex-1">
+            <p class="text-sm font-bold text-on-surface">{{ next_milestone.share }}</p>
+            <div class="w-full bg-surface-container-high rounded-full h-2 mt-2">
+                {% set pct = (streak.current / next_milestone.weeks * 100)|int %}
+                <div class="bg-primary rounded-full h-2 transition-all" style="width: {{ pct }}%"></div>
+            </div>
+            <p class="text-[10px] text-on-surface-variant mt-1">{{ streak.current }}/{{ next_milestone.weeks }} minggu</p>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- All milestones -->
+<section>
+    <h3 class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-3">Milestones</h3>
+    <div class="space-y-2">
+        {% for m in milestones %}
+        <div class="card !p-3 flex items-center justify-between {{ 'opacity-40' if streak.current < m.weeks }}">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0
+                            {% if streak.current >= m.weeks %}
+                            {% if m.tier == 'diamond' %}bg-info/15 text-info
+                            {% elif m.tier == 'gold' %}bg-warning/15 text-warning
+                            {% elif m.tier == 'silver' %}bg-primary/15 text-primary
+                            {% else %}bg-success/15 text-success{% endif %}
+                            {% else %}bg-surface-container-high text-on-surface-variant{% endif %}">
+                    {% if streak.current >= m.weeks %}
+                    <span class="material-symbols-outlined text-sm">check</span>
+                    {% else %}
+                    <span class="text-xs font-bold">{{ m.title }}</span>
+                    {% endif %}
+                </div>
+                <div>
+                    <p class="text-sm font-bold text-on-surface">{{ m.title }} {{ m.subtitle }}</p>
+                    <p class="text-[10px] text-on-surface-variant uppercase tracking-widest">{{ m.tier|upper }}</p>
+                </div>
+            </div>
+            {% if streak.current >= m.weeks %}
+            <span class="material-symbols-outlined text-success text-lg">verified</span>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

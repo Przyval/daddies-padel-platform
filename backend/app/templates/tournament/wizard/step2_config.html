@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+{% block title %}Konfigurasi — {{ tournament.name }}{% endblock %}
+
+{% block header_left %}
+<a href="{{ url_for('tournament.create_step', tournament_id=tournament.id, step=1) }}" class="text-primary-container">
+    <span class="material-symbols-outlined">arrow_back</span>
+</a>
+<h1 class="font-headline font-bold tracking-tight text-xl text-primary-container">Konfigurasi</h1>
+{% endblock %}
+
+{% block content %}
+{% set current_step = 2 %}
+{% include "tournament/wizard/_step_bar.html" %}
+
+<form method="post" class="space-y-5">
+
+    {# ══════════ ESSENTIALS (always visible) ══════════ #}
+
+    <!-- Courts — big, visual, primary choice -->
+    <section class="card space-y-3">
+        <h3 class="text-sm font-bold flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary text-lg">grid_view</span>
+            Berapa court?
+        </h3>
+        <div class="flex gap-1.5 overflow-x-auto no-scrollbar pb-1">
+            {% for c in range(1, 11) %}
+            <label class="flex-shrink-0 cursor-pointer">
+                <input type="radio" name="num_courts" value="{{ c }}"
+                       {{ 'checked' if tournament.num_courts == c }} class="sr-only peer">
+                <div class="w-12 h-12 flex items-center justify-center rounded-full bg-surface-container-high text-on-surface font-bold text-base
+                            peer-checked:bg-primary peer-checked:text-on-primary transition-all">{{ c }}</div>
+            </label>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Scoring mode — two big toggles -->
+    <section class="card space-y-3">
+        <h3 class="text-sm font-bold flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary text-lg">scoreboard</span>
+            Sistem skor
+        </h3>
+        <div class="grid grid-cols-2 gap-2">
+            <label class="cursor-pointer">
+                <input type="radio" name="scoring_mode" value="sets"
+                       {{ 'checked' if tournament.scoring_mode == 'sets' }} class="sr-only peer"
+                       onchange="document.getElementById('ppg-section').classList.add('hidden')">
+                <div class="text-center py-4 rounded-2xl bg-surface-container-low font-bold text-sm
+                            peer-checked:bg-primary peer-checked:text-on-primary transition-all">
+                    <span class="text-lg block mb-1">🎾</span>
+                    Sets &amp; Games
+                    <p class="text-[9px] font-normal mt-1 opacity-70">6-4, 7-5, dst</p>
+                </div>
+            </label>
+            <label class="cursor-pointer">
+                <input type="radio" name="scoring_mode" value="points"
+                       {{ 'checked' if tournament.scoring_mode == 'points' }} class="sr-only peer"
+                       onchange="document.getElementById('ppg-section').classList.remove('hidden')">
+                <div class="text-center py-4 rounded-2xl bg-surface-container-low font-bold text-sm
+                            peer-checked:bg-primary peer-checked:text-on-primary transition-all">
+                    <span class="text-lg block mb-1">🔢</span>
+                    Poin
+                    <p class="text-[9px] font-normal mt-1 opacity-70">Main sampai 21, dst</p>
+                </div>
+            </label>
+        </div>
+        <!-- Points per game (only visible when Points mode selected) -->
+        <div id="ppg-section" class="{{ 'hidden' if tournament.scoring_mode != 'points' }}">
+            <div class="flex items-center justify-between bg-surface-container-low rounded-2xl p-3">
+                <span class="text-sm text-on-surface">Main sampai berapa poin?</span>
+                <div class="flex items-center gap-2">
+                    {% for v in [16, 21, 24, 31] %}
+                    <label class="cursor-pointer">
+                        <input type="radio" name="points_per_game" value="{{ v }}"
+                               {{ 'checked' if tournament.points_per_game == v }} class="sr-only peer">
+                        <div class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-high text-xs font-bold
+                                    peer-checked:bg-primary peer-checked:text-on-primary transition-all">{{ v }}</div>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Date & venue — compact single row -->
+    <section class="card space-y-3">
+        <h3 class="text-sm font-bold flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary text-lg">event</span>
+            Kapan & dimana?
+        </h3>
+        <div class="grid grid-cols-5 gap-2">
+            <input class="input-field col-span-2 !py-2.5 text-sm" name="date" type="date"
+                   value="{{ tournament.date.strftime('%Y-%m-%d') }}" required>
+            <input class="input-field !py-2.5 text-sm" name="time" type="time"
+                   value="{{ tournament.date.strftime('%H:%M') }}" required>
+            <select class="input-field col-span-2 !py-2.5 text-sm" name="venue">
+                <option {{ 'selected' if tournament.venue == 'Daddies Court' }}>Daddies Court</option>
+                <option {{ 'selected' if tournament.venue == 'GBK Padel Arena' }}>GBK Padel Arena</option>
+                <option {{ 'selected' if tournament.venue == 'The Padel Club' }}>The Padel Club</option>
+            </select>
+        </div>
+    </section>
+
+    {# ══════════ ADVANCED (collapsed by default) ══════════ #}
+
+    <div>
+        <button type="button" onclick="document.getElementById('advanced').classList.toggle('hidden'); this.querySelector('.chevron').classList.toggle('rotate-180')"
+                class="flex items-center justify-between w-full py-3 text-sm text-on-surface-variant">
+            <span class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-lg">tune</span>
+                Pengaturan Lanjutan
+            </span>
+            <span class="material-symbols-outlined text-lg chevron transition-transform">expand_more</span>
+        </button>
+
+        <div id="advanced" class="hidden space-y-4 pb-2">
+            <!-- Win/Draw points -->
+            <div class="card !p-4 space-y-3">
+                <p class="text-xs font-bold text-on-surface-variant">Poin Ranking</p>
+                <div class="grid grid-cols-3 gap-3">
+                    <div class="text-center">
+                        <p class="text-[9px] font-bold uppercase tracking-widest text-success mb-1">Menang</p>
+                        <input class="input-field text-center text-lg font-bold !py-2" name="win_points"
+                               type="number" value="{{ tournament.win_points }}" min="0" max="10">
+                    </div>
+                    <div class="text-center">
+                        <p class="text-[9px] font-bold uppercase tracking-widest text-warning mb-1">Seri</p>
+                        <input class="input-field text-center text-lg font-bold !py-2" name="draw_points"
+                               type="number" value="{{ tournament.draw_points }}" min="0" max="10">
+                    </div>
+                    <div class="text-center">
+                        <p class="text-[9px] font-bold uppercase tracking-widest text-error mb-1">Kalah</p>
+                        <input class="input-field text-center text-lg font-bold !py-2 opacity-40" name="loss_points"
+                               type="number" value="0" min="0" max="10" disabled>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Timer -->
+            <div class="card !p-4 space-y-3">
+                <p class="text-xs font-bold text-on-surface-variant">Timer per Game</p>
+                <div class="flex gap-1.5 overflow-x-auto no-scrollbar">
+                    {% for m in [0, 10, 15, 20, 30, 45, 60] %}
+                    <label class="flex-shrink-0 cursor-pointer">
+                        <input type="radio" name="minutes_to_play" value="{{ m }}"
+                               {{ 'checked' if tournament.minutes_to_play == m }} class="sr-only peer">
+                        <div class="px-3 py-2 rounded-full bg-surface-container-high text-xs font-bold
+                                    peer-checked:bg-primary peer-checked:text-on-primary transition-all">
+                            {{ 'Tanpa' if m == 0 else (m ~ ' mnt') }}
+                        </div>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Tiebreaker -->
+            <div class="card !p-4 space-y-3">
+                <p class="text-xs font-bold text-on-surface-variant">Tiebreaker</p>
+                <label class="flex items-center justify-between cursor-pointer">
+                    <span class="text-sm text-on-surface">Sort by Wins</span>
+                    <input type="checkbox" name="sort_by_wins" {{ 'checked' if tournament.sort_by_wins }}
+                           class="w-5 h-5 rounded accent-primary">
+                </label>
+                <label class="flex items-center justify-between cursor-pointer">
+                    <span class="text-sm text-on-surface">Head-to-Head</span>
+                    <input type="checkbox" name="h2h_tiebreaker" {{ 'checked' if tournament.h2h_tiebreaker }}
+                           class="w-5 h-5 rounded accent-primary">
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nav -->
+    <div class="flex gap-3">
+        <a href="{{ url_for('tournament.create_step', tournament_id=tournament.id, step=1) }}"
+           class="btn-ghost flex-1 py-3.5 text-sm">
+            <span class="material-symbols-outlined text-lg">arrow_back</span> Kembali
+        </a>
+        <button type="submit" class="btn-primary flex-1 py-3.5 text-sm gap-1">
+            Lanjut <span class="material-symbols-outlined text-lg">arrow_forward</span>
+        </button>
+    </div>
+</form>
+{% endblock %}

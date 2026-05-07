@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Notifikasi — Daddies Padel{% endblock %}
+
+{% block header_left %}
+<a href="{{ url_for('member.index') }}" class="hover:opacity-80 transition-opacity text-primary-container">
+    <span class="material-symbols-outlined">arrow_back</span>
+</a>
+<h1 class="font-headline font-bold tracking-tight text-xl text-primary-container">Notifikasi</h1>
+{% endblock %}
+
+{% block header_right %}
+{% if notifications %}
+<form action="{{ url_for('main.mark_all_read') }}" method="POST">
+    <button type="submit" class="text-sm font-semibold text-primary">Baca Semua</button>
+</form>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<section class="space-y-3">
+    {% for notif in notifications %}
+    <div class="card !p-4 flex items-start gap-3 {% if not notif.is_read %}ring-2 ring-primary/10{% endif %}">
+        <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0
+            {% if not notif.is_read %}bg-primary/10{% else %}bg-surface-container-low{% endif %}">
+            <span class="material-symbols-outlined text-base
+                {% if not notif.is_read %}text-primary{% else %}text-on-surface-variant{% endif %}">
+                {{ notif.icon }}
+            </span>
+        </div>
+        <div class="flex-1 min-w-0">
+            <p class="font-bold text-on-surface text-sm">{{ notif.title }}</p>
+            <p class="text-xs text-on-surface-variant mt-0.5">{{ notif.body }}</p>
+            <p class="text-[10px] text-on-surface-variant/60 mt-1">
+                {{ notif.created_at.strftime('%d %b, %H:%M') }}
+            </p>
+        </div>
+        {% if not notif.is_read %}
+        <div class="w-2 h-2 rounded-full bg-primary flex-shrink-0 mt-2"></div>
+        {% endif %}
+    </div>
+    {% else %}
+    <div class="card text-center py-16">
+        <span class="material-symbols-outlined text-5xl text-on-surface-variant/20 mb-3">notifications_off</span>
+        <h3 class="font-bold text-on-surface">Tidak ada notifikasi</h3>
+        <p class="text-sm text-on-surface-variant mt-1">Kamu akan menerima notifikasi tentang sesi dan pembayaran.</p>
+    </div>
+    {% endfor %}
+</section>
+{% endblock %}

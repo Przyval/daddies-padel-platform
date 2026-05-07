@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="API docs for the DataService class from the data_service library, for the Dart programming language.">
+  <title>DataService class - data_service library - Dart API</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../static-assets/github.css?v1">
+  <link rel="stylesheet" href="../static-assets/styles.css?v1">
+  <link rel="icon" href="../static-assets/favicon.png?v1">
+  
+</head>
+
+<body data-base-href="../" data-using-base-href="false" class="light-theme">
+<div id="overlay-under-drawer"></div>
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../index.html">daddies_app</a></li>
+    <li><a href="../services_data_service/">services&#47;data_service.dart</a></li>
+    <li class="self-crumb">DataService class</li>
+  </ol>
+  <div class="self-name">DataService</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <button class="toggle" id="theme-button" title="Toggle between light and dark mode" aria-label="Light and dark mode toggle">
+    <span id="dark-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      dark_mode
+    </span>
+    <span id="light-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      light_mode
+    </span>
+  </button>
+</header>
+<main>
+<div
+    id="dartdoc-main-content"
+    class="main-content"
+    data-above-sidebar="services_data_service&#47;services_data_service-library-sidebar.html"
+    data-below-sidebar="services_data_service&#47;DataService-class-sidebar.html">
+    <div>
+<h1><span class="kind-class">DataService</span> class 
+ 
+</h1></div>
+
+    
+<section class="desc markdown">
+  <p>DataService: local cache + Firestore sync.</p>
+<p>Providers read synchronously from the local cache.
+Mutations write to Firestore FIRST, then update local cache on success.
+On init, data is loaded from Firestore into the local cache.</p>
+</section>
+
+
+    <section>
+      <dl class="dl-horizontal">
+        
+  <dt>Inheritance</dt>
+  <dd>
+    <ul class="gt-separated dark clazz-relationships">
+      <li><a href="https://api.flutter.dev/flutter/dart-core/Object-class.html">Object</a></li>
+        <li><a href="https://api.flutter.dev/flutter/foundation/ChangeNotifier-class.html">ChangeNotifier</a></li>
+      <li>DataService</li>
+    </ul>
+  </dd>
+
+        
+        
+
+
+        
+        
+
+
+      </dl>
+    </section>
+
+    
+  <section class="summary offset-anchor" id="constructors">
+    <h2>Constructors</h2>
+    <dl class="constructor-summary-list">
+        <dt id="DataService.new" class="callable">
+          <span class="name"><a href="../services_data_service/DataService/DataService.html">DataService</a></span><span class="signature">()</span>
+        </dt>
+        <dd>
+          
+            <div class="constructor-modifier features">factory</div>
+        </dd>
+    </dl>
+  </section>
+    
+  <section
+      class="summary offset-anchor"
+      id="instance-properties">
+    <h2>Properties</h2>
+    <dl class="properties">
+        <dt id="awards" class="property">
+  <span class="name"><a href="../services_data_service/DataService/awards.html">awards</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../models_award_model/AwardModel-class.html">AwardModel</a></span>&gt;</span></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">no setter</span></div>
+
+</dd>
+
+        <dt id="cashflows" class="property">
+  <span class="name"><a href="../services_data_service/DataService/cashflows.html">cashflows</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../models_cashflow_model/CashFlowModel-class.html">CashFlowModel</a></span>&gt;</span></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">no setter</span></div>
+
+</dd>
+
+        <dt id="chipsTransactions" class="property">
+  <span class="name"><a href="../services_data_service/DataService/chipsTransactions.html">chipsTransactions</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../models_chips_transaction_model/ChipsTransactionModel-class.html">ChipsTransactionModel</a></span>&gt;</span></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">no setter</span></div>
+
+</dd>
+
+        <dt id="hasError" class="property">
+  <span class="name"><a href="../services_data_service/DataService/hasError.html">hasError</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">no setter</span></div>
+
+</dd>
+
+        <dt id="hashCode" class="property inherited">
+  <span class="name"><a href="https://api.flutter.dev/flutter/dart-core/Object/hashCode.html">hashCode</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span>
+  
+
+</dt>
+<dd class="inherited">
+  The hash code for this object.
+  <div class="features"><span class="feature">no setter</span><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="hasListeners" class="property inherited">
+  <span class="name"><a href="https://api.flutter.dev/flutter/foundation/ChangeNotifier/hasListeners.html">hasListeners</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>
+  
+
+</dt>
+<dd class="inherited">
+  Whether any listeners are currently registered.
+  <div class="features"><span class="feature">no setter</span><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="isInitialized" class="property">
+  <span class="name"><a href="../services_data_service/DataService/isInitialized.html">isInitialized</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">no setter</span></div>
+
+</dd>
+
+        <dt id="isRefreshing" class="property">
+  <span class="name"><a href="../services_data_service/DataService/isRefreshing.html">isRefreshing</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">no setter</span></div>
+
+</dd>
+
+        <dt id="lastError" class="property">
+  <span class="name"><a href="../services_data_service/DataService/lastError.html">lastError</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">no setter</span></div>
+
+</dd>
+
+        <dt id="lastSyncedAt" class="property">
+  <span class="name"><a href="../services_data_service/DataService/lastSyncedAt.html">lastSyncedAt</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/DateTime-class.html">DateTime</a>?</span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">no setter</span></div>
+
+</dd>
+
+        <dt id="matchResults" class="property">
+  <span class="name"><a href="../services_data_service/DataService/matchResults.html">matchResults</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../models_match_result_model/MatchResultModel-class.html">MatchResultModel</a></span>&gt;</span></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">no setter</span></div>
+
+</dd>
+
+        <dt id="partners" class="property">
+  <span class="name"><a href="../services_data_service/DataService/partners.html">partners</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../models_partner_model/PartnerModel-class.html">PartnerModel</a></span>&gt;</span></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">no setter</span></div>
+
+</dd>
+
+        <dt id="payments" class="property">
+  <span class="name"><a href="../services_data_service/DataService/payments.html">payments</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../models_payment_model/PaymentModel-class.html">PaymentModel</a></span>&gt;</span></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">no setter</span></div>
+
+</dd>
+
+        <dt id="ratings" class="property">
+  <span class="name"><a href="../services_data_service/DataService/ratings.html">ratings</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../models_rating_model/RatingModel-class.html">RatingModel</a></span>&gt;</span></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">no setter</span></div>
+
+</dd>
+
+        <dt id="redemptions" class="property">
+  <span class="name"><a href="../services_data_service/DataService/redemptions.html">redemptions</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../models_redemption_model/RedemptionModel-class.html">RedemptionModel</a></span>&gt;</span></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">no setter</span></div>
+
+</dd>
+
+        <dt id="referrals" class="property">
+  <span class="name"><a href="../services_data_service/DataService/referrals.html">referrals</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../models_referral_model/ReferralModel-class.html">ReferralModel</a></span>&gt;</span></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">no setter</span></div>
+
+</dd>
+
+        <dt id="runtimeType" class="property inherited">
+  <span class="name"><a href="https://api.flutter.dev/flutter/dart-core/Object/runtimeType.html">runtimeType</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span>
+  
+
+</dt>
+<dd class="inherited">
+  A representation of the runtime type of the object.
+  <div class="features"><span class="feature">no setter</span><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="sessions" class="property">
+  <span class="name"><a href="../services_data_service/DataService/sessions.html">sessions</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../models_session_model/SessionModel-class.html">SessionModel</a></span>&gt;</span></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">no setter</span></div>
+
+</dd>
+
+        <dt id="slots" class="property">
+  <span class="name"><a href="../services_data_service/DataService/slots.html">slots</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../models_slot_model/SlotModel-class.html">SlotModel</a></span>&gt;</span></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">no setter</span></div>
+
+</dd>
+
+        <dt id="users" class="property">
+  <span class="name"><a href="../services_data_service/DataService/users.html">users</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../models_user_model/UserModel-class.html">UserModel</a></span>&gt;</span></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">no setter</span></div>
+
+</dd>
+
+        <dt id="venues" class="property">
+  <span class="name"><a href="../services_data_service/DataService/venues.html">venues</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../models_venue_model/VenueModel-class.html">VenueModel</a></span>&gt;</span></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">no setter</span></div>
+
+</dd>
+
+    </dl>
+  </section>
+
+    
+  <section
+      class="summary offset-anchor"
+      id="instance-methods">
+    <h2>Methods</h2>
+    <dl class="callables">
+        <dt id="addAward" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/addAward.html">addAward</a></span><span class="signature">(<wbr><span class="parameter" id="addAward-param-award"><span class="type-annotation"><a href="../models_award_model/AwardModel-class.html">AwardModel</a></span> <span class="parameter-name">award</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/flutter_test/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="addCashFlow" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/addCashFlow.html">addCashFlow</a></span><span class="signature">(<wbr><span class="parameter" id="addCashFlow-param-cashflow"><span class="type-annotation"><a href="../models_cashflow_model/CashFlowModel-class.html">CashFlowModel</a></span> <span class="parameter-name">cashflow</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/flutter_test/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="addChipsTransaction" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/addChipsTransaction.html">addChipsTransaction</a></span><span class="signature">(<wbr><span class="parameter" id="addChipsTransaction-param-txn"><span class="type-annotation"><a href="../models_chips_transaction_model/ChipsTransactionModel-class.html">ChipsTransactionModel</a></span> <span class="parameter-name">txn</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/flutter_test/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="addListener" class="callable inherited">
+  <span class="name"><a href="https://api.flutter.dev/flutter/foundation/ChangeNotifier/addListener.html">addListener</a></span><span class="signature">(<wbr><span class="parameter" id="addListener-param-listener"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-ui/VoidCallback.html">VoidCallback</a></span> <span class="parameter-name">listener</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  Register a closure to be called when the object changes.
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="addMatchResult" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/addMatchResult.html">addMatchResult</a></span><span class="signature">(<wbr><span class="parameter" id="addMatchResult-param-result"><span class="type-annotation"><a href="../models_match_result_model/MatchResultModel-class.html">MatchResultModel</a></span> <span class="parameter-name">result</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/flutter_test/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="addPartner" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/addPartner.html">addPartner</a></span><span class="signature">(<wbr><span class="parameter" id="addPartner-param-partner"><span class="type-annotation"><a href="../models_partner_model/PartnerModel-class.html">PartnerModel</a></span> <span class="parameter-name">partner</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/flutter_test/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="addPayment" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/addPayment.html">addPayment</a></span><span class="signature">(<wbr><span class="parameter" id="addPayment-param-payment"><span class="type-annotation"><a href="../models_payment_model/PaymentModel-class.html">PaymentModel</a></span> <span class="parameter-name">payment</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/flutter_test/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="addPhotoToSession" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/addPhotoToSession.html">addPhotoToSession</a></span><span class="signature">(<wbr><span class="parameter" id="addPhotoToSession-param-sessionId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">sessionId</span>, </span><span class="parameter" id="addPhotoToSession-param-photoPath"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">photoPath</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="addRating" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/addRating.html">addRating</a></span><span class="signature">(<wbr><span class="parameter" id="addRating-param-rating"><span class="type-annotation"><a href="../models_rating_model/RatingModel-class.html">RatingModel</a></span> <span class="parameter-name">rating</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/flutter_test/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="addRedemption" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/addRedemption.html">addRedemption</a></span><span class="signature">(<wbr><span class="parameter" id="addRedemption-param-redemption"><span class="type-annotation"><a href="../models_redemption_model/RedemptionModel-class.html">RedemptionModel</a></span> <span class="parameter-name">redemption</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/flutter_test/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="addReferral" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/addReferral.html">addReferral</a></span><span class="signature">(<wbr><span class="parameter" id="addReferral-param-referral"><span class="type-annotation"><a href="../models_referral_model/ReferralModel-class.html">ReferralModel</a></span> <span class="parameter-name">referral</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/flutter_test/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="addSession" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/addSession.html">addSession</a></span><span class="signature">(<wbr><span class="parameter" id="addSession-param-session"><span class="type-annotation"><a href="../models_session_model/SessionModel-class.html">SessionModel</a></span> <span class="parameter-name">session</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/flutter_test/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="addSlot" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/addSlot.html">addSlot</a></span><span class="signature">(<wbr><span class="parameter" id="addSlot-param-slot"><span class="type-annotation"><a href="../models_slot_model/SlotModel-class.html">SlotModel</a></span> <span class="parameter-name">slot</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/flutter_test/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="addUser" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/addUser.html">addUser</a></span><span class="signature">(<wbr><span class="parameter" id="addUser-param-user"><span class="type-annotation"><a href="../models_user_model/UserModel-class.html">UserModel</a></span> <span class="parameter-name">user</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/flutter_test/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="addVenue" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/addVenue.html">addVenue</a></span><span class="signature">(<wbr><span class="parameter" id="addVenue-param-venue"><span class="type-annotation"><a href="../models_venue_model/VenueModel-class.html">VenueModel</a></span> <span class="parameter-name">venue</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/flutter_test/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="awardChipsAtomic" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/awardChipsAtomic.html">awardChipsAtomic</a></span><span class="signature">(<wbr>{<span class="parameter" id="awardChipsAtomic-param-txn"><span>required</span> <span class="type-annotation"><a href="../models_chips_transaction_model/ChipsTransactionModel-class.html">ChipsTransactionModel</a></span> <span class="parameter-name">txn</span>, </span><span class="parameter" id="awardChipsAtomic-param-userId"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">userId</span>, </span><span class="parameter" id="awardChipsAtomic-param-newBalance"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">newBalance</span></span>})
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/flutter_test/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Atomic: write transaction + update user balance in one Firestore transaction.
+  
+
+</dd>
+
+        <dt id="clearCache" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/clearCache.html">clearCache</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  Clear all cached data (used on logout).
+  
+
+</dd>
+
+        <dt id="deleteAward" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/deleteAward.html">deleteAward</a></span><span class="signature">(<wbr><span class="parameter" id="deleteAward-param-id"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">id</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/flutter_test/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="deleteMatchResult" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/deleteMatchResult.html">deleteMatchResult</a></span><span class="signature">(<wbr><span class="parameter" id="deleteMatchResult-param-id"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">id</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/flutter_test/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="deletePartner" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/deletePartner.html">deletePartner</a></span><span class="signature">(<wbr><span class="parameter" id="deletePartner-param-id"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">id</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/flutter_test/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="deleteVenue" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/deleteVenue.html">deleteVenue</a></span><span class="signature">(<wbr><span class="parameter" id="deleteVenue-param-venueId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">venueId</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/flutter_test/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="dispose" class="callable inherited">
+  <span class="name"><a href="https://api.flutter.dev/flutter/foundation/ChangeNotifier/dispose.html">dispose</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  Discards any resources used by the object. After this is called, the
+object is not in a usable state and should be discarded (calls to
+<a href="https://api.flutter.dev/flutter/foundation/ChangeNotifier/addListener.html">addListener</a> will throw after the object is disposed).
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="getActivePartners" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/getActivePartners.html">getActivePartners</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../models_partner_model/PartnerModel-class.html">PartnerModel</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="getAverageRatingForUser" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/getAverageRatingForUser.html">getAverageRatingForUser</a></span><span class="signature">(<wbr><span class="parameter" id="getAverageRatingForUser-param-userId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">userId</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/double-class.html">double</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="getAwardsForPeriod" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/getAwardsForPeriod.html">getAwardsForPeriod</a></span><span class="signature">(<wbr><span class="parameter" id="getAwardsForPeriod-param-period"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">period</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../models_award_model/AwardModel-class.html">AwardModel</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="getAwardsForUser" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/getAwardsForUser.html">getAwardsForUser</a></span><span class="signature">(<wbr><span class="parameter" id="getAwardsForUser-param-userId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">userId</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../models_award_model/AwardModel-class.html">AwardModel</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="getBalance" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/getBalance.html">getBalance</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="getCashFlowsForSession" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/getCashFlowsForSession.html">getCashFlowsForSession</a></span><span class="signature">(<wbr><span class="parameter" id="getCashFlowsForSession-param-sessionId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">sessionId</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../models_cashflow_model/CashFlowModel-class.html">CashFlowModel</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="getChipsTransactionsForUser" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/getChipsTransactionsForUser.html">getChipsTransactionsForUser</a></span><span class="signature">(<wbr><span class="parameter" id="getChipsTransactionsForUser-param-userId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">userId</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../models_chips_transaction_model/ChipsTransactionModel-class.html">ChipsTransactionModel</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="getMatchResultsForSession" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/getMatchResultsForSession.html">getMatchResultsForSession</a></span><span class="signature">(<wbr><span class="parameter" id="getMatchResultsForSession-param-sessionId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">sessionId</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../models_match_result_model/MatchResultModel-class.html">MatchResultModel</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="getMatchResultsForUser" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/getMatchResultsForUser.html">getMatchResultsForUser</a></span><span class="signature">(<wbr><span class="parameter" id="getMatchResultsForUser-param-userId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">userId</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../models_match_result_model/MatchResultModel-class.html">MatchResultModel</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="getPaymentById" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/getPaymentById.html">getPaymentById</a></span><span class="signature">(<wbr><span class="parameter" id="getPaymentById-param-id"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">id</span></span>)
+    <span class="returntype parameter">&#8594; <a href="../models_payment_model/PaymentModel-class.html">PaymentModel</a>?</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="getPaymentForSlot" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/getPaymentForSlot.html">getPaymentForSlot</a></span><span class="signature">(<wbr><span class="parameter" id="getPaymentForSlot-param-slotId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">slotId</span></span>)
+    <span class="returntype parameter">&#8594; <a href="../models_payment_model/PaymentModel-class.html">PaymentModel</a>?</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="getPaymentsForSession" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/getPaymentsForSession.html">getPaymentsForSession</a></span><span class="signature">(<wbr><span class="parameter" id="getPaymentsForSession-param-sessionId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">sessionId</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../models_payment_model/PaymentModel-class.html">PaymentModel</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="getPaymentsForUser" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/getPaymentsForUser.html">getPaymentsForUser</a></span><span class="signature">(<wbr><span class="parameter" id="getPaymentsForUser-param-userId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">userId</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../models_payment_model/PaymentModel-class.html">PaymentModel</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="getPhotosForSession" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/getPhotosForSession.html">getPhotosForSession</a></span><span class="signature">(<wbr><span class="parameter" id="getPhotosForSession-param-sessionId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">sessionId</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="getRatingsByUser" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/getRatingsByUser.html">getRatingsByUser</a></span><span class="signature">(<wbr><span class="parameter" id="getRatingsByUser-param-userId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">userId</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../models_rating_model/RatingModel-class.html">RatingModel</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="getRatingsForSession" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/getRatingsForSession.html">getRatingsForSession</a></span><span class="signature">(<wbr><span class="parameter" id="getRatingsForSession-param-sessionId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">sessionId</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../models_rating_model/RatingModel-class.html">RatingModel</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="getRatingsForUser" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/getRatingsForUser.html">getRatingsForUser</a></span><span class="signature">(<wbr><span class="parameter" id="getRatingsForUser-param-userId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">userId</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../models_rating_model/RatingModel-class.html">RatingModel</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="getRedemptionsForUser" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/getRedemptionsForUser.html">getRedemptionsForUser</a></span><span class="signature">(<wbr><span class="parameter" id="getRedemptionsForUser-param-userId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">userId</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../models_redemption_model/RedemptionModel-class.html">RedemptionModel</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="getReferralByCode" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/getReferralByCode.html">getReferralByCode</a></span><span class="signature">(<wbr><span class="parameter" id="getReferralByCode-param-code"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">code</span></span>)
+    <span class="returntype parameter">&#8594; <a href="../models_referral_model/ReferralModel-class.html">ReferralModel</a>?</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="getReferralsForUser" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/getReferralsForUser.html">getReferralsForUser</a></span><span class="signature">(<wbr><span class="parameter" id="getReferralsForUser-param-userId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">userId</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../models_referral_model/ReferralModel-class.html">ReferralModel</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="getSessionById" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/getSessionById.html">getSessionById</a></span><span class="signature">(<wbr><span class="parameter" id="getSessionById-param-id"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">id</span></span>)
+    <span class="returntype parameter">&#8594; <a href="../models_session_model/SessionModel-class.html">SessionModel</a>?</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="getSessionsByMimin" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/getSessionsByMimin.html">getSessionsByMimin</a></span><span class="signature">(<wbr><span class="parameter" id="getSessionsByMimin-param-miminId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">miminId</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../models_session_model/SessionModel-class.html">SessionModel</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="getSessionsByStatus" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/getSessionsByStatus.html">getSessionsByStatus</a></span><span class="signature">(<wbr><span class="parameter" id="getSessionsByStatus-param-status"><span class="type-annotation"><a href="../models_session_model/SessionStatus.html">SessionStatus</a></span> <span class="parameter-name">status</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../models_session_model/SessionModel-class.html">SessionModel</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="getSlotById" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/getSlotById.html">getSlotById</a></span><span class="signature">(<wbr><span class="parameter" id="getSlotById-param-id"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">id</span></span>)
+    <span class="returntype parameter">&#8594; <a href="../models_slot_model/SlotModel-class.html">SlotModel</a>?</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="getSlotsForSession" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/getSlotsForSession.html">getSlotsForSession</a></span><span class="signature">(<wbr><span class="parameter" id="getSlotsForSession-param-sessionId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">sessionId</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../models_slot_model/SlotModel-class.html">SlotModel</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="getSlotsForUser" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/getSlotsForUser.html">getSlotsForUser</a></span><span class="signature">(<wbr><span class="parameter" id="getSlotsForUser-param-userId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">userId</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../models_slot_model/SlotModel-class.html">SlotModel</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="getTotalExpense" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/getTotalExpense.html">getTotalExpense</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="getTotalIncome" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/getTotalIncome.html">getTotalIncome</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="getUserById" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/getUserById.html">getUserById</a></span><span class="signature">(<wbr><span class="parameter" id="getUserById-param-id"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">id</span></span>)
+    <span class="returntype parameter">&#8594; <a href="../models_user_model/UserModel-class.html">UserModel</a>?</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="getUserByPhone" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/getUserByPhone.html">getUserByPhone</a></span><span class="signature">(<wbr><span class="parameter" id="getUserByPhone-param-phone"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">phone</span></span>)
+    <span class="returntype parameter">&#8594; <a href="../models_user_model/UserModel-class.html">UserModel</a>?</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="getUsersByRole" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/getUsersByRole.html">getUsersByRole</a></span><span class="signature">(<wbr><span class="parameter" id="getUsersByRole-param-role"><span class="type-annotation"><a href="../models_user_model/UserRole.html">UserRole</a></span> <span class="parameter-name">role</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../models_user_model/UserModel-class.html">UserModel</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="getVenueById" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/getVenueById.html">getVenueById</a></span><span class="signature">(<wbr><span class="parameter" id="getVenueById-param-id"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">id</span></span>)
+    <span class="returntype parameter">&#8594; <a href="../models_venue_model/VenueModel-class.html">VenueModel</a>?</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="getVenueByName" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/getVenueByName.html">getVenueByName</a></span><span class="signature">(<wbr><span class="parameter" id="getVenueByName-param-name"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span></span>)
+    <span class="returntype parameter">&#8594; <a href="../models_venue_model/VenueModel-class.html">VenueModel</a>?</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="initialize" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/initialize.html">initialize</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/flutter_test/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="initializePublicData" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/initializePublicData.html">initializePublicData</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/flutter_test/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Load only publicly-readable collections (sessions, venues, partners).
+Used for guest browsing before the user signs in.
+  
+
+</dd>
+
+        <dt id="joinSessionAtomic" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/joinSessionAtomic.html">joinSessionAtomic</a></span><span class="signature">(<wbr>{<span class="parameter" id="joinSessionAtomic-param-sessionId"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">sessionId</span>, </span><span class="parameter" id="joinSessionAtomic-param-userId"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">userId</span>, </span><span class="parameter" id="joinSessionAtomic-param-userName"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">userName</span>, </span><span class="parameter" id="joinSessionAtomic-param-newSlotId"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">newSlotId</span></span>})
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/flutter_test/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../models_slot_model/SlotModel-class.html">SlotModel</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Atomically join a session. Prevents overbooking via Firestore transaction.
+  
+
+</dd>
+
+        <dt id="leaveSessionAtomic" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/leaveSessionAtomic.html">leaveSessionAtomic</a></span><span class="signature">(<wbr>{<span class="parameter" id="leaveSessionAtomic-param-sessionId"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">sessionId</span>, </span><span class="parameter" id="leaveSessionAtomic-param-userId"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">userId</span></span>})
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/flutter_test/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Atomically leave a session with waitlist promotion.
+  
+
+</dd>
+
+        <dt id="markAttendance" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/markAttendance.html">markAttendance</a></span><span class="signature">(<wbr><span class="parameter" id="markAttendance-param-slotId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">slotId</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/flutter_test/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="noSuchMethod" class="callable inherited">
+  <span class="name"><a href="https://api.flutter.dev/flutter/dart-core/Object/noSuchMethod.html">noSuchMethod</a></span><span class="signature">(<wbr><span class="parameter" id="noSuchMethod-param-invocation"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Invocation-class.html">Invocation</a></span> <span class="parameter-name">invocation</span></span>)
+    <span class="returntype parameter">&#8594; dynamic</span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  Invoked when a nonexistent method or property is accessed.
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="notifyListeners" class="callable inherited">
+  <span class="name"><a href="https://api.flutter.dev/flutter/foundation/ChangeNotifier/notifyListeners.html">notifyListeners</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  Call all the registered listeners.
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="refresh" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/refresh.html">refresh</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/flutter_test/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Refresh data from Firestore.
+  
+
+</dd>
+
+        <dt id="removeCashFlow" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/removeCashFlow.html">removeCashFlow</a></span><span class="signature">(<wbr><span class="parameter" id="removeCashFlow-param-cashflowId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">cashflowId</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/flutter_test/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="removeListener" class="callable inherited">
+  <span class="name"><a href="https://api.flutter.dev/flutter/foundation/ChangeNotifier/removeListener.html">removeListener</a></span><span class="signature">(<wbr><span class="parameter" id="removeListener-param-listener"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-ui/VoidCallback.html">VoidCallback</a></span> <span class="parameter-name">listener</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  Remove a previously registered closure from the list of closures that are
+notified when the object changes.
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="removePayment" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/removePayment.html">removePayment</a></span><span class="signature">(<wbr><span class="parameter" id="removePayment-param-paymentId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">paymentId</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/flutter_test/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="removePhotoFromSession" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/removePhotoFromSession.html">removePhotoFromSession</a></span><span class="signature">(<wbr><span class="parameter" id="removePhotoFromSession-param-sessionId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">sessionId</span>, </span><span class="parameter" id="removePhotoFromSession-param-photoPath"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">photoPath</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="removeSession" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/removeSession.html">removeSession</a></span><span class="signature">(<wbr><span class="parameter" id="removeSession-param-sessionId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">sessionId</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/flutter_test/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="removeSlot" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/removeSlot.html">removeSlot</a></span><span class="signature">(<wbr><span class="parameter" id="removeSlot-param-slotId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">slotId</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/flutter_test/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="removeUser" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/removeUser.html">removeUser</a></span><span class="signature">(<wbr><span class="parameter" id="removeUser-param-userId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">userId</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/flutter_test/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="toString" class="callable inherited">
+  <span class="name"><a href="https://api.flutter.dev/flutter/dart-core/Object/toString.html">toString</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  A string representation of this object.
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="unmarkAttendance" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/unmarkAttendance.html">unmarkAttendance</a></span><span class="signature">(<wbr><span class="parameter" id="unmarkAttendance-param-slotId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">slotId</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/flutter_test/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="updatePartner" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/updatePartner.html">updatePartner</a></span><span class="signature">(<wbr><span class="parameter" id="updatePartner-param-partner"><span class="type-annotation"><a href="../models_partner_model/PartnerModel-class.html">PartnerModel</a></span> <span class="parameter-name">partner</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/flutter_test/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="updatePayment" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/updatePayment.html">updatePayment</a></span><span class="signature">(<wbr><span class="parameter" id="updatePayment-param-payment"><span class="type-annotation"><a href="../models_payment_model/PaymentModel-class.html">PaymentModel</a></span> <span class="parameter-name">payment</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/flutter_test/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="updateRedemption" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/updateRedemption.html">updateRedemption</a></span><span class="signature">(<wbr><span class="parameter" id="updateRedemption-param-redemption"><span class="type-annotation"><a href="../models_redemption_model/RedemptionModel-class.html">RedemptionModel</a></span> <span class="parameter-name">redemption</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/flutter_test/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="updateReferral" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/updateReferral.html">updateReferral</a></span><span class="signature">(<wbr><span class="parameter" id="updateReferral-param-referral"><span class="type-annotation"><a href="../models_referral_model/ReferralModel-class.html">ReferralModel</a></span> <span class="parameter-name">referral</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/flutter_test/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="updateSession" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/updateSession.html">updateSession</a></span><span class="signature">(<wbr><span class="parameter" id="updateSession-param-session"><span class="type-annotation"><a href="../models_session_model/SessionModel-class.html">SessionModel</a></span> <span class="parameter-name">session</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/flutter_test/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="updateSlot" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/updateSlot.html">updateSlot</a></span><span class="signature">(<wbr><span class="parameter" id="updateSlot-param-slot"><span class="type-annotation"><a href="../models_slot_model/SlotModel-class.html">SlotModel</a></span> <span class="parameter-name">slot</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/flutter_test/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="updateUser" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/updateUser.html">updateUser</a></span><span class="signature">(<wbr><span class="parameter" id="updateUser-param-user"><span class="type-annotation"><a href="../models_user_model/UserModel-class.html">UserModel</a></span> <span class="parameter-name">user</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/flutter_test/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="updateVenue" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/updateVenue.html">updateVenue</a></span><span class="signature">(<wbr><span class="parameter" id="updateVenue-param-venue"><span class="type-annotation"><a href="../models_venue_model/VenueModel-class.html">VenueModel</a></span> <span class="parameter-name">venue</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/flutter_test/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="verifyPaymentAtomic" class="callable">
+  <span class="name"><a href="../services_data_service/DataService/verifyPaymentAtomic.html">verifyPaymentAtomic</a></span><span class="signature">(<wbr>{<span class="parameter" id="verifyPaymentAtomic-param-paymentId"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">paymentId</span>, </span><span class="parameter" id="verifyPaymentAtomic-param-verifierId"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">verifierId</span>, </span><span class="parameter" id="verifyPaymentAtomic-param-cashflowEntry"><span>required</span> <span class="type-annotation"><a href="../models_cashflow_model/CashFlowModel-class.html">CashFlowModel</a></span> <span class="parameter-name">cashflowEntry</span></span>})
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/flutter_test/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Atomically verify a payment, update slot, and create cashflow entry.
+  
+
+</dd>
+
+    </dl>
+  </section>
+    
+  <section
+      class="summary offset-anchor inherited"
+      id="operators">
+    <h2>Operators</h2>
+    <dl class="callables">
+        <dt id="operator ==" class="callable inherited">
+  <span class="name"><a href="https://api.flutter.dev/flutter/dart-core/Object/operator_equals.html">operator ==</a></span><span class="signature">(<wbr><span class="parameter" id="==-param-other"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Object-class.html">Object</a></span> <span class="parameter-name">other</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  The equality operator.
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+    </dl>
+  </section>
+    
+    
+    
+
+  </div> <!-- /.main-content -->
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
+<header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+    <li><a href="../index.html">daddies_app</a></li>
+    <li><a href="../services_data_service/">data_service</a></li>
+    <li class="self-crumb">DataService class</li>
+</ol>
+
+    <h5>data_service library</h5>
+    <div id="dartdoc-sidebar-left-content"></div>
+  </div>
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  </div><!--/.sidebar-offcanvas-->
+</main>
+<footer>
+  <span class="no-break">
+    daddies_app
+      1.0.0+1
+  </span>
+  
+</footer>
+
+
+<script src="../static-assets/highlight.pack.js?v1"></script>
+<script src="../static-assets/docs.dart.js"></script>
+
+</body>
+</html>
+

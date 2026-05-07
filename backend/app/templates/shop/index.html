@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{% block title %}Chips Shop — Daddies Padel{% endblock %}
+
+{% block header_left %}
+<a href="{{ url_for('main.profile') }}" class="text-primary-container">
+    <span class="material-symbols-outlined">arrow_back</span>
+</a>
+<h1 class="font-headline font-bold tracking-tight text-xl text-primary-container">Chips Shop</h1>
+{% endblock %}
+
+{% block header_right %}
+<a href="{{ url_for('main.chips_history') }}" class="text-primary-container flex items-center gap-1">
+    <span class="material-symbols-outlined text-lg">toll</span>
+    <span class="text-sm font-bold">{{ '{:,}'.format(current_user.chips_balance) }}</span>
+</a>
+{% endblock %}
+
+{% block content %}
+<!-- Balance card -->
+<section class="card !p-5 flex items-center justify-between">
+    <div>
+        <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Saldo Chips</p>
+        <p class="text-3xl font-extrabold text-primary">{{ '{:,}'.format(current_user.chips_balance) }}</p>
+        <p class="text-xs text-on-surface-variant mt-1">Tukarkan dengan merchandise eksklusif</p>
+    </div>
+    <div class="w-14 h-14 bg-warning/10 rounded-full flex items-center justify-center">
+        <span class="material-symbols-outlined filled text-warning text-2xl">toll</span>
+    </div>
+</section>
+
+<!-- Category filter -->
+<section>
+    <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+        {% set categories = [('all', 'Semua', 'storefront'), ('merchandise', 'Merch', 'checkroom'), ('voucher', 'Voucher', 'redeem'), ('collectible', 'Collectible', 'collections'), ('exclusive', 'Exclusive', 'star')] %}
+        {% set cat_filter = request.args.get('cat', 'all') %}
+        {% for key, label, icon in categories %}
+        <a href="?cat={{ key }}"
+           class="flex-shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold transition-all
+                  {{ 'bg-primary text-on-primary' if cat_filter == key else 'bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest' }}">
+            <span class="material-symbols-outlined text-sm">{{ icon }}</span>
+            {{ label }}
+        </a>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Featured item (first exclusive/champion) -->
+{% set featured = items|selectattr('champion_only')|first %}
+{% if featured and cat_filter in ('all', 'exclusive') %}
+<section class="card !p-0 overflow-hidden ring-2 ring-warning/30">
+    <div class="bg-warning/5 px-5 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-warning text-sm">auto_awesome</span>
+            <span class="text-[10px] font-bold uppercase tracking-widest text-warning">Featured — Elite Only</span>
+        </div>
+        {% if featured.stock >= 0 %}
+        <span class="text-[10px] font-bold text-error">{{ featured.stock }} tersisa</span>
+        {% endif %}
+    </div>
+    <div class="p-5">
+        <div class="flex items-center gap-4">
+            <div class="w-20 h-20 rounded-2xl bg-warning/10 flex items-center justify-center flex-shrink-0">
+                <span class="material-symbols-outlined text-warning text-3xl">emoji_events</span>
+            </div>
+            <div class="flex-1">
+                <p class="text-lg font-extrabold text-on-surface">{{ featured.name }}</p>
+                <p class="text-xs text-on-surface-variant mt-1">{{ featured.description }}</p>
+                <div class="flex items-center justify-between mt-3">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xl font-extrabold text-primary">{{ '{:,}'.format(featured.price_chips) }}</span>
+                        <span class="text-[10px] font-bold uppercase text-on-surface-variant">chips</span>
+                    </div>
+                    {% if current_user.membership == 'elite' and featured.in_stock %}
+                    <form action="{{ url_for('main.shop_buy', item_id=featured.id) }}" method="post"
+                          onsubmit="return confirm('Tukar {{ featured.price_chips }} chips?')">
+                        <button type="submit" class="btn-primary !px-5 !py-2.5 text-sm
+                                {{ 'opacity-40 pointer-events-none' if current_user.chips_balance < featured.price_chips }}">
+                            Tukar
+                        </button>
+                    </form>
+                    {% else %}
+                    <span class="badge badge-waitlist">ELITE ONLY</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Items list -->
+<section>
+    <h3 class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-3">
+        {% if cat_filter == 'all' %}Semua Item{% else %}{{ cat_filter|title }}{% endif %}
+    </h3>
+    <div class="space-y-3">
+        {% set icon_map = {'merchandise': 'checkroom', 'voucher': 'redeem', 'collectible': 'collections', 'exclusive': 'star'} %}
+        {% for item in items %}
+        {% if (cat_filter == 'all' or item.category == cat_filter) and (not featured or item.id != featured.id or cat_filter != 'all') %}
+        <div class="card !p-4 {{ 'ring-1 ring-warning/20' if item.champion_only }}">
+            <div class="flex items-start gap-4">
+                <div class="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0
+                            {{ 'bg-warning/10' if item.champion_only else 'bg-surface-container-low' }}">
+                    <span class="material-symbols-outlined text-xl {{ 'text-warning' if item.champion_only else 'text-primary' }}">
+                        {{ icon_map.get(item.category, 'star') }}
+                    </span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-start justify-between gap-2">
+                        <div class="min-w-0">
+                            <p class="text-sm font-bold text-on-surface truncate">{{ item.name }}</p>
+                            <p class="text-[11px] text-on-surface-variant mt-0.5 line-clamp-2">{{ item.description }}</p>
+                        </div>
+                        {% if item.champion_only %}
+                        <span class="badge badge-waitlist flex-shrink-0 !text-[8px]">ELITE</span>
+                        {% endif %}
+                    </div>
+                    <div class="flex items-center justify-between mt-2.5">
+                        <div class="flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-warning text-sm">toll</span>
+                            <span class="text-base font-extrabold text-primary">{{ '{:,}'.format(item.price_chips) }}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            {% if item.stock >= 0 %}
+                            <span class="text-[10px] text-on-surface-variant">Stok: {{ item.stock }}</span>
+                            {% endif %}
+                            {% if item.in_stock and (not item.champion_only or current_user.membership == 'elite') %}
+                            <form action="{{ url_for('main.shop_buy', item_id=item.id) }}" method="post"
+                                  onsubmit="return confirm('Tukar {{ item.price_chips }} chips untuk {{ item.name }}?')">
+                                <button type="submit" class="btn-primary !px-4 !py-1.5 text-xs
+                                        {{ 'opacity-40 pointer-events-none' if current_user.chips_balance < item.price_chips }}">
+                                    Tukar
+                                </button>
+                            </form>
+                            {% elif not item.in_stock %}
+                            <span class="badge badge-canceled !text-[8px]">HABIS</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+</section>
+
+<!-- My orders -->
+{% if orders %}
+<section>
+    <h3 class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-3">Pesanan Saya</h3>
+    <div class="space-y-2">
+        {% for order in orders %}
+        <div class="card !p-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center">
+                    <span class="material-symbols-outlined text-sm text-on-surface-variant">{{ icon_map.get(order.item.category, 'star') }}</span>
+                </div>
+                <div>
+                    <p class="text-sm font-semibold text-on-surface">{{ order.item.name }}</p>
+                    <p class="text-[10px] text-on-surface-variant">{{ order.created_at.strftime('%d %b %Y') }} · -{{ '{:,}'.format(order.chips_spent) }} chips</p>
+                </div>
+            </div>
+            <span class="badge badge-{{ order.status }}">{{ order.status|upper }}</span>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+{% endblock %}

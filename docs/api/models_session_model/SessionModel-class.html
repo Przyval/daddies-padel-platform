@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="API docs for the SessionModel class from the session_model library, for the Dart programming language.">
+  <title>SessionModel class - session_model library - Dart API</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../static-assets/github.css?v1">
+  <link rel="stylesheet" href="../static-assets/styles.css?v1">
+  <link rel="icon" href="../static-assets/favicon.png?v1">
+  
+</head>
+
+<body data-base-href="../" data-using-base-href="false" class="light-theme">
+<div id="overlay-under-drawer"></div>
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../index.html">daddies_app</a></li>
+    <li><a href="../models_session_model/">models&#47;session_model.dart</a></li>
+    <li class="self-crumb">SessionModel class</li>
+  </ol>
+  <div class="self-name">SessionModel</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <button class="toggle" id="theme-button" title="Toggle between light and dark mode" aria-label="Light and dark mode toggle">
+    <span id="dark-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      dark_mode
+    </span>
+    <span id="light-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      light_mode
+    </span>
+  </button>
+</header>
+<main>
+<div
+    id="dartdoc-main-content"
+    class="main-content"
+    data-above-sidebar="models_session_model&#47;models_session_model-library-sidebar.html"
+    data-below-sidebar="models_session_model&#47;SessionModel-class-sidebar.html">
+    <div>
+<h1><span class="kind-class">SessionModel</span> class 
+ 
+</h1></div>
+
+    
+
+
+
+    
+  <section class="summary offset-anchor" id="constructors">
+    <h2>Constructors</h2>
+    <dl class="constructor-summary-list">
+        <dt id="SessionModel.new" class="callable">
+          <span class="name"><a href="../models_session_model/SessionModel/SessionModel.html">SessionModel</a></span><span class="signature">({<span class="parameter" id="-param-id"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">id</span>, </span><span class="parameter" id="-param-miminId"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">miminId</span>, </span><span class="parameter" id="-param-miminName"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">miminName</span>, </span><span class="parameter" id="-param-title"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">title</span>, </span><span class="parameter" id="-param-venue"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">venue</span>, </span><span class="parameter" id="-param-date"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/DateTime-class.html">DateTime</a></span> <span class="parameter-name">date</span>, </span><span class="parameter" id="-param-timeStart"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">timeStart</span>, </span><span class="parameter" id="-param-timeEnd"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">timeEnd</span>, </span><span class="parameter" id="-param-maxPlayers"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">maxPlayers</span>, </span><span class="parameter" id="-param-pricePerPlayer"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">pricePerPlayer</span>, </span><span class="parameter" id="-param-status"><span>required</span> <span class="type-annotation"><a href="../models_session_model/SessionStatus.html">SessionStatus</a></span> <span class="parameter-name">status</span>, </span><span class="parameter" id="-param-createdAt"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/DateTime-class.html">DateTime</a></span> <span class="parameter-name">createdAt</span>, </span><span class="parameter" id="-param-notes"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">notes</span>, </span><span class="parameter" id="-param-courtNumber"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">courtNumber</span>, </span><span class="parameter" id="-param-cancellationReason"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">cancellationReason</span>, </span><span class="parameter" id="-param-photoUrls"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>&gt;</span></span> <span class="parameter-name">photoUrls</span> = <span class="default-value">const []</span>, </span><span class="parameter" id="-param-deletedAt"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/DateTime-class.html">DateTime</a>?</span> <span class="parameter-name">deletedAt</span>, </span><span class="parameter" id="-param-matchFormat"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">matchFormat</span>, </span><span class="parameter" id="-param-invitedPlayerIds"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>&gt;</span></span> <span class="parameter-name">invitedPlayerIds</span> = <span class="default-value">const []</span>, </span><span class="parameter" id="-param-stakingEnabled"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">stakingEnabled</span> = <span class="default-value">false</span>, </span><span class="parameter" id="-param-stakeAmount"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">stakeAmount</span> = <span class="default-value">0</span></span>})</span>
+        </dt>
+        <dd>
+          
+            <div class="constructor-modifier features">const</div>
+        </dd>
+        <dt id="SessionModel.fromJson" class="callable">
+          <span class="name"><a href="../models_session_model/SessionModel/SessionModel.fromJson.html">SessionModel.fromJson</a></span><span class="signature">(<span class="parameter" id="fromJson-param-json"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, <span class="type-parameter">dynamic</span>&gt;</span></span> <span class="parameter-name">json</span></span>)</span>
+        </dt>
+        <dd>
+          
+            <div class="constructor-modifier features">factory</div>
+        </dd>
+    </dl>
+  </section>
+    
+  <section
+      class="summary offset-anchor"
+      id="instance-properties">
+    <h2>Properties</h2>
+    <dl class="properties">
+        <dt id="cancellationReason" class="property">
+  <span class="name"><a href="../models_session_model/SessionModel/cancellationReason.html">cancellationReason</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
+        <dt id="courtNumber" class="property">
+  <span class="name"><a href="../models_session_model/SessionModel/courtNumber.html">courtNumber</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a>?</span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
+        <dt id="createdAt" class="property">
+  <span class="name"><a href="../models_session_model/SessionModel/createdAt.html">createdAt</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/DateTime-class.html">DateTime</a></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
+        <dt id="date" class="property">
+  <span class="name"><a href="../models_session_model/SessionModel/date.html">date</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/DateTime-class.html">DateTime</a></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
+        <dt id="deletedAt" class="property">
+  <span class="name"><a href="../models_session_model/SessionModel/deletedAt.html">deletedAt</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/DateTime-class.html">DateTime</a>?</span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
+        <dt id="hashCode" class="property inherited">
+  <span class="name"><a href="https://api.flutter.dev/flutter/dart-core/Object/hashCode.html">hashCode</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span>
+  
+
+</dt>
+<dd class="inherited">
+  The hash code for this object.
+  <div class="features"><span class="feature">no setter</span><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="id" class="property">
+  <span class="name"><a href="../models_session_model/SessionModel/id.html">id</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
+        <dt id="invitedPlayerIds" class="property">
+  <span class="name"><a href="../models_session_model/SessionModel/invitedPlayerIds.html">invitedPlayerIds</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>&gt;</span></span>
+  
+
+</dt>
+<dd>
+  Player IDs explicitly invited to this session.
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
+        <dt id="isDeleted" class="property">
+  <span class="name"><a href="../models_session_model/SessionModel/isDeleted.html">isDeleted</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">no setter</span></div>
+
+</dd>
+
+        <dt id="matchFormat" class="property">
+  <span class="name"><a href="../models_session_model/SessionModel/matchFormat.html">matchFormat</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span>
+  
+
+</dt>
+<dd>
+  Match format: 'americano', 'mexicano', or null (manual).
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
+        <dt id="maxPlayers" class="property">
+  <span class="name"><a href="../models_session_model/SessionModel/maxPlayers.html">maxPlayers</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
+        <dt id="miminId" class="property">
+  <span class="name"><a href="../models_session_model/SessionModel/miminId.html">miminId</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
+        <dt id="miminName" class="property">
+  <span class="name"><a href="../models_session_model/SessionModel/miminName.html">miminName</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
+        <dt id="notes" class="property">
+  <span class="name"><a href="../models_session_model/SessionModel/notes.html">notes</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
+        <dt id="photoUrls" class="property">
+  <span class="name"><a href="../models_session_model/SessionModel/photoUrls.html">photoUrls</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>&gt;</span></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
+        <dt id="pricePerPlayer" class="property">
+  <span class="name"><a href="../models_session_model/SessionModel/pricePerPlayer.html">pricePerPlayer</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
+        <dt id="runtimeType" class="property inherited">
+  <span class="name"><a href="https://api.flutter.dev/flutter/dart-core/Object/runtimeType.html">runtimeType</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span>
+  
+
+</dt>
+<dd class="inherited">
+  A representation of the runtime type of the object.
+  <div class="features"><span class="feature">no setter</span><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="stakeAmount" class="property">
+  <span class="name"><a href="../models_session_model/SessionModel/stakeAmount.html">stakeAmount</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span>
+  
+
+</dt>
+<dd>
+  Chips stake amount per player (only used if stakingEnabled).
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
+        <dt id="stakingEnabled" class="property">
+  <span class="name"><a href="../models_session_model/SessionModel/stakingEnabled.html">stakingEnabled</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>
+  
+
+</dt>
+<dd>
+  Whether Daddies Chips staking is enabled for this session.
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
+        <dt id="status" class="property">
+  <span class="name"><a href="../models_session_model/SessionModel/status.html">status</a></span>
+  <span class="signature">&#8594; <a href="../models_session_model/SessionStatus.html">SessionStatus</a></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
+        <dt id="statusLabel" class="property">
+  <span class="name"><a href="../models_session_model/SessionModel/statusLabel.html">statusLabel</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">no setter</span></div>
+
+</dd>
+
+        <dt id="timeEnd" class="property">
+  <span class="name"><a href="../models_session_model/SessionModel/timeEnd.html">timeEnd</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
+        <dt id="timeStart" class="property">
+  <span class="name"><a href="../models_session_model/SessionModel/timeStart.html">timeStart</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
+        <dt id="title" class="property">
+  <span class="name"><a href="../models_session_model/SessionModel/title.html">title</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
+        <dt id="venue" class="property">
+  <span class="name"><a href="../models_session_model/SessionModel/venue.html">venue</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
+    </dl>
+  </section>
+
+    
+  <section
+      class="summary offset-anchor"
+      id="instance-methods">
+    <h2>Methods</h2>
+    <dl class="callables">
+        <dt id="copyWith" class="callable">
+  <span class="name"><a href="../models_session_model/SessionModel/copyWith.html">copyWith</a></span><span class="signature">(<wbr>{<span class="parameter" id="copyWith-param-id"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">id</span>, </span><span class="parameter" id="copyWith-param-miminId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">miminId</span>, </span><span class="parameter" id="copyWith-param-miminName"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">miminName</span>, </span><span class="parameter" id="copyWith-param-title"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">title</span>, </span><span class="parameter" id="copyWith-param-venue"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">venue</span>, </span><span class="parameter" id="copyWith-param-date"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/DateTime-class.html">DateTime</a>?</span> <span class="parameter-name">date</span>, </span><span class="parameter" id="copyWith-param-timeStart"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">timeStart</span>, </span><span class="parameter" id="copyWith-param-timeEnd"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">timeEnd</span>, </span><span class="parameter" id="copyWith-param-maxPlayers"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">maxPlayers</span>, </span><span class="parameter" id="copyWith-param-pricePerPlayer"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">pricePerPlayer</span>, </span><span class="parameter" id="copyWith-param-status"><span class="type-annotation"><a href="../models_session_model/SessionStatus.html">SessionStatus</a>?</span> <span class="parameter-name">status</span>, </span><span class="parameter" id="copyWith-param-createdAt"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/DateTime-class.html">DateTime</a>?</span> <span class="parameter-name">createdAt</span>, </span><span class="parameter" id="copyWith-param-notes"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">notes</span>, </span><span class="parameter" id="copyWith-param-courtNumber"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">courtNumber</span>, </span><span class="parameter" id="copyWith-param-cancellationReason"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">cancellationReason</span>, </span><span class="parameter" id="copyWith-param-photoUrls"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>&gt;</span>?</span> <span class="parameter-name">photoUrls</span>, </span><span class="parameter" id="copyWith-param-deletedAt"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/DateTime-class.html">DateTime</a>?</span> <span class="parameter-name">deletedAt</span>, </span><span class="parameter" id="copyWith-param-matchFormat"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">matchFormat</span>, </span><span class="parameter" id="copyWith-param-invitedPlayerIds"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>&gt;</span>?</span> <span class="parameter-name">invitedPlayerIds</span>, </span><span class="parameter" id="copyWith-param-stakingEnabled"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a>?</span> <span class="parameter-name">stakingEnabled</span>, </span><span class="parameter" id="copyWith-param-stakeAmount"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">stakeAmount</span></span>})
+    <span class="returntype parameter">&#8594; <a href="../models_session_model/SessionModel-class.html">SessionModel</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="noSuchMethod" class="callable inherited">
+  <span class="name"><a href="https://api.flutter.dev/flutter/dart-core/Object/noSuchMethod.html">noSuchMethod</a></span><span class="signature">(<wbr><span class="parameter" id="noSuchMethod-param-invocation"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Invocation-class.html">Invocation</a></span> <span class="parameter-name">invocation</span></span>)
+    <span class="returntype parameter">&#8594; dynamic</span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  Invoked when a nonexistent method or property is accessed.
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="toJson" class="callable">
+  <span class="name"><a href="../models_session_model/SessionModel/toJson.html">toJson</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, <span class="type-parameter">dynamic</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="toString" class="callable inherited">
+  <span class="name"><a href="https://api.flutter.dev/flutter/dart-core/Object/toString.html">toString</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  A string representation of this object.
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+    </dl>
+  </section>
+    
+  <section
+      class="summary offset-anchor inherited"
+      id="operators">
+    <h2>Operators</h2>
+    <dl class="callables">
+        <dt id="operator ==" class="callable inherited">
+  <span class="name"><a href="https://api.flutter.dev/flutter/dart-core/Object/operator_equals.html">operator ==</a></span><span class="signature">(<wbr><span class="parameter" id="==-param-other"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Object-class.html">Object</a></span> <span class="parameter-name">other</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  The equality operator.
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+    </dl>
+  </section>
+    
+    
+    
+
+  </div> <!-- /.main-content -->
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
+<header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+    <li><a href="../index.html">daddies_app</a></li>
+    <li><a href="../models_session_model/">session_model</a></li>
+    <li class="self-crumb">SessionModel class</li>
+</ol>
+
+    <h5>session_model library</h5>
+    <div id="dartdoc-sidebar-left-content"></div>
+  </div>
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  </div><!--/.sidebar-offcanvas-->
+</main>
+<footer>
+  <span class="no-break">
+    daddies_app
+      1.0.0+1
+  </span>
+  
+</footer>
+
+
+<script src="../static-assets/highlight.pack.js?v1"></script>
+<script src="../static-assets/docs.dart.js"></script>
+
+</body>
+</html>
+

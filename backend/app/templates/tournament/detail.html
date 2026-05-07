@@ -1,0 +1,790 @@
+{% extends "base.html" %}
+{% block title %}{{ tournament.name }} — Daddies Padel{% endblock %}
+
+{% block header_left %}
+<a href="{{ url_for('tournament.tournament_list') }}" class="text-primary-container">
+    <span class="material-symbols-outlined">arrow_back</span>
+</a>
+<h1 class="font-headline font-bold tracking-tight text-xl text-primary-container">{{ tournament.name }}</h1>
+{% endblock %}
+
+{% block header_right %}
+<a href="{{ url_for('tournament.share', tournament_id=tournament.id) }}" class="text-primary-container hover:opacity-80">
+    <span class="material-symbols-outlined">share</span>
+</a>
+<a href="{{ url_for('tournament.settings', tournament_id=tournament.id) }}" class="text-primary-container hover:opacity-80">
+    <span class="material-symbols-outlined">settings</span>
+</a>
+{% endblock %}
+
+{% block content %}
+<!-- Tournament header -->
+<section class="flex items-center justify-between gap-4">
+    <div class="space-y-1">
+        <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
+            {{ tournament.date.strftime('%a, %d %b %Y · %H:%M') }}
+        </p>
+        <div class="flex items-center gap-2 flex-wrap">
+            <span class="badge badge-{{ tournament.format_color }}">{{ tournament.format_label }}</span>
+            <span class="text-xs text-on-surface-variant">{{ tournament.venue }}</span>
+            <span class="text-xs text-on-surface-variant">· {{ tournament.participants.count() }} pemain</span>
+            <span class="text-xs text-on-surface-variant">· {{ tournament.scoring_mode|upper }}</span>
+        </div>
+    </div>
+    <div class="w-12 h-12 bg-{{ tournament.format_color }}/10 rounded-full flex items-center justify-center flex-shrink-0">
+        <span class="material-symbols-outlined text-{{ tournament.format_color }} text-xl">{{ tournament.format_icon }}</span>
+    </div>
+</section>
+
+<!-- Stats bar — mobile-optimized: min 44px touch, 11px labels -->
+<section class="grid grid-cols-4 gap-2">
+    {% set stats = [
+        (tournament.participants.count(), 'Peserta', 'primary'),
+        (rounds|length, 'Ronde', 'primary'),
+        (tournament.completed_matches, 'Selesai', 'success'),
+        (tournament.num_courts, 'Court', 'primary'),
+    ] %}
+    {% for val, label, color in stats %}
+    <div class="stat-card text-center !p-3" style="min-height:64px">
+        <p class="text-xl font-extrabold text-{{ color }}">{{ val }}</p>
+        <p class="text-[11px] font-bold uppercase tracking-widest text-on-surface-variant mt-0.5">{{ label }}</p>
+    </div>
+    {% endfor %}
+</section>
+
+<!-- Timer (if configured) -->
+{% if tournament.minutes_to_play > 0 and tournament.status == 'playing' %}
+<section class="card !p-4 flex items-center justify-between" id="timerSection">
+    <div class="flex items-center gap-3">
+        <span class="material-symbols-outlined text-primary text-xl">timer</span>
+        <span id="timerDisplay" class="text-2xl font-extrabold text-primary tabular-nums">
+            {{ '%02d:%02d'|format(tournament.minutes_to_play, 0) }}
+        </span>
+    </div>
+    <div class="flex items-center gap-2">
+        <button onclick="toggleTimer()" id="timerBtn"
+                class="btn-primary !px-4 !py-2 text-sm gap-1">
+            <span class="material-symbols-outlined text-sm" id="timerIcon">play_arrow</span>
+            <span id="timerLabel">Start</span>
+        </button>
+        <button onclick="resetTimer()" class="btn-ghost !px-3 !py-2">
+            <span class="material-symbols-outlined text-sm">restart_alt</span>
+        </button>
+    </div>
+</section>
+{% endif %}
+
+<!-- Tab bar -->
+<section>
+    <div class="flex gap-1 bg-surface-container-low rounded-full p-1">
+        <a href="?tab=rounds&round={{ current_round }}"
+           class="flex-1 text-center py-2.5 text-sm font-bold rounded-full transition-all flex items-center justify-center gap-1
+                  {{ 'bg-primary text-on-primary' if tab == 'rounds' else 'text-on-surface-variant hover:bg-surface-container-high' }}">
+            <span class="material-symbols-outlined text-sm">sports_tennis</span> Ronde
+        </a>
+        <a href="?tab=standing"
+           class="flex-1 text-center py-2.5 text-sm font-bold rounded-full transition-all flex items-center justify-center gap-1
+                  {{ 'bg-primary text-on-primary' if tab == 'standing' else 'text-on-surface-variant hover:bg-surface-container-high' }}">
+            <span class="material-symbols-outlined text-sm">leaderboard</span> Standing
+        </a>
+        <a href="?tab=playoff"
+           class="flex-1 text-center py-2.5 text-sm font-bold rounded-full transition-all flex items-center justify-center gap-1
+                  {{ 'bg-primary text-on-primary' if tab == 'playoff' else 'text-on-surface-variant hover:bg-surface-container-high' }}">
+            <span class="material-symbols-outlined text-sm">account_tree</span> Playoff
+        </a>
+    </div>
+</section>
+
+{# ═══════════════════════════════ TAB: ROUNDS ═══════════════════════════════ #}
+{% if tab == 'rounds' %}
+<section class="space-y-4">
+    {% if rounds %}
+    <!-- Round navigator -->
+    <div class="flex items-center justify-between">
+        {% if current_round > 1 %}
+        <a href="?tab=rounds&round={{ current_round - 1 }}" class="btn-ghost !px-3 !py-2">
+            <span class="material-symbols-outlined">chevron_left</span>
+        </a>
+        {% else %}<div class="w-10"></div>{% endif %}
+
+        <div class="text-center">
+            <p class="text-lg font-extrabold text-primary">Ronde {{ current_round }}</p>
+            {% if round_obj %}
+            <p class="text-[10px] font-bold uppercase tracking-widest
+                      {{ 'text-success' if round_obj.is_complete else 'text-on-surface-variant' }}">
+                {% if round_obj.is_complete %}Selesai{% else %}{{ round_obj.completed_count }}/{{ round_obj.total_matches }} selesai{% endif %}
+            </p>
+            {% endif %}
+        </div>
+
+        {% if current_round < rounds|length %}
+        <a href="?tab=rounds&round={{ current_round + 1 }}" class="btn-ghost !px-3 !py-2">
+            <span class="material-symbols-outlined">chevron_right</span>
+        </a>
+        {% else %}<div class="w-10"></div>{% endif %}
+    </div>
+
+    <!-- Round pills with completion status -->
+    <div class="flex gap-1.5 overflow-x-auto no-scrollbar pb-1">
+        {% for r in rounds %}
+        <a href="?tab=rounds&round={{ r.round_number }}"
+           class="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold transition-all relative
+                  {% if r.round_number == current_round %}bg-primary text-on-primary
+                  {% elif r.is_complete %}bg-success/15 text-success ring-1 ring-success/30
+                  {% else %}bg-surface-container-high text-on-surface-variant{% endif %}">
+            {% if r.is_complete and r.round_number != current_round %}
+            <span class="material-symbols-outlined text-sm">check</span>
+            {% else %}
+            {{ r.round_number }}
+            {% endif %}
+        </a>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Round progress bar -->
+    {% if round_obj and round_obj.total_matches > 0 %}
+    <div class="w-full bg-surface-container-high rounded-full h-1.5">
+        {% set pct = (round_obj.completed_count / round_obj.total_matches * 100)|int %}
+        <div class="h-1.5 rounded-full transition-all {{ 'bg-success' if round_obj.is_complete else 'bg-primary' }}"
+             style="width: {{ pct }}%"></div>
+    </div>
+    {% endif %}
+
+    <!-- Match cards — benchmark layout: horizontal teams + inline score counters -->
+    {% if round_obj %}
+    <div class="space-y-4">
+        {% for match in round_obj.matches %}
+        <div class="card !p-0 overflow-hidden {{ 'ring-1 ring-success/20' if match.status == 'completed' }}">
+
+            <!-- Court label + status -->
+            <div class="px-4 py-2 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    {% if match.status == 'completed' and match.winner != 'draw' %}
+                    <span class="material-symbols-outlined text-warning text-sm">emoji_events</span>
+                    {% endif %}
+                    <span class="badge {{ 'badge-confirmed' if match.status == 'completed' else 'badge-canceled' if match.status == 'canceled' else 'badge-open' }}">
+                        {{ 'SELESAI' if match.status == 'completed' else 'BATAL' if match.status == 'canceled' else 'PENDING' }}
+                    </span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-sm font-bold text-on-surface">Court {{ match.court }}</span>
+                    {% if match.status == "pending" %}
+                    <form action="{{ url_for('tournament.cancel_match', tournament_id=tournament.id, match_id=match.id) }}"
+                          method="post" class="contents" onsubmit="return confirm('Batalkan match ini?')">
+                        <button type="submit" class="w-9 h-9 flex items-center justify-center hover:bg-error/10 active:bg-error/15 rounded-full transition-colors">
+                            <span class="material-symbols-outlined text-error/40 text-lg">block</span>
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Inline score counters — mobile-optimized -->
+            {% if match.status != 'canceled' %}
+            <div class="px-3 pb-2">
+                <form id="scoreForm-{{ match.id }}" action="{{ url_for('tournament.update_score', tournament_id=tournament.id, match_id=match.id) }}" method="post">
+
+                {% if tournament.scoring_mode == 'points' %}
+                {# Points mode: two large counters side by side #}
+                <div class="flex justify-center gap-5 mb-3">
+                    <div class="bg-inverse-surface rounded-2xl flex items-center justify-center" style="width:72px;height:72px">
+                        <input name="points_t1" type="number" min="0" max="99" inputmode="numeric"
+                               value="{{ match.score_team1 if match.status == 'completed' else '' }}"
+                               aria-label="Poin Tim 1" placeholder="0"
+                               class="w-full h-full text-center text-3xl font-extrabold bg-transparent text-inverse-on-surface outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                    </div>
+                    <div class="bg-inverse-surface rounded-2xl flex items-center justify-center" style="width:72px;height:72px">
+                        <input name="points_t2" type="number" min="0" max="99" inputmode="numeric"
+                               value="{{ match.score_team2 if match.status == 'completed' else '' }}"
+                               aria-label="Poin Tim 2" placeholder="0"
+                               class="w-full h-full text-center text-3xl font-extrabold bg-transparent text-inverse-on-surface outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                    </div>
+                </div>
+
+                {% else %}
+                {# Sets mode: bigger inputs for mobile thumb #}
+                <div class="mb-3">
+                    <div class="grid grid-cols-3 gap-3 mb-2">
+                        {% for si in range(1, 4) %}
+                        <p class="text-[11px] font-bold text-on-surface-variant text-center uppercase tracking-wider">Set {{ si }}</p>
+                        {% endfor %}
+                    </div>
+                    <div class="grid grid-cols-3 gap-3">
+                        {% for si in range(1, 4) %}
+                        <div class="flex gap-1.5 justify-center">
+                            <div class="bg-inverse-surface rounded-2xl flex-1 flex items-center justify-center" style="min-height:52px">
+                                <input name="set{{ si }}_t1" type="number" min="0" max="10" inputmode="numeric"
+                                       value="{{ match.sets[si-1][0] if match.sets|length >= si else '' }}"
+                                       aria-label="Set {{ si }} Tim 1" placeholder="·"
+                                       class="w-full h-full text-center text-xl font-extrabold bg-transparent text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none placeholder:text-white/30 py-3">
+                            </div>
+                            <div class="bg-inverse-surface rounded-2xl flex-1 flex items-center justify-center" style="min-height:52px">
+                                <input name="set{{ si }}_t2" type="number" min="0" max="10" inputmode="numeric"
+                                       value="{{ match.sets[si-1][1] if match.sets|length >= si else '' }}"
+                                       aria-label="Set {{ si }} Tim 2" placeholder="·"
+                                       class="w-full h-full text-center text-xl font-extrabold bg-transparent text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none placeholder:text-white/30 py-3">
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                </form>
+            </div>
+            {% endif %}
+
+            <!-- Team names — horizontal layout -->
+            <div class="px-4 pb-4">
+                <div class="flex items-start justify-between gap-3">
+                    <!-- Team 1 (left) -->
+                    <div class="flex-1 text-left {{ 'opacity-40' if match.status == 'completed' and match.winner == 'team2' }}">
+                        <p class="text-sm {{ 'font-extrabold' if match.winner == 'team1' else 'font-bold' }} text-on-surface">
+                            {{ match.team1_p1.first_name if match.team1_p1 else '?' }}
+                        </p>
+                        <p class="text-sm {{ 'font-extrabold' if match.winner == 'team1' else 'font-bold' }} text-on-surface">
+                            {{ match.team1_p2.first_name if match.team1_p2 else '?' }}
+                        </p>
+                    </div>
+
+                    <!-- VS center -->
+                    <div class="flex flex-col items-center gap-1 pt-1 flex-shrink-0">
+                        <span class="text-xs font-bold text-on-surface-variant">vs</span>
+                    </div>
+
+                    <!-- Team 2 (right) -->
+                    <div class="flex-1 text-right {{ 'opacity-40' if match.status == 'completed' and match.winner == 'team1' }}">
+                        <p class="text-sm {{ 'font-extrabold' if match.winner == 'team2' else 'font-bold' }} text-on-surface">
+                            {{ match.team2_p1.first_name if match.team2_p1 else '?' }}
+                        </p>
+                        <p class="text-sm {{ 'font-extrabold' if match.winner == 'team2' else 'font-bold' }} text-on-surface">
+                            {{ match.team2_p2.first_name if match.team2_p2 else '?' }}
+                        </p>
+                    </div>
+                </div>
+
+                {% if match.status != "canceled" %}
+                <button type="submit" form="scoreForm-{{ match.id }}"
+                        class="btn-primary w-full py-3 text-sm gap-1.5 mt-3 active:scale-[0.97]" style="min-height:48px">
+                    <span class="material-symbols-outlined text-base">check</span>
+                    {{ 'Update Skor' if match.status == 'completed' else 'Simpan Skor' }}
+                </button>
+                {% endif %}
+
+                {% if match.status == 'completed' %}
+                <p class="text-[11px] font-semibold text-center mt-2 {{ 'text-success' if match.winner != 'draw' else 'text-warning' }}">
+                    {% if match.winner == 'team1' %}{{ match.team1_p1.first_name if match.team1_p1 else '?' }} &amp; {{ match.team1_p2.first_name if match.team1_p2 else '?' }} menang · {{ match.score_display }}
+                    {% elif match.winner == 'team2' %}{{ match.team2_p1.first_name if match.team2_p1 else '?' }} &amp; {{ match.team2_p2.first_name if match.team2_p2 else '?' }} menang · {{ match.score_display }}
+                    {% else %}Seri · {{ match.score_display }}{% endif %}
+                </p>
+                {% elif match.status == 'canceled' %}
+                <p class="text-xs text-error/60 text-center pt-2">Match dibatalkan</p>
+                {% endif %}
+            </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Round actions -->
+    {% if tournament.status == 'playing' %}
+    <div class="space-y-3">
+        <!-- Next round / Generate -->
+        <div class="flex gap-2">
+            {% if tournament.format in ('mexicano','team_mexicano','super_mexicano','mixicano','club_mexicano') %}
+            <form action="{{ url_for('tournament.next_round', tournament_id=tournament.id) }}" method="post" class="flex-1">
+                <button type="submit" class="btn-primary w-full py-4 text-sm gap-1 active:scale-[0.97]
+                        {{ 'opacity-40 pointer-events-none' if round_obj and not round_obj.is_complete }}"
+                        style="min-height:52px">
+                    <span class="material-symbols-outlined text-lg">add_circle_outline</span> Generate Ronde Baru
+                </button>
+            </form>
+            {% elif current_round < rounds|length %}
+            <form action="{{ url_for('tournament.next_round', tournament_id=tournament.id) }}" method="post" class="flex-1">
+                <button type="submit" class="btn-primary w-full py-4 text-sm gap-1 active:scale-[0.97]
+                        {{ 'opacity-40 pointer-events-none' if round_obj and not round_obj.is_complete }}"
+                        style="min-height:52px">
+                    <span class="material-symbols-outlined text-lg">skip_next</span> Ronde {{ current_round + 1 }}
+                </button>
+            </form>
+            {% elif round_obj and round_obj.is_complete %}
+            <div class="flex-1 text-center py-4 text-sm font-semibold text-success" style="min-height:52px">
+                <span class="material-symbols-outlined text-lg align-text-bottom">check_circle</span>
+                Semua ronde selesai!
+            </div>
+            {% endif %}
+
+            <form action="{{ url_for('tournament.complete_tournament', tournament_id=tournament.id) }}" method="post">
+                <button type="submit" class="btn-ghost py-4 px-6 text-sm gap-1 active:scale-[0.97]"
+                        onclick="return confirm('Selesaikan turnamen? Standing saat ini akan menjadi final.')"
+                        style="min-height:52px">
+                    <span class="material-symbols-outlined text-lg">flag</span> Selesai
+                </button>
+            </form>
+        </div>
+
+        <!-- Hint if round not complete -->
+        {% if round_obj and not round_obj.is_complete %}
+        <p class="text-xs text-center text-on-surface-variant">
+            <span class="material-symbols-outlined text-sm align-text-bottom">info</span>
+            Selesaikan semua match di ronde ini untuk lanjut ke ronde berikutnya
+        </p>
+        {% endif %}
+
+        {# ── Swap Nama (Round 1 only) ── #}
+        {% if tournament.status == 'playing' and current_round <= 1 %}
+        <div class="card !p-4 mt-3">
+            <div class="flex items-center justify-between mb-3">
+                <p class="text-xs font-bold text-on-surface-variant uppercase tracking-widest">
+                    <span class="material-symbols-outlined text-sm align-text-bottom mr-1">swap_horiz</span>
+                    Tukar Pemain (hanya Ronde 1)
+                </p>
+            </div>
+            <form action="{{ url_for('tournament.swap_player', tournament_id=tournament.id) }}" method="post"
+                  class="flex items-center gap-2">
+                <select name="p1_id" class="input-field !py-2 text-xs flex-1" required>
+                    <option value="">Pemain 1</option>
+                    {% for p in tournament.participants %}
+                    <option value="{{ p.id }}">{{ p.name }}</option>
+                    {% endfor %}
+                </select>
+                <span class="material-symbols-outlined text-on-surface-variant">swap_horiz</span>
+                <select name="p2_id" class="input-field !py-2 text-xs flex-1" required>
+                    <option value="">Pemain 2</option>
+                    {% for p in tournament.participants %}
+                    <option value="{{ p.id }}">{{ p.name }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn-ghost !px-3 !py-2 text-xs"
+                        onclick="return confirm('Tukar 2 pemain ini?')">Tukar</button>
+            </form>
+        </div>
+        {% elif tournament.status == 'playing' and current_round > 1 %}
+        <p class="text-[10px] text-center text-on-surface-variant/50 mt-2">
+            <span class="material-symbols-outlined text-[10px] align-text-bottom">lock</span>
+            Swap pemain dikunci setelah ronde 1
+        </p>
+        {% endif %}
+
+        {# ── Sitting Out Permanent ── #}
+        {% if tournament.status == 'playing' %}
+        <details class="mt-3">
+            <summary class="text-xs font-bold text-on-surface-variant uppercase tracking-widest cursor-pointer px-2 py-2">
+                <span class="material-symbols-outlined text-sm align-text-bottom mr-1">airline_seat_recline_normal</span>
+                Pemain Istirahat / Pulang
+            </summary>
+            <div class="space-y-1 mt-2">
+                {% for p in tournament.participants %}
+                <form action="{{ url_for('tournament.toggle_sitting_out', tournament_id=tournament.id, participant_id=p.id) }}"
+                      method="post" class="flex items-center justify-between px-3 py-2 rounded-xl
+                             {{ 'bg-error/5' if p.sitting_out_permanent else 'bg-surface-container-low' }}">
+                    <span class="text-sm {{ 'line-through text-on-surface-variant/40' if p.sitting_out_permanent else 'text-on-surface font-semibold' }}">
+                        {{ p.name }}
+                    </span>
+                    <button type="submit" class="text-xs font-bold px-3 py-1.5 rounded-full
+                            {{ 'bg-success/10 text-success' if p.sitting_out_permanent else 'bg-error/10 text-error' }}">
+                        {{ 'Aktifkan' if p.sitting_out_permanent else 'Pulang' }}
+                    </button>
+                </form>
+                {% endfor %}
+            </div>
+        </details>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="card text-center py-8">
+        <span class="material-symbols-outlined text-3xl text-on-surface-variant/30">sports_scoreboard</span>
+        <p class="text-sm text-on-surface-variant mt-2">Belum ada ronde.</p>
+    </div>
+    {% endif %}
+</section>
+{% endif %}
+
+{# ═══════════════════════════════ TAB: STANDING ═══════════════════════════════ #}
+{% if tab == 'standing' %}
+<section class="space-y-2">
+
+    {# ── Sort Toggle ── #}
+    <div class="flex items-center justify-between mb-2">
+        <p class="text-xs font-bold text-on-surface-variant uppercase tracking-widest">
+            Ranking {{ 'by Wins' if tournament.sort_by_wins else 'by Points' }}
+        </p>
+        <div class="flex gap-1 bg-surface-container-low rounded-full p-0.5">
+            <a href="?tab=standing&sort=points"
+               class="px-3 py-1.5 rounded-full text-[10px] font-bold transition-all
+                      {{ 'bg-primary text-on-primary' if not tournament.sort_by_wins else 'text-on-surface-variant' }}">
+                Points
+            </a>
+            <a href="?tab=standing&sort=wins"
+               class="px-3 py-1.5 rounded-full text-[10px] font-bold transition-all
+                      {{ 'bg-primary text-on-primary' if tournament.sort_by_wins else 'text-on-surface-variant' }}">
+                Wins
+            </a>
+        </div>
+    </div>
+
+    {# ── Verify + Champion Share (completed tournaments) ── #}
+    {% if tournament.status == 'completed' %}
+    <div class="flex gap-2 mb-3">
+        <form action="{{ url_for('tournament.verify_participants', tournament_id=tournament.id) }}" method="post" class="flex-1">
+            <button type="submit" class="btn-ghost w-full py-3 text-xs gap-1 active:scale-[0.97]">
+                <span class="material-symbols-outlined text-sm">verified</span> Verifikasi Peserta
+            </button>
+        </form>
+        <a href="{{ url_for('tournament.champion_share', tournament_id=tournament.id) }}"
+           class="btn-primary flex-1 py-3 text-xs gap-1 active:scale-[0.97]" target="_blank">
+            <span class="material-symbols-outlined text-sm">share</span> Share Juara
+        </a>
+    </div>
+    <a href="{{ url_for('tournament.claim_streak', tournament_id=tournament.id) }}"
+       class="btn-ghost w-full py-3 text-xs gap-1 mb-3 active:scale-[0.97]">
+        <span class="material-symbols-outlined text-sm">qr_code_2</span> QR Claim Streak
+    </a>
+    {% endif %}
+
+    <!-- Header -->
+    <div class="flex items-center gap-2 px-2 text-[9px] font-bold uppercase tracking-widest text-on-surface-variant">
+        <span class="w-6 text-center">#</span>
+        <span class="flex-1">Pemain</span>
+        <span class="w-12 text-center">W-L-T</span>
+        <span class="w-9 text-center">Diff</span>
+        <span class="w-8 text-center">P</span>
+    </div>
+
+    {% for s in leaderboard %}
+    <div>
+        <!-- Main row — clickable to expand -->
+        <div class="card !p-3 flex items-center gap-2 cursor-pointer {{ 'ring-1 ring-warning/20' if loop.index <= 3 }}"
+             onclick="document.getElementById('detail-{{ loop.index }}').classList.toggle('hidden')">
+            <div class="w-6 flex-shrink-0 text-center">
+                {% if loop.index == 1 %}<span class="text-base">🥇</span>
+                {% elif loop.index == 2 %}<span class="text-base">🥈</span>
+                {% elif loop.index == 3 %}<span class="text-base">🥉</span>
+                {% else %}<span class="text-sm font-bold text-on-surface-variant">{{ loop.index }}</span>{% endif %}
+            </div>
+            <div class="flex items-center gap-2 flex-1 min-w-0">
+                <div class="w-7 h-7 rounded-full bg-surface-container-low flex items-center justify-center flex-shrink-0">
+                    <span class="text-[9px] font-bold text-on-surface-variant">{{ s.participant.initials }}</span>
+                </div>
+                <p class="text-sm font-bold text-on-surface truncate">{{ s.participant.first_name }}</p>
+            </div>
+            <div class="w-12 text-center text-[11px] font-bold">
+                <span class="text-success">{{ s.wins }}</span>-<span class="text-error">{{ s.losses }}</span>-<span class="text-on-surface-variant">{{ s.ties }}</span>
+            </div>
+            <div class="w-9 text-center">
+                {% set diff = s.games_won - s.games_lost %}
+                <span class="text-xs font-bold {{ 'text-success' if diff > 0 else 'text-error' if diff < 0 else 'text-on-surface-variant' }}">
+                    {{ '+' if diff > 0 }}{{ diff }}
+                </span>
+            </div>
+            <div class="w-8 text-center">
+                <span class="text-sm font-extrabold text-primary">{{ s.points }}</span>
+            </div>
+        </div>
+
+        <!-- Expandable detail (hidden by default) -->
+        <div id="detail-{{ loop.index }}" class="hidden bg-surface-container-low rounded-b-lg mx-2 p-4 -mt-2 space-y-4">
+            <!-- Stat boxes -->
+            <div class="grid grid-cols-5 gap-2 text-center">
+                <div><p class="text-lg font-extrabold text-success">{{ s.wins }}</p><p class="text-[8px] font-bold uppercase text-on-surface-variant">W</p></div>
+                <div><p class="text-lg font-extrabold text-error">{{ s.losses }}</p><p class="text-[8px] font-bold uppercase text-on-surface-variant">L</p></div>
+                <div><p class="text-lg font-extrabold text-warning">{{ s.ties }}</p><p class="text-[8px] font-bold uppercase text-on-surface-variant">T</p></div>
+                <div><p class="text-lg font-extrabold text-on-surface">{{ s.matches_played }}</p><p class="text-[8px] font-bold uppercase text-on-surface-variant">Games</p></div>
+                <div>
+                    {% set gd = s.games_won - s.games_lost %}
+                    <p class="text-lg font-extrabold {{ 'text-success' if gd > 0 else 'text-error' if gd < 0 else 'text-on-surface-variant' }}">{{ '+' if gd > 0 }}{{ gd }}</p>
+                    <p class="text-[8px] font-bold uppercase text-on-surface-variant">Diff</p>
+                </div>
+            </div>
+
+            {% if tournament.scoring_mode == 'sets' %}
+            <div class="grid grid-cols-2 gap-2 text-center">
+                <div>
+                    {% set sd = s.sets_won - s.sets_lost %}
+                    <p class="text-sm font-bold {{ 'text-success' if sd > 0 else 'text-error' if sd < 0 else 'text-on-surface-variant' }}">{{ '+' if sd > 0 }}{{ sd }}</p>
+                    <p class="text-[8px] font-bold uppercase text-on-surface-variant">Set Diff</p>
+                </div>
+                <div>
+                    <p class="text-sm font-bold text-on-surface">{{ s.games_won }}</p>
+                    <p class="text-[8px] font-bold uppercase text-on-surface-variant">Game Won</p>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Teammates -->
+            {% if s.teammates %}
+            <div>
+                <p class="text-[9px] font-bold uppercase tracking-widest text-on-surface-variant mb-2">Teammates</p>
+                <div class="flex flex-wrap gap-1.5">
+                    {% for name, cnt in s.teammates %}
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-container-lowest text-[11px] font-semibold text-on-surface">
+                        {{ name }} <span class="text-on-surface-variant">{{ cnt }}x</span>
+                    </span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- H2H -->
+            {% if s.h2h %}
+            <div>
+                <p class="text-[9px] font-bold uppercase tracking-widest text-on-surface-variant mb-2">Head-to-Head</p>
+                <div class="space-y-1">
+                    {% for name, delta in s.h2h %}
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-on-surface">{{ name }}</span>
+                        <span class="text-xs font-bold {{ 'text-success' if delta > 0 else 'text-error' if delta < 0 else 'text-on-surface-variant' }}">
+                            {{ '+' if delta > 0 }}{{ delta }}
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% else %}
+    <div class="card text-center py-8">
+        <span class="material-symbols-outlined text-3xl text-on-surface-variant/30">leaderboard</span>
+        <p class="text-sm text-on-surface-variant mt-2">Belum ada data.</p>
+    </div>
+    {% endfor %}
+
+    <!-- Summary bar -->
+    {% if leaderboard %}
+    <div class="card !p-3 flex items-center justify-around text-center mt-4">
+        <div>
+            <p class="text-sm font-extrabold text-primary">{{ leaderboard|length }}</p>
+            <p class="text-[8px] font-bold uppercase text-on-surface-variant">Players</p>
+        </div>
+        <div>
+            {% set total_games = leaderboard|sum(attribute='matches_played') %}
+            <p class="text-sm font-extrabold text-primary">{{ total_games }}</p>
+            <p class="text-[8px] font-bold uppercase text-on-surface-variant">Total Games</p>
+        </div>
+        <div>
+            {% if leaderboard|length > 0 %}
+            {% set avg = (leaderboard|sum(attribute='points') / leaderboard|length)|round(1) %}
+            <p class="text-sm font-extrabold text-primary">{{ avg }}</p>
+            {% endif %}
+            <p class="text-[8px] font-bold uppercase text-on-surface-variant">Avg Score</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Playoff buttons -->
+    {% if leaderboard|length >= 4 and tournament.status == 'playing' %}
+    <div class="space-y-2 mt-4">
+        <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant text-center">Create Playoff Bracket</p>
+        <div class="flex gap-2">
+            <form action="{{ url_for('tournament.generate_playoff', tournament_id=tournament.id) }}" method="post" class="flex-1">
+                <input type="hidden" name="bracket_size" value="4">
+                <button type="submit" class="btn-primary w-full py-3 text-sm">Top 4</button>
+            </form>
+            {% if leaderboard|length >= 8 %}
+            <form action="{{ url_for('tournament.generate_playoff', tournament_id=tournament.id) }}" method="post" class="flex-1">
+                <input type="hidden" name="bracket_size" value="8">
+                <button type="submit" class="btn-secondary w-full py-3 text-sm">Top 8</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</section>
+{% endif %}
+
+{# ═══════════════════════════════ TAB: PLAYOFF ═══════════════════════════════ #}
+{% if tab == 'playoff' %}
+<section class="space-y-6">
+    {% if playoffs %}
+    <!-- Visual bracket tree — horizontal scroll -->
+    <div class="overflow-x-auto no-scrollbar -mx-6 px-6">
+        <div class="flex gap-6 min-w-[600px] items-center py-4">
+            {% set bracket_rounds = {} %}
+            {% for p in playoffs %}
+                {% if p.bracket_round not in bracket_rounds %}{% set _ = bracket_rounds.update({p.bracket_round: []}) %}{% endif %}
+                {% set _ = bracket_rounds[p.bracket_round].append(p) %}
+            {% endfor %}
+
+            {% for rnd_num in bracket_rounds|sort %}
+            <div class="flex-1 space-y-{{ 2 ** rnd_num * 2 }}">
+                <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant text-center mb-3">
+                    {% if rnd_num == bracket_rounds|length %}Final
+                    {% elif rnd_num == bracket_rounds|length - 1 %}Semi-Final
+                    {% else %}Ronde {{ rnd_num }}{% endif %}
+                </p>
+                {% for match in bracket_rounds[rnd_num] %}
+                <div class="card !p-3 space-y-1.5 min-w-[180px]">
+                    <!-- Player 1 / Team 1 -->
+                    <div class="flex items-center justify-between py-1.5 px-2 rounded-lg
+                                {{ 'bg-success/10 border-l-2 border-success' if match.status == 'completed' and match.winner == 'team1' else 'bg-surface-container-low' }}">
+                        <span class="text-xs font-bold text-on-surface truncate">
+                            {{ match.team1_p1.first_name if match.team1_p1 else 'TBD' }}
+                            {% if match.team1_p2 %} &amp; {{ match.team1_p2.first_name }}{% endif %}
+                        </span>
+                        {% if match.status == 'completed' %}
+                        <span class="text-xs font-extrabold {{ 'text-success' if match.winner == 'team1' else 'text-on-surface-variant' }}">
+                            {{ match.sets|map('first')|sum if match.sets else '-' }}
+                        </span>
+                        {% endif %}
+                    </div>
+                    <!-- Player 2 / Team 2 -->
+                    <div class="flex items-center justify-between py-1.5 px-2 rounded-lg
+                                {{ 'bg-success/10 border-l-2 border-success' if match.status == 'completed' and match.winner == 'team2' else 'bg-surface-container-low' }}">
+                        <span class="text-xs font-bold text-on-surface truncate">
+                            {{ match.team2_p1.first_name if match.team2_p1 else 'TBD' }}
+                            {% if match.team2_p2 %} &amp; {{ match.team2_p2.first_name }}{% endif %}
+                        </span>
+                        {% if match.status == 'completed' %}
+                        <span class="text-xs font-extrabold {{ 'text-success' if match.winner == 'team2' else 'text-on-surface-variant' }}">
+                            {{ match.sets|map('last')|sum if match.sets else '-' }}
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    {% if match.status == "pending" %}
+                    <form action="{{ url_for('tournament.playoff_score', tournament_id=tournament.id, playoff_id=match.id) }}" method="post" class="space-y-2 pt-2">
+                        {% for i in range(1, 4) %}
+                        <div class="grid grid-cols-3 gap-1 items-center">
+                            <span class="text-[10px] font-bold text-on-surface-variant text-center">S{{ i }}</span>
+                            <input name="set{{ i }}_t1" type="number" min="0" max="10" class="input-field !py-1 !px-2 text-center text-sm font-bold !rounded-lg" {{ 'required' if i == 1 }}>
+                            <input name="set{{ i }}_t2" type="number" min="0" max="10" class="input-field !py-1 !px-2 text-center text-sm font-bold !rounded-lg" {{ 'required' if i == 1 }}>
+                        </div>
+                        {% endfor %}
+                        <button type="submit" class="btn-primary w-full py-2 text-xs">Simpan</button>
+                    </form>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% else %}
+    <div class="card text-center py-10">
+        <span class="material-symbols-outlined text-4xl text-on-surface-variant/20">account_tree</span>
+        <h3 class="font-bold text-on-surface mt-3 text-lg">Playoffs</h3>
+        <p class="text-sm text-on-surface-variant mt-1">Buat bracket playoff dari Standing setelah semua ronde selesai.</p>
+        <p class="text-xs text-on-surface-variant mt-3">Minimal 4 pemain diperlukan</p>
+    </div>
+    {% endif %}
+</section>
+{% endif %}
+
+{# ═══════════════════════════════ SCORE MODAL ═══════════════════════════════ #}
+<div id="scoreModal" class="fixed inset-0 z-[100] hidden">
+    <div class="absolute inset-0 bg-inverse-surface/50 backdrop-blur-sm" onclick="closeScoreModal()"></div>
+    <div class="absolute bottom-0 left-0 right-0 bg-surface rounded-t-[2rem] p-6 max-w-md mx-auto
+                transform transition-transform duration-300">
+        <div class="w-10 h-1 bg-surface-container-high rounded-full mx-auto mb-6"></div>
+        <h3 class="text-lg font-bold tracking-tight text-center mb-1">Input Skor</h3>
+        <p class="text-xs text-on-surface-variant text-center mb-6" id="modalMatchInfo"></p>
+
+        <form id="scoreForm" method="post" class="space-y-4">
+            <div class="grid grid-cols-3 gap-3 items-center">
+                <div></div>
+                <p class="text-[10px] font-bold uppercase tracking-widest text-center text-primary" id="modalTeam1"></p>
+                <p class="text-[10px] font-bold uppercase tracking-widest text-center text-tertiary" id="modalTeam2"></p>
+            </div>
+
+            {% if tournament.scoring_mode == 'points' %}
+            <!-- Points mode -->
+            <div class="grid grid-cols-3 gap-3 items-center">
+                <span class="text-sm font-bold text-on-surface-variant text-center">Poin</span>
+                <input name="points_t1" type="number" min="0" max="99" class="input-field text-center text-2xl font-extrabold !py-4" required>
+                <input name="points_t2" type="number" min="0" max="99" class="input-field text-center text-2xl font-extrabold !py-4" required>
+            </div>
+            <!-- Quick-select presets -->
+            <div class="grid grid-cols-5 gap-2">
+                {% for v in [0, 7, 14, 21, 24] %}
+                <button type="button" onclick="document.activeElement.value={{ v }}"
+                        class="btn-ghost py-2 text-sm font-bold">{{ v }}</button>
+                {% endfor %}
+            </div>
+            {% else %}
+            <!-- Sets mode -->
+            {% for i in range(1, 4) %}
+            <div class="grid grid-cols-3 gap-3 items-center">
+                <span class="text-sm font-bold text-on-surface-variant text-center">Set {{ i }}</span>
+                <input name="set{{ i }}_t1" type="number" min="0" max="10" class="input-field text-center text-xl font-extrabold !py-3" {{ 'required' if i == 1 }}>
+                <input name="set{{ i }}_t2" type="number" min="0" max="10" class="input-field text-center text-xl font-extrabold !py-3" {{ 'required' if i == 1 }}>
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            <button type="submit" class="btn-primary w-full py-4 text-base gap-2 mt-2">
+                <span class="material-symbols-outlined text-lg">check</span> Simpan Skor
+            </button>
+        </form>
+        <button onclick="closeScoreModal()" class="btn-ghost w-full py-3 text-sm mt-2">Batal</button>
+    </div>
+</div>
+
+<script>
+function openScoreModal(matchId, team1, team2) {
+    const modal = document.getElementById('scoreModal');
+    const form = document.getElementById('scoreForm');
+    form.action = '/tournament/{{ tournament.id }}/score/' + matchId;
+    document.getElementById('modalTeam1').textContent = team1;
+    document.getElementById('modalTeam2').textContent = team2;
+    document.getElementById('modalMatchInfo').textContent = team1 + ' vs ' + team2;
+    modal.classList.remove('hidden');
+    setTimeout(() => { const f = form.querySelector('input[type="number"]'); if(f) f.focus(); }, 100);
+}
+function closeScoreModal() { document.getElementById('scoreModal').classList.add('hidden'); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeScoreModal(); });
+
+{% if tournament.minutes_to_play > 0 %}
+// Timer
+let timerSeconds = {{ tournament.minutes_to_play }} * 60;
+let timerInterval = null;
+let timerRunning = false;
+const timerTotal = timerSeconds;
+
+function updateTimerDisplay() {
+    const m = Math.floor(timerSeconds / 60);
+    const s = timerSeconds % 60;
+    const display = document.getElementById('timerDisplay');
+    display.textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+    if (timerSeconds <= 60) display.classList.add('text-error');
+    else display.classList.remove('text-error');
+}
+
+function toggleTimer() {
+    if (timerRunning) {
+        clearInterval(timerInterval);
+        timerRunning = false;
+        document.getElementById('timerIcon').textContent = 'play_arrow';
+        document.getElementById('timerLabel').textContent = 'Start';
+    } else {
+        timerInterval = setInterval(() => {
+            if (timerSeconds <= 0) {
+                clearInterval(timerInterval);
+                timerRunning = false;
+                alert("Time's Up!");
+                return;
+            }
+            timerSeconds--;
+            updateTimerDisplay();
+        }, 1000);
+        timerRunning = true;
+        document.getElementById('timerIcon').textContent = 'pause';
+        document.getElementById('timerLabel').textContent = 'Pause';
+    }
+}
+
+function resetTimer() {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    timerSeconds = timerTotal;
+    updateTimerDisplay();
+    document.getElementById('timerIcon').textContent = 'play_arrow';
+    document.getElementById('timerLabel').textContent = 'Start';
+}
+{% endif %}
+</script>
+{% endblock %}

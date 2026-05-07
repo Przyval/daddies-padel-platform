@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="API docs for the generateSchedule method from the AmericanoRotation class, for the Dart programming language.">
+  <title>generateSchedule method - AmericanoRotation class - americano_rotation library - Dart API</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../static-assets/github.css?v1">
+  <link rel="stylesheet" href="../../static-assets/styles.css?v1">
+  <link rel="icon" href="../../static-assets/favicon.png?v1">
+  
+</head>
+
+<body data-base-href="../../" data-using-base-href="false" class="light-theme">
+<div id="overlay-under-drawer"></div>
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../../index.html">daddies_app</a></li>
+    <li><a href="../../core_utils_americano_rotation/">core&#47;utils&#47;americano_rotation.dart</a></li>
+    <li><a href="../../core_utils_americano_rotation/AmericanoRotation-class.html">AmericanoRotation</a></li>
+    <li class="self-crumb">generateSchedule static method</li>
+  </ol>
+  <div class="self-name">generateSchedule</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <button class="toggle" id="theme-button" title="Toggle between light and dark mode" aria-label="Light and dark mode toggle">
+    <span id="dark-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      dark_mode
+    </span>
+    <span id="light-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      light_mode
+    </span>
+  </button>
+</header>
+<main>
+<div
+    id="dartdoc-main-content"
+    class="main-content"
+    data-above-sidebar="core_utils_americano_rotation&#47;AmericanoRotation-class-sidebar.html"
+    data-below-sidebar="">
+    <div>
+<h1><span class="kind-method">generateSchedule</span> static method 
+</h1></div>
+
+    <section class="multi-line-signature">
+      
+<span class="returntype"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../core_utils_americano_rotation/RoundPairing-class.html">RoundPairing</a></span>&gt;</span></span>
+<span class="name ">generateSchedule</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="generateSchedule-param-playerIds"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>&gt;</span></span> <span class="parameter-name">playerIds</span></span></li>
+</ol>)
+
+      
+
+    </section>
+    
+<section class="desc markdown">
+  <p>Generate a full Americano schedule for <code>playerIds</code> (4–16 players).</p>
+<p>Uses the circle method for round-robin with a partner-minimization
+heuristic. Each round produces matches for <code>playerCount / 4</code> courts.
+Players sit out in rotation when count isn't divisible by 4.</p>
+</section>
+
+
+    
+<section class="summary source-code" id="source">
+  <h2><span>Implementation</span></h2>
+  <pre class="language-dart"><code class="language-dart">static List&lt;RoundPairing&gt; generateSchedule(List&lt;String&gt; playerIds) {
+  assert(playerIds.length &gt;= 4, &#39;Need at least 4 players&#39;);
+  assert(playerIds.length &lt;= 16, &#39;Maximum 16 players supported&#39;);
+
+  final n = playerIds.length;
+  final playersPerRound = (n ~&#47; 4) * 4; &#47;&#47; largest multiple of 4 ≤ n
+  final courtsPerRound = playersPerRound ~&#47; 4;
+  final sitOutCount = n - playersPerRound;
+
+  &#47;&#47; Track how many times each pair has been partners
+  final partnerCount = &lt;String, int&gt;{};
+
+  String pairKey(String a, String b) {
+    final sorted = [a, b]..sort();
+    return &#39;${sorted[0]}|${sorted[1]}&#39;;
+  }
+
+  void recordPartnership(String a, String b) {
+    final key = pairKey(a, b);
+    partnerCount[key] = (partnerCount[key] ?? 0) + 1;
+  }
+
+  int getPartnerCount(String a, String b) {
+    return partnerCount[pairKey(a, b)] ?? 0;
+  }
+
+  &#47;&#47; Generate all unique pairings using circle method
+  &#47;&#47; For n players, we need n-1 rounds (or n rounds if n is even but we
+  &#47;&#47; want everyone to play with everyone).
+  final totalRounds = n - 1 + (n.isEven ? 0 : 1);
+
+  &#47;&#47; Use circle method to generate opponent matchups
+  final rounds = &lt;RoundPairing&gt;[];
+  final sitOutTracker = List.generate(n, (i) =&gt; 0); &#47;&#47; times sat out
+
+  for (int r = 0; r &lt; totalRounds &amp;&amp; rounds.length &lt; totalRounds; r++) {
+    &#47;&#47; Determine who sits out this round (those who sat out least)
+    List&lt;String&gt; activePlayers;
+    if (sitOutCount &gt; 0) {
+      final indexed = List.generate(n, (i) =&gt; i);
+      indexed.sort((a, b) =&gt; sitOutTracker[a].compareTo(sitOutTracker[b]));
+      final sitOutIndices = indexed.sublist(n - sitOutCount).toSet();
+      for (final idx in sitOutIndices) {
+        sitOutTracker[idx]++;
+      }
+      activePlayers = [
+        for (int i = 0; i &lt; n; i++)
+          if (!sitOutIndices.contains(i)) playerIds[i],
+      ];
+    } else {
+      activePlayers = List.of(playerIds);
+    }
+
+    &#47;&#47; Generate pairings for this round using greedy partner minimization
+    final assignments = _greedyPairRound(
+      activePlayers,
+      courtsPerRound,
+      getPartnerCount,
+    );
+
+    if (assignments == null) continue;
+
+    &#47;&#47; Record partnerships
+    for (final court in assignments) {
+      recordPartnership(court.pair.team1[0], court.pair.team1[1]);
+      recordPartnership(court.pair.team2[0], court.pair.team2[1]);
+    }
+
+    rounds.add(RoundPairing(round: rounds.length + 1, courts: assignments));
+  }
+
+  return rounds;
+}</code></pre>
+</section>
+
+
+  </div> <!-- /.main-content -->
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
+<header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+    <li><a href="../../index.html">daddies_app</a></li>
+    <li><a href="../../core_utils_americano_rotation/">americano_rotation</a></li>
+    <li><a href="../../core_utils_americano_rotation/AmericanoRotation-class.html">AmericanoRotation</a></li>
+    <li class="self-crumb">generateSchedule static method</li>
+</ol>
+
+    <h5>AmericanoRotation class</h5>
+    <div id="dartdoc-sidebar-left-content"></div>
+  </div><!--/.sidebar-offcanvas-->
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+</div><!--/.sidebar-offcanvas-->
+</main>
+<footer>
+  <span class="no-break">
+    daddies_app
+      1.0.0+1
+  </span>
+  
+</footer>
+
+
+<script src="../../static-assets/highlight.pack.js?v1"></script>
+<script src="../../static-assets/docs.dart.js"></script>
+
+</body>
+</html>
+

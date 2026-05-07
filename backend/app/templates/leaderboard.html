@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% block title %}Leaderboard — Daddies Padel{% endblock %}
+
+{% block header_left %}
+<a href="{{ url_for('member.index') }}" class="text-primary-container">
+    <span class="material-symbols-outlined">arrow_back</span>
+</a>
+<h1 class="font-headline font-extrabold tracking-tight text-xl text-primary-container">Leaderboard</h1>
+{% endblock %}
+
+{% block content %}
+<!-- Tab bar -->
+<section>
+    <div class="flex gap-1 bg-surface-container-low rounded-full p-1">
+        <a href="?tab=chips"
+           class="flex-1 text-center py-2.5 text-sm font-bold rounded-full transition-all flex items-center justify-center gap-1
+                  {{ 'bg-primary text-on-primary' if tab == 'chips' else 'text-on-surface-variant hover:bg-surface-container-high' }}">
+            <span class="material-symbols-outlined text-sm">toll</span> Chips
+        </a>
+        <a href="?tab=loyalty"
+           class="flex-1 text-center py-2.5 text-sm font-bold rounded-full transition-all flex items-center justify-center gap-1
+                  {{ 'bg-primary text-on-primary' if tab == 'loyalty' else 'text-on-surface-variant hover:bg-surface-container-high' }}">
+            <span class="material-symbols-outlined text-sm">favorite</span> Loyalty
+        </a>
+        <a href="?tab=spender"
+           class="flex-1 text-center py-2.5 text-sm font-bold rounded-full transition-all flex items-center justify-center gap-1
+                  {{ 'bg-primary text-on-primary' if tab == 'spender' else 'text-on-surface-variant hover:bg-surface-container-high' }}">
+            <span class="material-symbols-outlined text-sm">payments</span> Spender
+        </a>
+        <a href="?tab=streak"
+           class="flex-1 text-center py-2.5 text-sm font-bold rounded-full transition-all flex items-center justify-center gap-1
+                  {{ 'bg-primary text-on-primary' if tab == 'streak' else 'text-on-surface-variant hover:bg-surface-container-high' }}">
+            🔥 Streak
+        </a>
+    </div>
+</section>
+
+<!-- Podium top 3 -->
+{% if ranked|length >= 3 %}
+<section class="flex items-end justify-center gap-3 pt-4">
+    <!-- 2nd -->
+    <div class="text-center flex-1">
+        <div class="w-14 h-14 rounded-full bg-surface-container-high flex items-center justify-center mx-auto mb-2">
+            <span class="text-sm font-bold text-on-surface-variant">{{ ranked[1].initials }}</span>
+        </div>
+        <div class="bg-surface-container-low rounded-t-2xl pt-6 pb-3 px-2">
+            <span class="text-base">🥈</span>
+            <p class="text-xs font-bold text-on-surface truncate">{{ ranked[1].first_name }}</p>
+            <p class="text-lg font-extrabold text-on-surface-variant">
+                {% if tab == 'chips' %}{{ '{:,}'.format(ranked[1].chips_balance) }}
+                {% elif tab == 'loyalty' %}{{ ranked[1].sessions_played }}
+                {% elif tab == 'streak' %}{{ ranked[1]._streak|default(0) }}
+                {% else %}{{ '{:,}'.format(ranked[1]._spent|default(0)) }}{% endif %}
+            </p>
+            <p class="text-[9px] uppercase tracking-wider text-on-surface-variant font-bold">
+                {{ 'chips' if tab == 'chips' else 'sesi' if tab == 'loyalty' else 'minggu' if tab == 'streak' else 'spent' }}
+            </p>
+        </div>
+    </div>
+    <!-- 1st -->
+    <div class="text-center flex-1">
+        <div class="w-16 h-16 rounded-full bg-primary-container flex items-center justify-center mx-auto mb-2 shadow-lg ring-4 ring-primary/10">
+            <span class="text-lg font-bold text-surface">{{ ranked[0].initials }}</span>
+        </div>
+        <div class="bg-primary-container rounded-t-2xl pt-8 pb-3 px-2">
+            <span class="text-xl">🥇</span>
+            <p class="text-xs font-bold text-surface truncate">{{ ranked[0].first_name }}</p>
+            <p class="text-xl font-extrabold text-surface">
+                {% if tab == 'chips' %}{{ '{:,}'.format(ranked[0].chips_balance) }}
+                {% elif tab == 'loyalty' %}{{ ranked[0].sessions_played }}
+                {% elif tab == 'streak' %}{{ ranked[0]._streak|default(0) }}
+                {% else %}{{ '{:,}'.format(ranked[0]._spent|default(0)) }}{% endif %}
+            </p>
+            <p class="text-[9px] uppercase tracking-wider text-on-primary-container font-bold">
+                {{ 'chips' if tab == 'chips' else 'sesi' if tab == 'loyalty' else 'minggu' if tab == 'streak' else 'spent' }}
+            </p>
+        </div>
+    </div>
+    <!-- 3rd -->
+    <div class="text-center flex-1">
+        <div class="w-14 h-14 rounded-full bg-surface-container-high flex items-center justify-center mx-auto mb-2">
+            <span class="text-sm font-bold text-on-surface-variant">{{ ranked[2].initials }}</span>
+        </div>
+        <div class="bg-surface-container-low rounded-t-2xl pt-4 pb-3 px-2">
+            <span class="text-base">🥉</span>
+            <p class="text-xs font-bold text-on-surface truncate">{{ ranked[2].first_name }}</p>
+            <p class="text-lg font-extrabold text-on-surface-variant">
+                {% if tab == 'chips' %}{{ '{:,}'.format(ranked[2].chips_balance) }}
+                {% elif tab == 'loyalty' %}{{ ranked[2].sessions_played }}
+                {% elif tab == 'streak' %}{{ ranked[2]._streak|default(0) }}
+                {% else %}{{ '{:,}'.format(ranked[2]._spent|default(0)) }}{% endif %}
+            </p>
+            <p class="text-[9px] uppercase tracking-wider text-on-surface-variant font-bold">
+                {{ 'chips' if tab == 'chips' else 'sesi' if tab == 'loyalty' else 'minggu' if tab == 'streak' else 'spent' }}
+            </p>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Full ranking -->
+<section class="space-y-2">
+    {% for user in ranked %}
+    {% if loop.index > 3 or ranked|length < 3 %}
+    <div class="card !p-4 flex items-center justify-between
+        {% if current_user.is_authenticated and user.id == current_user.id %}ring-2 ring-primary/20{% endif %}">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-surface-container-low flex items-center justify-center">
+                <span class="text-xs font-extrabold text-on-surface-variant">{{ loop.index }}</span>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center">
+                <span class="text-xs font-bold text-on-surface-variant">{{ user.initials }}</span>
+            </div>
+            <div>
+                <p class="font-bold text-on-surface text-sm">{{ user.display_name }}</p>
+                <span class="badge badge-{{ user.kta_tier if user.kta_tier != 'bronze' else 'member' }} !text-[8px]">
+                    {{ user.kta_tier|upper }}
+                </span>
+            </div>
+        </div>
+        <div class="text-right">
+            <p class="text-lg font-extrabold text-primary">
+                {% if tab == 'chips' %}{{ '{:,}'.format(user.chips_balance) }}
+                {% elif tab == 'loyalty' %}{{ user.sessions_played }}
+                {% elif tab == 'streak' %}{{ user._streak|default(0) }}
+                {% else %}{{ '{:,}'.format(user._spent|default(0)) }}{% endif %}
+            </p>
+            <p class="text-[9px] uppercase tracking-wider text-on-surface-variant font-bold">
+                {{ 'chips' if tab == 'chips' else 'sesi' if tab == 'loyalty' else 'minggu' if tab == 'streak' else 'spent' }}
+            </p>
+        </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+</section>
+
+<!-- Share + CTA -->
+{% if current_user.is_authenticated %}
+<section class="flex gap-2 justify-center">
+    <a href="{{ url_for('main.leaderboard_share_card') }}" class="btn-primary px-6 py-3 text-sm gap-2">
+        <span class="material-symbols-outlined text-lg">share</span>
+        Share Ranking
+    </a>
+    <a href="{{ url_for('main.chips_history') }}" class="btn-ghost px-6 py-3 text-sm gap-2">
+        <span class="material-symbols-outlined text-lg">toll</span>
+        {{ '{:,}'.format(current_user.chips_balance) }} Chips
+    </a>
+</section>
+{% endif %}
+{% endblock %}

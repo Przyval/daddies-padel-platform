@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Keuangan — Daddies Padel{% endblock %}
+
+{% block header_left %}
+<a href="{{ url_for('member.index') }}" class="hover:opacity-80 transition-opacity text-primary-container">
+    <span class="material-symbols-outlined">arrow_back</span>
+</a>
+<h1 class="font-headline font-extrabold tracking-tight text-xl text-primary-container">Keuangan</h1>
+{% endblock %}
+
+{% block content %}
+<!-- Revenue cards -->
+<section class="grid grid-cols-2 gap-3">
+    <div class="stat-card">
+        <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-2">Terkumpul</p>
+        <p class="text-xl font-extrabold text-success">IDR {{ "{:,.0f}".format(total_revenue) }}</p>
+        <p class="text-[10px] text-on-surface-variant mt-1">Paid & Confirmed</p>
+    </div>
+    <div class="stat-card">
+        <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-2">Pending</p>
+        <p class="text-xl font-extrabold text-warning">IDR {{ "{:,.0f}".format(pending_revenue) }}</p>
+        <p class="text-[10px] text-on-surface-variant mt-1">Menunggu bayar</p>
+    </div>
+</section>
+
+<!-- Per-session breakdown -->
+<section>
+    <h3 class="text-lg font-bold tracking-tight mb-4">Detail per Sesi</h3>
+    <div class="space-y-3">
+        {% for match in matches %}
+        {% set paid_count = paid_counts.get(match.id, 0) %}
+        <div class="card !p-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded bg-surface-container-low flex flex-col items-center justify-center">
+                    <span class="text-[9px] font-bold text-on-surface-variant uppercase">{{ match.date_time.strftime('%b') }}</span>
+                    <span class="text-base font-extrabold text-primary leading-tight">{{ match.date_time.strftime('%d') }}</span>
+                </div>
+                <div>
+                    <p class="font-bold text-on-surface text-sm">{{ match.title }}</p>
+                    <p class="text-xs text-on-surface-variant">
+                        IDR {{ "{:,.0f}".format(match.price) }}/orang · {{ paid_count }} bayar
+                    </p>
+                </div>
+            </div>
+            <p class="text-base font-extrabold text-success">IDR {{ "{:,.0f}".format(paid_count * match.price) }}</p>
+        </div>
+        {% else %}
+        <div class="card text-center py-8">
+            <p class="text-sm text-on-surface-variant">Belum ada data keuangan.</p>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
