@@ -1,5 +1,5 @@
 """Main routes — all non-auth pages live here."""
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
 from flask_login import current_user, login_required
 from app.models import (
     User, Match, Booking, Notification, Venue, Partner, ChipsTransaction,
@@ -115,10 +115,21 @@ def member_profile(user_id):
 @bp.route('/profile')
 @login_required
 def profile():
+    # Lazy-init referral code for existing users who don't have one
+    from app.utils.referral import ensure_code
+    from app.utils.wallet import wallet_status
+    from app.utils.leaderboard import get_user_rank, shop_discount_for_rank
+    ensure_code(current_user)
+    db.session.commit()
+
     recent_bookings = current_user.bookings.join(Match)\
         .order_by(Match.date_time.desc()).limit(5).all()
+    rank = get_user_rank(current_user.id)
     return render_template('profile/view.html', user=current_user,
                            recent_bookings=recent_bookings,
+                           wallet=wallet_status(current_user),
+                           leaderboard_rank=rank,
+                           shop_discount=shop_discount_for_rank(rank),
                            active_tab='profile')
 
 
@@ -445,6 +456,12 @@ def shop():
 def shop_buy(item_id):
     item = ShopItem.query.get_or_404(item_id)
 
+    # Member-only gate
+    if item.member_only and not current_user.membership_paid \
+            and current_user.role not in ('admin', 'treasurer'):
+        flash('Item ini khusus untuk member berbayar.', 'error')
+        return redirect(url_for('main.shop'))
+
     if item.champion_only and current_user.membership != 'elite':
         flash('Item ini khusus untuk Elite member.', 'error')
         return redirect(url_for('main.shop'))
@@ -453,31 +470,54 @@ def shop_buy(item_id):
         flash('Stok habis.', 'error')
         return redirect(url_for('main.shop'))
 
-    if current_user.chips_balance < item.price_chips:
-        flash(f'Chips tidak cukup. Butuh {item.price_chips:,}, kamu punya {current_user.chips_balance:,}.', 'error')
+    # Per-user limit check
+    existing = ShopOrder.query.filter_by(
+        user_id=current_user.id, item_id=item.id
+    ).filter(ShopOrder.status != 'canceled').count()
+    if existing >= item.max_per_user:
+        flash(f'Kamu sudah punya {item.name}. Maks {item.max_per_user} per member.', 'error')
         return redirect(url_for('main.shop'))
 
-    # Deduct chips
-    current_user.chips_balance -= item.price_chips
+    # Apply Top-50 leaderboard discount
+    from app.utils.leaderboard import shop_discount_for_rank, get_user_rank
+    discount_pct = shop_discount_for_rank(get_user_rank(current_user.id))
+    final_price = int(item.price_chips * (1 - discount_pct / 100))
+
+    if current_user.chips_balance < final_price:
+        flash(f'Chips tidak cukup. Butuh {final_price:,}, kamu punya {current_user.chips_balance:,}.', 'error')
+        return redirect(url_for('main.shop'))
+
+    # Assign edition number atomically (prevent race: UniqueConstraint handles collisions)
+    edition_num = None
+    if item.edition_total:
+        last = ShopOrder.query.filter_by(item_id=item.id)\
+            .order_by(ShopOrder.edition_number.desc()).first()
+        edition_num = (last.edition_number or 0) + 1 if last else 1
+
+    # Deduct chips (using discounted price)
+    current_user.chips_balance -= final_price
     if item.stock > 0:
         item.stock -= 1
 
-    # Record transaction
     db.session.add(ChipsTransaction(
-        user_id=current_user.id, amount=-item.price_chips,
+        user_id=current_user.id, amount=-final_price,
         balance_after=current_user.chips_balance,
-        type='spend', description=f'Beli: {item.name}',
+        type='spend', description=f'Beli: {item.name}' + (f' (diskon {discount_pct}%)' if discount_pct else ''),
         season=f"{datetime.utcnow().year}-{datetime.utcnow().strftime('%m')}"
     ))
 
-    # Create order
-    db.session.add(ShopOrder(
+    order = ShopOrder(
         user_id=current_user.id, item_id=item.id,
-        chips_spent=item.price_chips, status='pending'
-    ))
-
+        chips_spent=final_price, status='pending',
+        edition_number=edition_num
+    )
+    db.session.add(order)
     db.session.commit()
-    flash(f'{item.name} berhasil dipesan!', 'success')
+
+    if edition_num:
+        flash(f'{item.name} #{edition_num}/{item.edition_total} berhasil dipesan!', 'success')
+    else:
+        flash(f'{item.name} berhasil dipesan!', 'success')
     return redirect(url_for('main.shop'))
 
 
@@ -495,13 +535,28 @@ def membership():
 @login_required
 def membership_upgrade():
     """Manual trigger for membership check / payment confirmation."""
+    from app.utils.wallet import deposit
+    from app.utils.referral import MEMBERSHIP_PRICE_WITHOUT_CODE, MEMBERSHIP_PRICE_WITH_CODE
+
+    # Determine price based on referral
+    has_referral = current_user.referred_by is not None
+    price = MEMBERSHIP_PRICE_WITH_CODE if has_referral else MEMBERSHIP_PRICE_WITHOUT_CODE
+
+    # Record wallet deposit for non-referral (Rp 400K hangus deposit)
+    if not has_referral:
+        deposit(current_user, price, source='membership')
+
     current_user.membership_paid = True
+    current_user.membership_amount_paid = price
+    current_user.membership = 'member'
     changed = current_user.check_auto_upgrade()
     db.session.commit()
-    if changed:
-        flash(f'Selamat! Membership kamu naik ke {current_user.membership_label}.', 'success')
+
+    price_label = f'Rp {price:,}'
+    if has_referral:
+        flash(f'Membership aktif! Pembayaran {price_label} via referral.', 'success')
     else:
-        flash('Pembayaran tercatat. Membership akan upgrade otomatis setelah syarat terpenuhi.', 'info')
+        flash(f'Membership aktif! Deposit {price_label} tersimpan di wallet (berlaku 1 tahun).', 'success')
     return redirect(url_for('main.membership'))
 
 
@@ -545,6 +600,76 @@ def streak_share_card():
     """Duolingo-style 1080x1080 streak share card."""
     data = current_user.streak_data
     return render_template('streak/share_card.html', user=current_user, streak=data)
+
+
+# ══════════════════════════════════════════════════
+# KOTH — King of the Hill
+# ══════════════════════════════════════════════════
+
+KOTH_SHIELD_MILESTONE = 10  # wins needed for the exclusive Dedis Shield jersey
+
+
+@bp.route('/koth')
+@login_required
+def koth():
+    """KOTH leaderboard — total wins per user."""
+    from app.models import KOTHResult
+    from sqlalchemy import func
+    rows = db.session.query(
+        KOTHResult.winner_user_id,
+        func.count(KOTHResult.id).label('wins')
+    ).group_by(KOTHResult.winner_user_id)\
+     .order_by(func.count(KOTHResult.id).desc()).all()
+
+    my_wins = db.session.query(func.count(KOTHResult.id)).filter_by(
+        winner_user_id=current_user.id
+    ).scalar() or 0
+
+    return render_template('koth/index.html',
+                           rows=rows, my_wins=my_wins,
+                           milestone=KOTH_SHIELD_MILESTONE,
+                           active_tab='explore')
+
+
+@bp.route('/koth/<int:match_id>/result', methods=['POST'])
+@login_required
+def koth_record_win(match_id):
+    """Record a KOTH win. Admin/mimin only."""
+    from app.models import Match, KOTHResult, ShopItem, ShopOrder
+    if current_user.role not in ('admin', 'treasurer'):
+        return jsonify({'ok': False, 'error': 'Hanya admin'}), 403
+
+    winner_id = request.form.get('winner_user_id', type=int)
+    if not winner_id:
+        return jsonify({'ok': False, 'error': 'winner_user_id required'}), 400
+
+    result = KOTHResult(match_id=match_id, winner_user_id=winner_id)
+    db.session.add(result)
+    db.session.flush()
+
+    # Check milestone: 10 wins → award Dedis Shield
+    from sqlalchemy import func
+    total_wins = db.session.query(func.count(KOTHResult.id)).filter_by(
+        winner_user_id=winner_id
+    ).scalar() or 0
+
+    awarded = False
+    if total_wins >= KOTH_SHIELD_MILESTONE:
+        shield = ShopItem.query.filter_by(category='collectible', champion_only=True,
+                                          season='koth-shield').first()
+        if shield:
+            already = ShopOrder.query.filter_by(
+                user_id=winner_id, item_id=shield.id
+            ).filter(ShopOrder.status != 'canceled').first()
+            if not already:
+                db.session.add(ShopOrder(
+                    user_id=winner_id, item_id=shield.id,
+                    chips_spent=0, status='fulfilled'
+                ))
+                awarded = True
+
+    db.session.commit()
+    return jsonify({'ok': True, 'total_wins': total_wins, 'shield_awarded': awarded})
 
 
 @bp.route('/streak/whatsapp')

@@ -24,8 +24,12 @@ class User(UserMixin, db.Model):
     invited_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     membership_paid = db.Column(db.Boolean, default=False)
     membership_amount_paid = db.Column(db.Integer, default=0)  # Rp 200K or 400K
+    wallet_balance = db.Column(db.Integer, default=0)          # in Rupiah
+    wallet_expires_at = db.Column(db.DateTime, nullable=True)  # non-refundable deposit expiry
+    wallet_hangus = db.Column(db.Boolean, default=False)       # forfeited
+    leaderboard_rank = db.Column(db.Integer, nullable=True)    # cached global rank
     referral_uses_this_month = db.Column(db.Integer, default=0)
-    referral_reset_date = db.Column(db.Date, nullable=True)  # date of last monthly reset
+    referral_reset_date = db.Column(db.Date, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     bookings = db.relationship('Booking', backref='player', lazy='dynamic')
@@ -246,16 +250,22 @@ class Match(db.Model):
     max_players = db.Column(db.Integer, default=4)
     price = db.Column(db.Integer, default=0)
     status = db.Column(db.String(20), default='open')
+    event_type = db.Column(db.String(20), default='session')  # 'session', 'koth', 'tournament'
     notes = db.Column(db.Text, default='')
     created_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     bookings = db.relationship('Booking', backref='match', lazy='dynamic')
 
-    creator = db.relationship('User', foreign_keys=[created_by])
 
-    @property
-    def confirmed_count(self):
-        return self.bookings.filter(Booking.status.in_(['paid', 'confirmed'])).count()
+class KOTHResult(db.Model):
+    """King of the Hill win record. 10 wins = Dedis Shield jersey (non-sellable)."""
+    id = db.Column(db.Integer, primary_key=True)
+    match_id = db.Column(db.Integer, db.ForeignKey('match.id'))
+    winner_user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    match = db.relationship('Match', backref='koth_results')
+    winner = db.relationship('User', backref='koth_wins')
 
     @property
     def waitlist_count(self):
@@ -662,6 +672,9 @@ class ShopItem(db.Model):
     stock = db.Column(db.Integer, default=-1)  # -1 = unlimited
     is_active = db.Column(db.Boolean, default=True)
     champion_only = db.Column(db.Boolean, default=False)
+    member_only = db.Column(db.Boolean, default=True)   # only paying members can buy
+    max_per_user = db.Column(db.Integer, default=1)     # max 1 per person (collectible rule)
+    edition_total = db.Column(db.Integer, nullable=True)  # e.g. 100 for "nomor X dari 100"
     season = db.Column(db.String(20), default='')  # e.g. '2026-03' for March collectible
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -681,6 +694,7 @@ class ShopOrder(db.Model):
     item_id = db.Column(db.Integer, db.ForeignKey('shop_item.id'))
     chips_spent = db.Column(db.Integer, default=0)
     status = db.Column(db.String(20), default='pending')  # 'pending', 'fulfilled', 'canceled'
+    edition_number = db.Column(db.Integer, nullable=True)  # "nomor 52 dari 100"
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     user = db.relationship('User', backref='shop_orders')
