@@ -864,6 +864,9 @@ def v2_detail(tournament_id):
 def update_score(tournament_id, match_id):
     match = TournamentMatch.query.get_or_404(match_id)
     tournament = Tournament.query.get_or_404(tournament_id)
+    # Prevent cross-tournament score manipulation (IDOR)
+    if match.tournament_id != tournament_id:
+        return jsonify({'ok': False, 'error': 'Match bukan bagian dari tournament ini'}), 403
 
     if tournament.scoring_mode == 'points':
         # Points mode: single score pair, clamped to 0..max
@@ -1006,6 +1009,7 @@ def next_round(tournament_id):
 
 @bp.route('/<int:tournament_id>/generate_playoff', methods=['POST'])
 @login_required_json
+@require_tournament_owner
 def generate_playoff(tournament_id):
     tournament = Tournament.query.get_or_404(tournament_id)
     bracket_size = request.form.get('bracket_size', 4, type=int)  # 4, 8, or 16
@@ -1061,6 +1065,7 @@ def generate_playoff(tournament_id):
 
 @bp.route('/<int:tournament_id>/playoff_score/<int:playoff_id>', methods=['POST'])
 @login_required_json
+@require_tournament_owner
 def playoff_score(tournament_id, playoff_id):
     playoff = TournamentPlayoff.query.get_or_404(playoff_id)
     sets = []
@@ -1128,9 +1133,9 @@ def complete_tournament(tournament_id):
 
 
 @bp.route('/<int:tournament_id>/settings', methods=['GET', 'POST'])
-@login_required_json
 @require_tournament_owner
 def settings(tournament_id):
+    # Note: @require_tournament_owner handles auth — redirects GET, returns JSON for POST
     tournament = Tournament.query.get_or_404(tournament_id)
     if request.method == 'POST':
         tournament.name = request.form.get('name', tournament.name)
@@ -1168,6 +1173,8 @@ def settings(tournament_id):
 # ══════════════════════════════════════════
 
 @bp.route('/<int:tournament_id>/swap', methods=['POST'])
+@login_required_json
+@require_tournament_owner
 def swap_player(tournament_id):
     """Swap player names — only allowed in round 1 (game pertama).
     After round 2, locked."""
@@ -1191,6 +1198,8 @@ def swap_player(tournament_id):
 
 
 @bp.route('/<int:tournament_id>/sitting_out/<int:participant_id>', methods=['POST'])
+@login_required_json
+@require_tournament_owner
 def toggle_sitting_out(tournament_id, participant_id):
     """Toggle permanent sitting out (pulang)."""
     p = TournamentParticipant.query.get_or_404(participant_id)

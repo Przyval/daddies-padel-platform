@@ -41,18 +41,26 @@ def require_member(f):
 
 def require_tournament_owner(f):
     """Allow only the tournament creator (or admin) to call this route.
-    Expects tournament_id in kwargs or request args.
+    GET requests redirect to login/standings; POST/fetch returns JSON 403.
     """
     @wraps(f)
     def decorated(*args, **kwargs):
         if not current_user.is_authenticated:
+            if request.method == 'GET':
+                return redirect(url_for('auth.login'))
             return jsonify({'ok': False, 'error': 'Login dulu'}), 401
         if current_user.role in ('admin', 'treasurer'):
             return f(*args, **kwargs)
         from app.models import Tournament
-        tid = kwargs.get('tournament_id')
+        # Check kwargs, then URL args, then form data
+        tid = (kwargs.get('tournament_id') or
+               request.args.get('tournament_id', type=int) or
+               request.form.get('tournament_id', type=int))
         t = Tournament.query.get(tid) if tid else None
         if not t or t.created_by != current_user.id:
+            if request.method == 'GET':
+                return redirect(url_for('tournament.detail',
+                                        tournament_id=tid or 0, tab='standing'))
             return jsonify({'ok': False, 'error': 'Hanya pembuat turnamen yang bisa melakukan ini'}), 403
         return f(*args, **kwargs)
     return decorated

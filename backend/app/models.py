@@ -256,6 +256,27 @@ class Match(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     bookings = db.relationship('Booking', backref='match', lazy='dynamic')
 
+    @property
+    def waitlist_count(self):
+        return self.bookings.filter_by(status='waitlist').count()
+
+    @property
+    def approved_count(self):
+        return self.bookings.filter_by(status='approved').count()
+
+    @property
+    def confirmed_count(self):
+        return self.bookings.filter(Booking.status.in_(['paid', 'confirmed'])).count()
+
+    @property
+    def all_players(self):
+        return [b.player for b in self.bookings.filter(
+            Booking.status.in_(['waitlist', 'approved', 'paid', 'confirmed'])
+        ).all()]
+
+    def __repr__(self):
+        return f'<Match {self.title} {self.date_time}>'
+
 
 class KOTHResult(db.Model):
     """King of the Hill win record. 10 wins = Dedis Shield jersey (non-sellable)."""
@@ -266,23 +287,6 @@ class KOTHResult(db.Model):
 
     match = db.relationship('Match', backref='koth_results')
     winner = db.relationship('User', backref='koth_wins')
-
-    @property
-    def waitlist_count(self):
-        return self.bookings.filter_by(status='waitlist').count()
-
-    @property
-    def approved_count(self):
-        return self.bookings.filter_by(status='approved').count()
-
-    @property
-    def all_players(self):
-        return [b.player for b in self.bookings.filter(
-            Booking.status.in_(['waitlist', 'approved', 'paid', 'confirmed'])
-        ).all()]
-
-    def __repr__(self):
-        return f'<Match {self.title} {self.date_time}>'
 
 
 class Booking(db.Model):
@@ -699,6 +703,10 @@ class ShopOrder(db.Model):
 
     user = db.relationship('User', backref='shop_orders')
     item = db.relationship('ShopItem', backref='orders')
+
+    __table_args__ = (
+        db.UniqueConstraint('item_id', 'edition_number', name='uq_order_item_edition'),
+    )
 
 
 # ══════════════════════════════════════════════════
