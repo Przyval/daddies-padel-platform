@@ -39,10 +39,57 @@
                 <input class="input-field" id="password" name="password" type="password"
                        placeholder="Buat password" required autocomplete="new-password">
             </div>
+            <!-- Referral code (optional) -->
+            <div>
+                <label class="label-overline mb-2 block" for="referral_code">
+                    Kode Referral <span class="text-on-surface-variant font-normal">(opsional)</span>
+                </label>
+                <div class="relative">
+                    <input class="input-field uppercase" id="referral_code" name="referral_code" type="text"
+                           placeholder="Contoh: ABC123" maxlength="6" autocomplete="off"
+                           value="{{ prefill_code }}"
+                           oninput="checkReferral(this.value)">
+                </div>
+                <div id="referral-msg" class="text-xs mt-1 hidden"></div>
+                <div id="price-badge" class="mt-2 hidden text-sm font-semibold rounded-lg px-3 py-2"></div>
+            </div>
+
             <div class="pt-2">
                 <button type="submit" class="btn-primary w-full py-4 text-base">Daftar</button>
             </div>
         </form>
+
+        <script>
+        let _refTimer;
+        function checkReferral(code) {
+            clearTimeout(_refTimer);
+            var msg = document.getElementById('referral-msg');
+            var badge = document.getElementById('price-badge');
+            if (!code || code.length < 6) {
+                msg.classList.add('hidden');
+                badge.classList.add('hidden');
+                return;
+            }
+            _refTimer = setTimeout(function() {
+                fetch('/auth/validate-referral?code=' + encodeURIComponent(code))
+                    .then(function(r){ return r.json(); })
+                    .then(function(d){
+                        msg.textContent = d.message;
+                        msg.className = 'text-xs mt-1 ' + (d.valid ? 'text-green-600' : 'text-red-500');
+                        badge.textContent = d.valid
+                            ? '💚 Membership: ' + d.price_display + ' (diskon 50%!)'
+                            : '💳 Membership: ' + d.price_display + ' (tanpa referral)';
+                        badge.className = 'mt-2 text-sm font-semibold rounded-lg px-3 py-2 '
+                            + (d.valid ? 'bg-green-50 text-green-700' : 'bg-orange-50 text-orange-700');
+                        badge.classList.remove('hidden');
+                    });
+            }, 400);
+        }
+        // Auto-check if prefilled
+        if (document.getElementById('referral_code').value) {
+            checkReferral(document.getElementById('referral_code').value);
+        }
+        </script>
 
         <!-- Divider -->
         <div class="flex items-center gap-4">

@@ -23,6 +23,9 @@ class User(UserMixin, db.Model):
     referred_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     invited_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     membership_paid = db.Column(db.Boolean, default=False)
+    membership_amount_paid = db.Column(db.Integer, default=0)  # Rp 200K or 400K
+    referral_uses_this_month = db.Column(db.Integer, default=0)
+    referral_reset_date = db.Column(db.Date, nullable=True)  # date of last monthly reset
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     bookings = db.relationship('Booking', backref='player', lazy='dynamic')

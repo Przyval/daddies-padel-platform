@@ -262,9 +262,12 @@ def partners():
 @bp.route('/referral')
 @login_required
 def referral():
-    referred = User.query.filter_by(referred_by=current_user.id).all()
+    from app.utils.referral import referral_stats, ensure_code
+    ensure_code(current_user)
+    stats = referral_stats(current_user)
+    referred = User.query.filter_by(referred_by=current_user.id).order_by(User.created_at.desc()).all()
     return render_template('referral.html', user=current_user,
-                           referred=referred, active_tab='profile')
+                           referred=referred, stats=stats, active_tab='profile')
 
 
 # ══════════════════════════════════════════════════
