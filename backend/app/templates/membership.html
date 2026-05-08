@@ -117,14 +117,96 @@
     </div>
 </section>
 
-<!-- Upgrade button -->
-{% if user.membership in ('guest', 'pre_member') and not user.membership_paid %}
-<form action="{{ url_for('main.membership_upgrade') }}" method="post">
-    <button type="submit" class="btn-primary w-full py-4 text-base gap-2">
-        <span class="material-symbols-outlined text-lg">card_membership</span>
-        Konfirmasi Pembayaran Iuran
-    </button>
-</form>
+<!-- Pricing & Referral -->
+{% if not user.membership_paid %}
+<section class="card space-y-4">
+    <h3 class="text-sm font-bold">Harga Membership</h3>
+
+    <!-- Referral code input -->
+    <div>
+        <label class="label-overline mb-2 block">Punya kode referral?</label>
+        <div class="flex gap-2">
+            <input class="input-field flex-1 uppercase" id="refCodeInput" type="text"
+                   placeholder="Contoh: ABC123" maxlength="6"
+                   oninput="checkRef(this.value)">
+        </div>
+        <div id="refMsg" class="text-xs mt-1 hidden"></div>
+    </div>
+
+    <!-- Price display -->
+    <div id="priceCard" class="rounded-xl p-4 bg-surface-container text-center">
+        <p class="text-xs text-on-surface-variant mb-1">Biaya membership</p>
+        <p id="priceDisplay" class="text-3xl font-extrabold text-primary">Rp 400.000</p>
+        <p id="priceNote" class="text-xs text-on-surface-variant mt-1">Tanpa kode referral</p>
+    </div>
+
+    <!-- Upgrade button -->
+    <form action="{{ url_for('main.membership_upgrade') }}" method="post" id="upgradeForm">
+        <input type="hidden" name="referral_code_used" id="refCodeHidden">
+        <button type="submit" class="btn-primary w-full py-4 text-base gap-2">
+            <span class="material-symbols-outlined text-lg">card_membership</span>
+            Konfirmasi Pembayaran Iuran
+        </button>
+    </form>
+
+    <p class="text-xs text-on-surface-variant text-center">
+        Deposit Rp 400.000 tersimpan di wallet selama 1 tahun.
+        Dengan kode referral hanya Rp 200.000.
+    </p>
+</section>
+
+<script>
+var _refTimer;
+function checkRef(code) {
+    clearTimeout(_refTimer);
+    var msg = document.getElementById('refMsg');
+    var price = document.getElementById('priceDisplay');
+    var note = document.getElementById('priceNote');
+    var hidden = document.getElementById('refCodeHidden');
+    if (!code || code.length < 6) {
+        price.textContent = 'Rp 400.000';
+        note.textContent = 'Tanpa kode referral';
+        hidden.value = '';
+        msg.classList.add('hidden');
+        return;
+    }
+    _refTimer = setTimeout(function() {
+        fetch('/auth/validate-referral?code=' + encodeURIComponent(code))
+            .then(function(r){ return r.json(); })
+            .then(function(d){
+                price.textContent = d.price_display;
+                note.textContent = d.valid ? ('✅ ' + d.message) : ('❌ ' + d.message);
+                hidden.value = d.valid ? code.toUpperCase() : '';
+                msg.className = 'text-xs mt-1 ' + (d.valid ? 'text-green-600' : 'text-red-500');
+                msg.classList.remove('hidden');
+            });
+    }, 400);
+}
+</script>
+
+{% elif user.membership_paid and user.wallet_balance > 0 %}
+<!-- Wallet status for paid members -->
+<section class="card space-y-3">
+    <h3 class="text-sm font-bold">Wallet Kamu</h3>
+    <div class="flex justify-between items-center p-3 bg-surface-container rounded-xl">
+        <div>
+            <p class="text-xs text-on-surface-variant">Saldo wallet</p>
+            <p class="text-xl font-extrabold text-primary">Rp {{ "{:,}".format(user.wallet_balance) }}</p>
+        </div>
+        {% if user.wallet_expires_at %}
+        <div class="text-right">
+            <p class="text-xs text-on-surface-variant">Berlaku sampai</p>
+            <p class="text-xs font-bold {{ 'text-error' if user.wallet_hangus else 'text-on-surface' }}">
+                {{ user.wallet_expires_at.strftime('%d %b %Y') if user.wallet_expires_at else '-' }}
+            </p>
+        </div>
+        {% endif %}
+    </div>
+    {% if user.wallet_hangus %}
+    <p class="text-xs text-error text-center font-semibold">⚠️ Wallet hangus — saldo tidak bisa digunakan</p>
+    {% endif %}
+</section>
+
 {% elif user.can_unlock_kta %}
 <form action="{{ url_for('main.membership_upgrade') }}" method="post">
     <button type="submit" class="btn-primary w-full py-4 text-base gap-2">

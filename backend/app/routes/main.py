@@ -538,6 +538,14 @@ def membership_upgrade():
     from app.utils.wallet import deposit
     from app.utils.referral import MEMBERSHIP_PRICE_WITHOUT_CODE, MEMBERSHIP_PRICE_WITH_CODE
 
+    # Check for referral code submitted with form (overrides existing referred_by)
+    from app.utils.referral import use_code, validate_code
+    ref_code = request.form.get('referral_code_used', '').strip().upper()
+    if ref_code and not current_user.referred_by:
+        ok, msg = use_code(ref_code, current_user)
+        if ok:
+            flash(f'Kode referral valid! {msg}', 'success')
+
     # Determine price based on referral
     has_referral = current_user.referred_by is not None
     price = MEMBERSHIP_PRICE_WITH_CODE if has_referral else MEMBERSHIP_PRICE_WITHOUT_CODE
@@ -615,10 +623,12 @@ def koth():
     """KOTH leaderboard — total wins per user."""
     from app.models import KOTHResult
     from sqlalchemy import func
+    # Join with User to get display names
     rows = db.session.query(
-        KOTHResult.winner_user_id,
+        User,
         func.count(KOTHResult.id).label('wins')
-    ).group_by(KOTHResult.winner_user_id)\
+    ).join(KOTHResult, User.id == KOTHResult.winner_user_id)\
+     .group_by(User.id)\
      .order_by(func.count(KOTHResult.id).desc()).all()
 
     my_wins = db.session.query(func.count(KOTHResult.id)).filter_by(

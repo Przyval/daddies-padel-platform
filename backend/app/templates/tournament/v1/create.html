@@ -272,6 +272,22 @@ function renderPlayers(){
         document.getElementById('playerInput').placeholder = 'Name, Name (comma = team)';
     }
 
+    // Court warning: show when players < courts × 4
+    const maxCourts = Math.floor(n / 4);
+    let warn = document.getElementById('courtWarn');
+    if(!warn){
+        warn = document.createElement('p');
+        warn.id = 'courtWarn';
+        warn.style.cssText = 'font-size:12px;color:#E86830;font-weight:600;padding:4px 0;margin:0';
+        document.getElementById('plCount').after(warn);
+    }
+    if(S.courts > 0 && n >= 4 && maxCourts < S.courts){
+        warn.textContent = S.courts + ' courts butuh ' + (S.courts*4) + ' pemain — kamu baru ' + n + ' → akan pakai ' + maxCourts + ' court' + (maxCourts>1?'s':'');
+        warn.style.display = '';
+    } else {
+        warn.style.display = 'none';
+    }
+
     const btn = document.getElementById('startBtn');
     const ready = n >= 4;
     btn.className = 'start-btn ' + (ready ? 'on' : 'off');

@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% block title %}KOTH — King of the Hill{% endblock %}
+
+{% block header_left %}
+<a href="{{ url_for('main.explore') }}" class="text-primary-container">
+    <span class="material-symbols-outlined">arrow_back</span>
+</a>
+<h1 class="font-headline font-bold tracking-tight text-xl text-primary-container">King of the Hill</h1>
+{% endblock %}
+
+{% block content %}
+
+<!-- My stats -->
+<section class="card space-y-3 py-6 text-center">
+    <div class="w-16 h-16 rounded-full bg-warning/10 flex items-center justify-center mx-auto">
+        <span class="material-symbols-outlined filled text-warning text-3xl">emoji_events</span>
+    </div>
+    <div>
+        <p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">KOTH Wins Kamu</p>
+        <p class="text-4xl font-extrabold text-warning">{{ my_wins }}</p>
+    </div>
+    {% if my_wins < milestone %}
+    <div class="bg-surface-container rounded-xl px-4 py-3 text-sm text-on-surface-variant">
+        <span class="font-bold text-on-surface">{{ milestone - my_wins }}</span> menang lagi untuk dapat
+        <span class="font-bold text-primary">Dedis Shield Jersey 🛡️</span>
+    </div>
+    {% else %}
+    <div class="bg-success/10 rounded-xl px-4 py-3 text-sm font-bold text-success">
+        🏆 Kamu sudah dapat Dedis Shield Jersey!
+    </div>
+    {% endif %}
+
+    <!-- Progress bar -->
+    <div class="w-full bg-surface-container rounded-full h-2 mx-auto">
+        <div class="bg-warning h-2 rounded-full transition-all"
+             style="width: {{ [my_wins / milestone * 100, 100]|min|int }}%"></div>
+    </div>
+    <p class="text-xs text-on-surface-variant">{{ my_wins }} / {{ milestone }} wins</p>
+</section>
+
+<!-- Prize info -->
+<section class="card space-y-3">
+    <h2 class="font-bold text-sm uppercase tracking-wide text-on-surface-variant">Hadiah</h2>
+    <div class="flex items-start gap-3 p-3 bg-surface-container rounded-xl">
+        <span class="material-symbols-outlined text-warning text-2xl">shield</span>
+        <div>
+            <p class="font-bold text-sm">Dedis Shield Jersey</p>
+            <p class="text-xs text-on-surface-variant">Eksklusif — tidak dijual, hanya bisa didapat dengan menang 10x KOTH. Tidak bisa diresell.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Leaderboard -->
+<section class="card space-y-0 overflow-hidden">
+    <h2 class="font-bold text-sm uppercase tracking-wide text-on-surface-variant px-4 pt-4 pb-3">Leaderboard</h2>
+    {% if rows %}
+    {% for player, wins in rows %}
+    {% set rank = loop.index %}
+    <div class="flex items-center gap-3 px-4 py-3 {{ 'bg-warning/5' if rank <= 3 }}
+                border-b border-outline-variant/10 last:border-0">
+        <span class="w-7 text-center font-bold text-sm
+              {{ 'text-yellow-500' if rank == 1 else 'text-slate-400' if rank == 2 else 'text-orange-400' if rank == 3 else 'text-on-surface-variant' }}">
+            {% if rank == 1 %}🥇{% elif rank == 2 %}🥈{% elif rank == 3 %}🥉{% else %}{{ rank }}{% endif %}
+        </span>
+        
+        
+        <div class="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary flex-shrink-0">
+            {{ player.initials }}
+        </div>
+        <div class="flex-1 min-w-0">
+            <p class="font-semibold text-sm truncate">{{ player.display_name }}</p>
+            {% if player.id == current_user.id %}<span class="text-xs text-primary font-bold">Kamu</span>{% endif %}
+        </div>
+        <div class="text-right flex-shrink-0">
+            <span class="font-extrabold text-warning text-lg">{{ wins }}</span>
+            <p class="text-xs text-on-surface-variant">wins</p>
+        </div>
+        {% if wins >= milestone %}
+        <span class="text-lg" title="Sudah dapat Dedis Shield!">🛡️</span>
+        {% endif %}
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="text-center py-12 text-on-surface-variant">
+        <span class="material-symbols-outlined text-4xl block mb-2">sports_tennis</span>
+        <p class="text-sm">Belum ada KOTH game. Main yuk!</p>
+    </div>
+    {% endif %}
+</section>
+
+{% if current_user.role in ('admin', 'treasurer') %}
+<!-- Admin: record win (shown only to admin) -->
+<section class="card space-y-3 border-2 border-dashed border-outline-variant">
+    <h2 class="font-bold text-sm text-on-surface-variant">Admin: Catat KOTH Win</h2>
+    <form method="post" id="kothForm" class="space-y-3">
+        <div>
+            <label class="label-overline mb-1 block">Match ID</label>
+            <input class="input-field" type="number" name="match_id_input" placeholder="ID match" required>
+        </div>
+        <div>
+            <label class="label-overline mb-1 block">Winner User ID</label>
+            <input class="input-field" type="number" name="winner_user_id_input" placeholder="User ID pemenang" required>
+        </div>
+        <button type="button" onclick="recordWin()" class="btn-primary w-full py-3">Catat Win</button>
+    </form>
+    <div id="kothResult" class="text-sm hidden"></div>
+</section>
+
+<script>
+function recordWin() {
+    var form = document.getElementById('kothForm');
+    var matchId = form.querySelector('[name=match_id_input]').value;
+    var winnerId = form.querySelector('[name=winner_user_id_input]').value;
+    if (!matchId || !winnerId) return;
+
+    var b = new FormData();
+    b.append('winner_user_id', winnerId);
+    fetch('/koth/' + matchId + '/result', {method:'POST', body:b})
+        .then(function(r){ return r.json(); })
+        .then(function(d){
+            var el = document.getElementById('kothResult');
+            el.classList.remove('hidden');
+            if (d.ok) {
+                el.className = 'text-sm text-success font-semibold';
+                el.textContent = 'Win tercatat! Total: ' + d.total_wins + ' wins.'
+                    + (d.shield_awarded ? ' 🛡️ Dedis Shield diberikan!' : '');
+            } else {
+                el.className = 'text-sm text-error';
+                el.textContent = d.error || 'Gagal';
+            }
+        });
+}
+</script>
+{% endif %}
+
+{% endblock %}

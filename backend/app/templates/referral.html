@@ -23,28 +23,72 @@
     <div class="bg-surface-container-low rounded-lg py-4 px-6">
         <p class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-1">Kode Referral Kamu</p>
         <p class="text-2xl font-extrabold tracking-widest text-primary" id="ref-code">
-            {{ user.referral_code or 'DPC%04d' | format(user.id) }}
+            {{ stats.code if stats else (user.referral_code or 'LOAD') }}
         </p>
     </div>
 
-    <button onclick="navigator.clipboard.writeText(document.getElementById('ref-code').textContent.trim())"
-            class="btn-ghost px-6 py-2.5 text-sm w-full">
-        <span class="material-symbols-outlined text-base mr-1">content_copy</span>
-        Salin Kode
-    </button>
+    {% if stats %}
+    <p class="text-xs text-on-surface-variant">
+        Tersisa <span class="font-bold text-primary">{{ stats.remaining_this_month }}</span> undangan bulan ini
+        (maks {{ stats.uses_this_month }}/3 terpakai)
+    </p>
+    {% endif %}
+
+    <!-- Invite link -->
+    {% set invite_url = request.host_url + 'auth/register?ref=' + (stats.code if stats else '') %}
+    <div class="flex gap-2">
+        <input class="input-field flex-1 text-xs" id="inviteLink" readonly
+               value="{{ invite_url }}">
+        <button onclick="copyInvite()" class="btn-ghost px-3 py-2 flex-shrink-0">
+            <span class="material-symbols-outlined text-base">content_copy</span>
+        </button>
+    </div>
+
+    <div class="flex gap-2">
+        <button onclick="navigator.clipboard.writeText(document.getElementById('ref-code').textContent.trim())"
+                class="btn-ghost px-6 py-2.5 text-sm flex-1">
+            <span class="material-symbols-outlined text-base mr-1">content_copy</span>
+            Salin Kode
+        </button>
+        <button onclick="shareInvite()" class="btn-primary px-6 py-2.5 text-sm flex-1">
+            <span class="material-symbols-outlined text-base mr-1">share</span>
+            Share
+        </button>
+    </div>
 </section>
 
 <!-- Stats -->
-<section class="grid grid-cols-2 gap-3">
+<section class="grid grid-cols-3 gap-3">
     <div class="stat-card text-center">
-        <p class="text-2xl font-extrabold text-primary">{{ referred | length }}</p>
+        <p class="text-2xl font-extrabold text-primary">{{ stats.total_referred if stats else referred|length }}</p>
         <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mt-1">Diundang</p>
     </div>
     <div class="stat-card text-center">
-        <p class="text-2xl font-extrabold text-success">{{ (referred | length) * 50 }}</p>
-        <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mt-1">Chips Bonus</p>
+        <p class="text-2xl font-extrabold text-success">{{ stats.paid_referred if stats else 0 }}</p>
+        <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mt-1">Aktif</p>
+    </div>
+    <div class="stat-card text-center">
+        <p class="text-2xl font-extrabold text-warning">{{ stats.remaining_this_month if stats else 3 }}</p>
+        <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mt-1">Sisa Bulan Ini</p>
     </div>
 </section>
+
+<script>
+function copyInvite(){
+    navigator.clipboard.writeText(document.getElementById('inviteLink').value);
+    var btn = event.currentTarget;
+    btn.innerHTML = '<span class="material-symbols-outlined text-base">check</span>';
+    setTimeout(function(){ btn.innerHTML = '<span class="material-symbols-outlined text-base">content_copy</span>'; }, 1500);
+}
+function shareInvite(){
+    var url = document.getElementById('inviteLink').value;
+    if(navigator.share){
+        navigator.share({title:'Join Daddies Padel!', text:'Pakai kode referral {{ stats.code if stats else "" }} dan dapat harga spesial membership!', url: url});
+    } else {
+        navigator.clipboard.writeText(url);
+    }
+}
+</script>
 
 <!-- Referred users -->
 {% if referred %}
