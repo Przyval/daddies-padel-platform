@@ -9,6 +9,7 @@ State machine:
 import json
 import pytest
 from app import create_app
+from app.config import TestingConfig
 from app.extensions import db as _db
 from app.models import (
     Tournament, TournamentParticipant, TournamentRound, TournamentMatch, User
@@ -17,10 +18,8 @@ from app.models import (
 
 @pytest.fixture
 def app():
-    app = create_app()
-    app.config['TESTING'] = True
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
-    app.config['WTF_CSRF_ENABLED'] = False
+    # TestingConfig binds in-memory DB at init_app time — dev DB untouched.
+    app = create_app(TestingConfig)
     app.config['LOGIN_DISABLED'] = False
     with app.app_context():
         _db.create_all()

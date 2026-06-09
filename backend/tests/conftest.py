@@ -2,6 +2,7 @@
 import pytest
 import json
 from app import create_app
+from app.config import TestingConfig
 from app.extensions import db as _db
 from app.models import (
     Tournament, TournamentParticipant, TournamentRound, TournamentMatch
@@ -10,11 +11,9 @@ from app.models import (
 
 @pytest.fixture
 def app():
-    app = create_app()
-    app.config['TESTING'] = True
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'  # in-memory
-    app.config['WTF_CSRF_ENABLED'] = False
-    app.config['RATELIMIT_ENABLED'] = False  # don't throttle the test client
+    # TestingConfig binds an in-memory DB at init_app time, so the dev DB is
+    # never touched (engines bind on init_app, before any post-hoc override).
+    app = create_app(TestingConfig)
     with app.app_context():
         _db.create_all()
         yield app

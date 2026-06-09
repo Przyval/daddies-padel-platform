@@ -53,3 +53,13 @@ class Config:
                 raise RuntimeError(
                     'Missing required production env vars: ' + ', '.join(problems)
                 )
+
+
+class TestingConfig(Config):
+    """Pass to create_app() in tests. Binds an in-memory DB at init_app time so
+    the real dev database is never touched (engines bind at init_app, before any
+    post-hoc config override would apply)."""
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = 'sqlite://'   # in-memory
+    WTF_CSRF_ENABLED = False
+    RATELIMIT_ENABLED = False

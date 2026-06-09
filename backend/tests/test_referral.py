@@ -1,6 +1,7 @@
 """Tests for Phase 2: Referral code system."""
 import pytest
 from app import create_app
+from app.config import TestingConfig
 from app.extensions import db as _db
 from app.models import User
 from app.utils.referral import (
@@ -12,10 +13,8 @@ from app.utils.referral import (
 
 @pytest.fixture
 def app():
-    app = create_app()
-    app.config['TESTING'] = True
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
-    app.config['WTF_CSRF_ENABLED'] = False
+    # TestingConfig binds in-memory DB at init_app time — dev DB untouched.
+    app = create_app(TestingConfig)
     with app.app_context():
         _db.create_all()
         yield app
