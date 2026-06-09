@@ -253,7 +253,7 @@ Dikonsolidasi dari ~95 route lama (buang duplikat wizard v1/v2/v3, gabung share-
 
 | # | Keputusan | Pilihan | Catatan |
 |---|---|---|---|
-| 1 | **Hosting** | **Railway** | HTTPS otomatis, region Singapura, ~$5/bln always-on. (Render alternatif, tapi free tier "tidur") |
+| 1 | **Hosting** | **VPS sendiri** | Kontrol penuh. Stack: nginx (reverse proxy) + gunicorn (systemd) + Postgres lokal + Let's Encrypt (HTTPS gratis). Wajib **domain** untuk SSL |
 | 2 | **Database** | **Postgres (managed)** | SQLite TIDAK dipakai di hosting — filesystem container ephemeral (data hilang saat redeploy). Migrasi `DATABASE_URL` + alembic |
 | 3 | **Platform** | **iOS + Android (dual sejak awal)** | Satu codebase Expo. Submit Android dulu, iOS menyusul ~1–2 minggu (akun Apple + review) |
 | 4 | **Format turnamen** | **Lengkapi di Fase 1, MVP rilis Americano** | Mexicano & Mixicano belum ada logikanya; fix bug americano juga |
@@ -274,6 +274,43 @@ Dikonsolidasi dari ~95 route lama (buang duplikat wizard v1/v2/v3, gabung share-
 - **Chips, numbered editions, unlock membership digital** berpotensi kena aturan ini.
 - **Bebas IAP:** layanan/barang fisik nyata (booking sesi padel, merch fisik).
 - **Mitigasi:** Chips & Shop tidak masuk MVP → tidak ada blocker IAP saat rilis pertama. Saat dirilis nanti: pakai `expo-in-app-purchases` / RevenueCat, atau posisikan sebagai layanan klub fisik.
+
+---
+
+## 14b. Deployment VPS (pengganti Railway)
+
+**Arsitektur:**
+```
+Internet ──HTTPS──► nginx (443, reverse proxy + SSL)
+                      └──proxy──► gunicorn (127.0.0.1:8000, systemd service)
+                                    └──► Flask app (wsgi:app)
+                                            └──► PostgreSQL (localhost:5432)
+```
+
+**Checklist setup (sekali):**
+1. VPS Ubuntu 22/24 LTS, user non-root + `ufw` (buka 22, 80, 443 saja)
+2. Install: `python3-venv`, `nginx`, `postgresql`, `certbot`
+3. PostgreSQL: buat DB + user; `DATABASE_URL=postgresql://user:pass@localhost:5432/daddies`
+4. Clone repo, venv, `pip install -r requirements.txt`
+5. Env var via systemd `EnvironmentFile=/etc/daddies/env` (SECRET_KEY, JWT_SECRET_KEY, DATABASE_URL, FLASK_ENV=production)
+6. `flask db upgrade` (migrasi schema)
+7. systemd service: `gunicorn wsgi:app --workers 3 --bind 127.0.0.1:8000`
+8. nginx: reverse proxy ke `127.0.0.1:8000`, server_name = domain
+9. `certbot --nginx -d api.daddiespadel.com` → HTTPS gratis + auto-renew
+10. (Opsional) Redis untuk rate-limit storage multi-worker
+
+**File yang perlu dibuat di repo (deploy/):**
+- `deploy/daddies.service` (systemd unit)
+- `deploy/nginx.conf` (reverse proxy + SSL)
+- `deploy/gunicorn.conf.py` (workers, timeout, logging)
+- `deploy/DEPLOY.md` (langkah lengkap)
+- `deploy/deploy.sh` (pull + migrate + restart untuk update berikutnya)
+
+**Keamanan VPS (lanjutan checklist §9):**
+- Postgres **hanya** listen localhost (jangan expose publik)
+- gunicorn jalan sebagai user non-root
+- `ufw` aktif, SSH key-only (matikan password login)
+- Backup DB rutin (`pg_dump` cron)
 
 ---
 

@@ -43,8 +43,10 @@ def create_app(config_class=Config):
     def live_redirect(tournament_id):
         return redirect(url_for('tournament.live_results', tournament_id=tournament_id))
 
-    # Create tables for dev
-    with app.app_context():
-        db.create_all()
+    # Dev convenience: auto-create tables. In production the schema is owned
+    # by Alembic migrations (`flask db upgrade`), so we skip this there.
+    if not app.config['IS_PRODUCTION']:
+        with app.app_context():
+            db.create_all()
 
     return app

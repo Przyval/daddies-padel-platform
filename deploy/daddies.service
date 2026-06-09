@@ -1,0 +1,28 @@
+# systemd unit for the Daddies Padel API.
+# Install: sudo cp deploy/daddies.service /etc/systemd/system/daddies.service
+#          sudo systemctl daemon-reload && sudo systemctl enable --now daddies
+[Unit]
+Description=Daddies Padel API (gunicorn)
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=notify
+User=deploy
+Group=deploy
+WorkingDirectory=/opt/daddies/app/backend
+EnvironmentFile=/etc/daddies/env
+ExecStart=/opt/daddies/venv/bin/gunicorn -c /opt/daddies/app/deploy/gunicorn.conf.py wsgi:app
+ExecReload=/bin/kill -s HUP $MAINPID
+Restart=always
+RestartSec=3
+
+# --- hardening ---
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+ReadWritePaths=/opt/daddies /var/log/daddies
+
+[Install]
+WantedBy=multi-user.target
