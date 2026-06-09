@@ -223,6 +223,39 @@ def tournament_detail(t, standings_rows=None):
     return data
 
 
+def notification_public(n):
+    if n is None:
+        return None
+    return {
+        'id': n.id,
+        'title': n.title,
+        'body': n.body,
+        'icon': n.icon,
+        'is_read': n.is_read,
+        'link': n.link,
+        'created_at': _iso(n.created_at),
+    }
+
+
+def member_profile(u, rank=None):
+    """Public profile of another member (no email/phone)."""
+    if u is None:
+        return None
+    streak = u.streak_data
+    return {
+        **user_public(u),
+        'kta_number': u.kta_number,
+        'global_rank': rank if rank is not None else u.leaderboard_rank,
+        'stats': {
+            'sessions_played': u.sessions_played,
+            'tournaments_played': u.tournaments_played,
+            'total_games': u.total_games,
+            'total_points': u.total_points,
+        },
+        'streak': {'current': streak.get('current'), 'longest': streak.get('longest')},
+    }
+
+
 def membership_status(u):
     """Shape for the membership screen — status + progress toward next tier."""
     if u is None:
