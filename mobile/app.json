@@ -1,0 +1,32 @@
+{
+  "expo": {
+    "name": "Daddies Padel",
+    "slug": "daddies-padel",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "daddiespadel",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.daddies.padel"
+    },
+    "android": {
+      "package": "com.daddies.padel",
+      "adaptiveIcon": {
+        "backgroundColor": "#0B5D3B"
+      }
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static"
+    },
+    "plugins": ["expo-router", "expo-secure-store"],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "apiUrl": "http://127.0.0.1:5000"
+    }
+  }
+}
