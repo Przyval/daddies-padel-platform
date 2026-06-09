@@ -161,15 +161,22 @@ sudo reboot
 curl -fsS https://api.daddiespadel.com/api/v1/health    # → {"ok":true}
 ```
 
-### Migrasi idempotent (jalankan dua kali, tidak ganda)
+### Migrasi: buktikan dari Postgres + revisi Alembic
 ```bash
+# tabel benar-benar ada di DB (bukan sekadar klaim "21 tabel")
+sudo -u postgres psql -d daddies -c '\dt'
+
 cd /opt/daddies/app/backend
 set -a; source /etc/daddies/env; set +a
-/opt/daddies/venv/bin/flask db upgrade     # kedua kali = no-op (alembic tracks version)
+/opt/daddies/venv/bin/flask db current      # revisi yang terpasang
+/opt/daddies/venv/bin/flask db heads        # revisi terbaru di kode
+# current HARUS sama dengan heads.
+/opt/daddies/venv/bin/flask db upgrade      # jalankan lagi → no-op (idempotent)
 ```
 
-### API smoke test (otomatis)
+### API smoke test (otomatis) — jalankan dari ROOT repo
 ```bash
+cd /opt/daddies/app          # deploy/ ada di root repo, BUKAN di backend/
 ./deploy/smoke_test.sh https://api.daddiespadel.com
 # Harus berakhir: VERDICT: GO ✓
 ```

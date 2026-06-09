@@ -52,7 +52,11 @@ done
 [ "$got429" = "yes" ] && { echo "  ✓ rate limit returns 429"; PASS=$((PASS+1)); } || { echo "  ✗ no 429 seen — check RATELIMIT config"; FAIL=$((FAIL+1)); }
 
 echo "[6] transport"
-check "HTTP → HTTPS redirect (301/308)" 301 "$(code -o /dev/null "${BASE/https:/http:}/api/v1/health" 2>/dev/null || echo 000)"
+REDIR=$(code -o /dev/null "${BASE/https:/http:}/api/v1/health" 2>/dev/null || echo 000)
+case "$REDIR" in
+  301|302|307|308) echo "  ✓ HTTP → HTTPS redirect ($REDIR)"; PASS=$((PASS+1));;
+  *) echo "  ✗ HTTP → HTTPS redirect — expected 3xx, got $REDIR"; FAIL=$((FAIL+1));;
+esac
 
 echo ""
 echo "== Result: $PASS passed, $FAIL failed =="

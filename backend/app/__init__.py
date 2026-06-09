@@ -53,10 +53,16 @@ def create_app(config_class=Config):
     app.register_blueprint(api_bp, url_prefix='/api/v1')
 
     # Top-level /r/{id} → redirect to tournament live results
-    from flask import redirect, url_for
+    from flask import redirect, url_for, jsonify
     @app.route('/r/<int:tournament_id>')
     def live_redirect(tournament_id):
         return redirect(url_for('tournament.live_results', tournament_id=tournament_id))
+
+    # Top-level /health for uptime checks / load balancers (no auth, no DB).
+    # The versioned API health lives at /api/v1/health.
+    @app.route('/health')
+    def health():
+        return jsonify({'ok': True, 'data': {'status': 'up'}})
 
     # Dev convenience: auto-create tables. In production the schema is owned
     # by Alembic migrations (`flask db upgrade`), so we skip this there.

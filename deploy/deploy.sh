@@ -6,9 +6,13 @@
 # version keeps serving). If the post-restart healthcheck fails, exits non-zero.
 set -Eeuo pipefail
 
-APP_DIR="/opt/daddies/app"
-VENV="/opt/daddies/venv"
-HEALTH_URL="https://api.daddiespadel.com/api/v1/health"
+# Resolve the repo root from THIS script's location, not the current working
+# directory — works no matter where deploy.sh is invoked from.
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+APP_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+# venv lives outside the repo; override with VENV=... if you installed elsewhere.
+VENV="${VENV:-/opt/daddies/venv}"
+HEALTH_URL="${HEALTH_URL:-https://api.daddiespadel.com/api/v1/health}"
 
 trap 'echo "✗ Deploy FAILED at line $LINENO. Service was not changed past this point."; exit 1' ERR
 
