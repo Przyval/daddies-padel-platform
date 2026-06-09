@@ -1,12 +1,13 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
 from flask_login import login_user, logout_user, current_user
 from app.models import User
-from app.extensions import db
+from app.extensions import db, limiter
 from app.utils.referral import use_code, membership_price_for, ensure_code, validate_code
 
 bp = Blueprint('auth', __name__)
 
 @bp.route('/login', methods=['GET', 'POST'])
+@limiter.limit('10 per minute', methods=['POST'])
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('member.dashboard'))
@@ -36,6 +37,7 @@ def login():
     return render_template('auth/login.html')
 
 @bp.route('/register', methods=['GET', 'POST'])
+@limiter.limit('5 per minute', methods=['POST'])
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('member.dashboard'))

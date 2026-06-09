@@ -14,6 +14,7 @@ def app():
     app.config['TESTING'] = True
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'  # in-memory
     app.config['WTF_CSRF_ENABLED'] = False
+    app.config['RATELIMIT_ENABLED'] = False  # don't throttle the test client
     with app.app_context():
         _db.create_all()
         yield app

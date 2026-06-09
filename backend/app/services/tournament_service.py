@@ -32,7 +32,6 @@ class TournamentService:
         Generates a simplified Americano schedule.
         """
         player_ids = [p.id for p in participants]
-        print(f"DEBUG: Generating schedule for {len(player_ids)} players: {player_ids}")
         random.shuffle(player_ids)
         
         # Determine number of rounds.
@@ -40,7 +39,6 @@ class TournamentService:
         
         # Simple Logic for 4 players (Exact Round Robin)
         if len(player_ids) == 4:
-            print("DEBUG: Using 4-player template")
             # Round 1: (0,1) vs (2,3)
             # Round 2: (0,2) vs (1,3)
             # Round 3: (0,3) vs (1,2)

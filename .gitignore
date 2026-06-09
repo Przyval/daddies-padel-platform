@@ -66,6 +66,11 @@ backend/__pycache__/
 **/__pycache__/
 *.egg-info/
 
+# Secrets / local env — never commit
+.env
+backend/.env
+*.db
+
 # Research / competitor analysis (large binaries, not for source control)
 research/
 
