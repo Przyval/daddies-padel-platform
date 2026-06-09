@@ -117,10 +117,12 @@ class TournamentService:
         for tm_round in rounds:
             matches = tm_round.matches.all()
             for match in matches:
-                # If match is played (has scores)
+                # Only count matches that have actually been played.
+                if match.status != 'completed':
+                    continue
                 s1 = match.score_team1
                 s2 = match.score_team2
-                
+
                 # Team 1
                 for pid in [match.team1_p1_id, match.team1_p2_id]:
                     if pid:

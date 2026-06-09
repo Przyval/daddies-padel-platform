@@ -36,4 +36,4 @@ def health():
 
 
 # Attach route modules (must come after api_bp is defined).
-from . import auth, me, sessions  # noqa: E402,F401
+from . import auth, me, sessions, tournaments  # noqa: E402,F401

@@ -1,71 +1,65 @@
-from app import create_app, db
-from app import create_app, db
-from app.models import User, Tournament, TournamentParticipant, TournamentRound, TournamentMatch
+"""Tournament service: schedule generation + derived standings (event sourcing)."""
+import pytest
+from app import create_app
+from app.config import TestingConfig
+from app.extensions import db as _db
+from app.models import Tournament, TournamentParticipant, TournamentMatch
 from app.services.tournament_service import TournamentService
-import random
 
-def test_americano_logic():
-    app = create_app()
+
+@pytest.fixture
+def app():
+    # In-memory DB (TestingConfig binds at init_app) — never touches dev DB.
+    app = create_app(TestingConfig)
     with app.app_context():
-        # Clean up
-        db.session.query(TournamentMatch).delete()
-        db.session.query(TournamentRound).delete()
-        db.session.query(TournamentParticipant).delete()
-        db.session.query(Tournament).delete()
-        db.session.commit()
+        _db.create_all()
+        yield app
+        _db.session.remove()
+        _db.drop_all()
 
-        print("--- Setting up Tournament ---")
-        t = Tournament(name="Test Americano", format="americano")
-        db.session.add(t)
-        db.session.commit()
-        
-        # Add 4 dummy players
-        players = ["Alice", "Bob", "Charlie", "David"]
-        for p_name in players:
-            tp = TournamentParticipant(tournament_id=t.id, name=p_name)
-            db.session.add(tp)
-        db.session.commit()
-        
-        print("--- Generating Schedule ---")
+
+def test_americano_schedule_and_standings(app):
+    with app.app_context():
+        t = Tournament(name='Test Americano', format='americano')
+        _db.session.add(t)
+        _db.session.commit()
+
+        for name in ['Alice', 'Bob', 'Charlie', 'David']:
+            _db.session.add(TournamentParticipant(tournament_id=t.id, name=name))
+        _db.session.commit()
+
         TournamentService.generate_schedule(t.id)
-        
+
         rounds = t.rounds.all()
-        print(f"Generated {len(rounds)} rounds.")
-        for r in rounds:
-            matches = r.matches.all()
-            print(f"Round {r.round_number}: {len(matches)} matches")
-            for m in matches:
-                print(f"  Match: {m.team1_p1.name}/{m.team1_p2.name} vs {m.team2_p1.name}/{m.team2_p2.name}")
-        
-        print("\n--- Simulating Gameplay (Event Sourcing) ---")
-        # Round 1
-        r1 = rounds[0]
-        m1 = r1.matches.first()
-        m1.score_team1 = 14
-        m1.score_team2 = 10
-        db.session.commit()
-        print(f"Match 1 Played: {m1.score_team1}-{m1.score_team2}")
-        
-        print("\n--- Calculating Standings (Derived State) ---")
+        assert len(rounds) == 3  # 4-player round robin
+
+        # Score round 1 match 1: team1 14, team2 10 (sets are the source of truth).
+        m1 = rounds[0].matches.first()
+        m1.sets = [[14, 10]]
+        m1.status = 'completed'
+        _db.session.commit()
+
         standings = TournamentService.calculate_standings(t.id)
-        for rank, s in enumerate(standings, 1):
-            print(f"{rank}. {s['name']} - Points: {s['points']} (Avg: {s['avg_points']})")
-        
-        # Verify logic dynamically based on who played match 1
-        t1_p1 = m1.team1_p1.name
-        t1_p2 = m1.team1_p2.name
-        t2_p1 = m1.team2_p1.name
-        t2_p2 = m1.team2_p2.name
-        
-        print(f"DEBUG: Team 1 ({t1_p1}, {t1_p2}) scored 14. Team 2 ({t2_p1}, {t2_p2}) scored 10.")
+        by_name = {s['name']: s for s in standings}
 
-        p1_stats = next(p for p in standings if p['name'] == t1_p1)
-        assert p1_stats['points'] == 14, f"Expected {t1_p1} to have 14 points, got {p1_stats['points']}"
-        
-        p3_stats = next(p for p in standings if p['name'] == t2_p1)
-        assert p3_stats['points'] == 10, f"Expected {t2_p1} to have 10 points, got {p3_stats['points']}"
-        
-        print("\n✅ Americano Logic Verified Successfully!")
+        # Team 1 players got 14 points, team 2 players got 10. Unplayed matches
+        # must NOT count (only 1 match completed).
+        assert by_name[m1.team1_p1.name]['points'] == 14
+        assert by_name[m1.team1_p1.name]['matches_played'] == 1
+        assert by_name[m1.team2_p1.name]['points'] == 10
+        assert by_name[m1.team2_p1.name]['matches_played'] == 1
 
-if __name__ == "__main__":
-    test_americano_logic()
+
+def test_standings_ignore_pending_matches(app):
+    """A tournament with zero completed matches yields zero points for everyone."""
+    with app.app_context():
+        t = Tournament(name='Empty', format='americano')
+        _db.session.add(t)
+        _db.session.commit()
+        for name in ['A', 'B', 'C', 'D']:
+            _db.session.add(TournamentParticipant(tournament_id=t.id, name=name))
+        _db.session.commit()
+        TournamentService.generate_schedule(t.id)
+
+        standings = TournamentService.calculate_standings(t.id)
+        assert all(s['points'] == 0 and s['matches_played'] == 0 for s in standings)
