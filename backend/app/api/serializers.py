@@ -1,6 +1,7 @@
 """Model → JSON serializers. Keep all API shaping in one place so the
 native app sees a stable contract regardless of internal model changes.
 """
+from app.models import Booking
 
 
 def user_public(u):
@@ -53,6 +54,54 @@ def user_full(u):
             'tier': streak.get('tier'),
         },
     }
+
+
+def _iso(dt):
+    return dt.isoformat() if dt else None
+
+
+def session_summary(m, my_status=None):
+    """Match (play session) shape for lists."""
+    if m is None:
+        return None
+    return {
+        'id': m.id,
+        'title': m.title,
+        'date_time': _iso(m.date_time),
+        'location': m.location,
+        'price': m.price,
+        'max_players': m.max_players,
+        'status': m.status,
+        'event_type': m.event_type,
+        'confirmed_count': m.confirmed_count,
+        'waitlist_count': m.waitlist_count,
+        'is_full': m.confirmed_count >= m.max_players,
+        'my_status': my_status,  # this user's booking status, or None
+    }
+
+
+def booking_public(b):
+    if b is None:
+        return None
+    return {
+        'id': b.id,
+        'status': b.status,
+        'player': user_public(b.player),
+        'has_payment_proof': bool(b.payment_proof),
+        'created_at': _iso(b.created_at),
+    }
+
+
+def session_detail(m, my_booking=None):
+    """Match detail with players + the requesting user's booking."""
+    if m is None:
+        return None
+    bookings = m.bookings.order_by(Booking.created_at).all()
+    data = session_summary(m, my_status=my_booking.status if my_booking else None)
+    data['notes'] = m.notes
+    data['players'] = [booking_public(b) for b in bookings]
+    data['my_booking'] = booking_public(my_booking)
+    return data
 
 
 def membership_status(u):

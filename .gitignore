@@ -71,6 +71,9 @@ backend/__pycache__/
 backend/.env
 *.db
 
+# Runtime user uploads (payment proofs, avatars) — not source
+backend/app/static/uploads/
+
 # Research / competitor analysis (large binaries, not for source control)
 research/
 
