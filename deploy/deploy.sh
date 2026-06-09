@@ -1,19 +1,26 @@
 #!/usr/bin/env bash
 # Update deploy: pull latest code, install deps, migrate DB, restart service.
 # Run on the VPS:  cd /opt/daddies/app && ./deploy/deploy.sh
-set -euo pipefail
+#
+# Fails hard: if migration fails, the running service is NOT restarted (old
+# version keeps serving). If the post-restart healthcheck fails, exits non-zero.
+set -Eeuo pipefail
 
 APP_DIR="/opt/daddies/app"
 VENV="/opt/daddies/venv"
+HEALTH_URL="https://api.daddiespadel.com/api/v1/health"
+
+trap 'echo "✗ Deploy FAILED at line $LINENO. Service was not changed past this point."; exit 1' ERR
 
 cd "$APP_DIR"
+
 echo "==> Pulling latest code"
 git pull --ff-only
 
 echo "==> Installing dependencies"
 "$VENV/bin/pip" install -q -r backend/requirements.txt
 
-echo "==> Running database migrations"
+echo "==> Running database migrations (before restart — abort here on failure)"
 cd backend
 set -a; source /etc/daddies/env; set +a
 "$VENV/bin/flask" db upgrade
@@ -21,7 +28,12 @@ set -a; source /etc/daddies/env; set +a
 echo "==> Restarting service"
 sudo systemctl restart daddies
 sleep 2
-sudo systemctl --no-pager status daddies | head -5
 
-echo "==> Health check"
-curl -fsS https://api.daddiespadel.com/api/v1/health && echo "" && echo "✓ Deploy OK"
+echo "==> Healthcheck"
+if ! curl -fsS "$HEALTH_URL" >/dev/null; then
+    echo "✗ Healthcheck failed after restart. Recent logs:"
+    sudo journalctl -u daddies -n 40 --no-pager
+    exit 1
+fi
+
+echo "✓ Deploy OK — $(curl -fsS "$HEALTH_URL")"

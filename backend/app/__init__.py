@@ -10,14 +10,29 @@ def create_app(config_class=Config):
     # Fail fast in production if real secrets / DB are missing.
     config_class.validate()
 
+    # Behind nginx (1 proxy hop): trust X-Forwarded-* so HTTPS URLs, secure
+    # cookies, and redirects are correct. Only in production to avoid dev
+    # spoofing of forwarded headers.
+    if app.config['IS_PRODUCTION']:
+        from werkzeug.middleware.proxy_fix import ProxyFix
+        app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
+
     # Initialize Flask extensions
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
     limiter.init_app(app)
     jwt.init_app(app)
-    # CORS only on the JSON API; native apps send no Origin but web clients do.
-    cors.init_app(app, resources={r'/api/*': {'origins': '*'}})
+    # CORS only on the JSON API. Allowlist from env; in production an unset
+    # list means no cross-origin browser access (native apps are unaffected).
+    _origins_cfg = app.config['CORS_ORIGINS']
+    if _origins_cfg:
+        _origins = [o.strip() for o in _origins_cfg.split(',') if o.strip()]
+    elif app.config['IS_PRODUCTION']:
+        _origins = []  # locked down by default
+    else:
+        _origins = '*'  # dev convenience
+    cors.init_app(app, resources={r'/api/*': {'origins': _origins}})
 
     # Import models to ensure they are registered with SQLAlchemy
     from . import models

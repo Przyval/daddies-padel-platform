@@ -35,6 +35,11 @@ class Config:
     JWT_ACCESS_TOKEN_EXPIRES = 60 * 60             # 1 hour
     JWT_REFRESH_TOKEN_EXPIRES = 60 * 60 * 24 * 30  # 30 days
 
+    # CORS allowlist (comma-separated origins). Native apps send no Origin so
+    # they are unaffected; this only gates browsers. Unset → '*' in dev,
+    # locked down (no cross-origin) in production.
+    CORS_ORIGINS = os.environ.get('CORS_ORIGINS')
+
     @staticmethod
     def validate():
         """Fail fast in production if real secrets / DB are missing."""

@@ -116,11 +116,71 @@ curl -s -X POST https://api.daddiespadel.com/api/v1/auth/login \
 cd /opt/daddies/app && ./deploy/deploy.sh
 ```
 
-## Backup database (cron harian)
+## Backup database (cron harian) + UJI RESTORE
 
 ```bash
+mkdir -p /opt/daddies/backups
 # crontab -e (sebagai user deploy)
 0 2 * * * pg_dump -U daddies daddies | gzip > /opt/daddies/backups/daddies-$(date +\%F).sql.gz
+```
+
+**Wajib: buktikan backup BISA dipulihkan** (file ada ≠ bisa restore):
+
+```bash
+# 1. buat backup manual
+pg_dump -U daddies daddies | gzip > /tmp/test-backup.sql.gz
+# 2. restore ke DB sementara
+sudo -u postgres createdb daddies_restore_test
+gunzip -c /tmp/test-backup.sql.gz | psql -U daddies -d daddies_restore_test
+# 3. cek jumlah tabel & baris user
+psql -U daddies -d daddies_restore_test -c "\dt" | grep -c table
+psql -U daddies -d daddies_restore_test -c "SELECT count(*) FROM \"user\";"
+# 4. bersihkan
+sudo -u postgres dropdb daddies_restore_test
+```
+
+---
+
+## ✅ Gate verifikasi (wajib GO sebelum lanjut Endpoint Sesi)
+
+### Infrastruktur
+```bash
+dig +short api.daddiespadel.com            # → IP VPS yang benar
+sudo ufw status                            # → hanya 22, 80, 443
+sudo ss -tlnp | grep 5432                  # → 127.0.0.1:5432 saja (bukan 0.0.0.0)
+ps -o user= -C gunicorn | sort -u          # → 'deploy', bukan root
+curl -sI http://api.daddiespadel.com/api/v1/health | head -1   # → 301/308 ke https
+sudo certbot renew --dry-run               # → simulasi renew sukses
+```
+
+### Persistence (service hidup setelah reboot)
+```bash
+systemctl is-enabled daddies               # → enabled
+sudo reboot
+# setelah online lagi:
+curl -fsS https://api.daddiespadel.com/api/v1/health    # → {"ok":true}
+```
+
+### Migrasi idempotent (jalankan dua kali, tidak ganda)
+```bash
+cd /opt/daddies/app/backend
+set -a; source /etc/daddies/env; set +a
+/opt/daddies/venv/bin/flask db upgrade     # kedua kali = no-op (alembic tracks version)
+```
+
+### API smoke test (otomatis)
+```bash
+./deploy/smoke_test.sh https://api.daddiespadel.com
+# Harus berakhir: VERDICT: GO ✓
+```
+
+### Operasional (restart/reboot tidak merusak data)
+```bash
+sudo systemctl restart daddies && sleep 2 && curl -fsS .../api/v1/health
+sudo systemctl restart nginx   && sleep 1 && curl -fsS .../api/v1/health
+# Setelah tiap aksi: login tetap jalan, data user tetap ada,
+# `systemctl status daddies` tidak restart-loop, log tanpa secret/traceback berulang.
+sudo journalctl -u daddies -n 50 --no-pager
 ```
 
 ## Catatan
