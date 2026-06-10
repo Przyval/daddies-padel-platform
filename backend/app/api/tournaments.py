@@ -256,6 +256,10 @@ def complete_tournament(tid):
         return err('NOT_FOUND', 'Turnamen tidak ditemukan', 404)
     if not _owner_or_admin(t, user):
         return err('FORBIDDEN', 'Hanya pembuat/admin', 403)
+    # Idempotency guard: completing again would re-run the cascade and award
+    # chips twice. Block repeat completion.
+    if t.status == 'completed':
+        return err('ALREADY_COMPLETED', 'Turnamen sudah selesai', 409)
     t.status = 'completed'
     events = master_tournament_cascade(t)  # chips, milestones, tier upgrades, notifs
     db.session.commit()

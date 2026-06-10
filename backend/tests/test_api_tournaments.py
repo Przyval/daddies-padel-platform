@@ -165,6 +165,21 @@ def test_complete_runs_cascade(client, owner):
     assert 'standings' in d and 'events' in d
 
 
+def test_complete_is_idempotent_no_double_chips(client, owner):
+    """Completing twice must not re-run the cascade (would double chips)."""
+    t = _token(client, 'owner@test.com')
+    tid = _create_t(client, t).get_json()['data']['id']
+    detail = client.get(f'/api/v1/tournaments/{tid}', headers=_auth(t)).get_json()['data']
+    for m in detail['rounds'][0]['matches']:
+        client.post(f'/api/v1/tournaments/{tid}/score/{m["id"]}', headers=_auth(t),
+                    json={'points_t1': 11, 'points_t2': 9})
+    assert client.post(f'/api/v1/tournaments/{tid}/complete', headers=_auth(t)).status_code == 200
+    # second call blocked
+    r2 = client.post(f'/api/v1/tournaments/{tid}/complete', headers=_auth(t))
+    assert r2.status_code == 409
+    assert r2.get_json()['error']['code'] == 'ALREADY_COMPLETED'
+
+
 def test_generate_and_score_playoff(client, owner):
     t = _token(client, 'owner@test.com')
     tid = _create_t(client, t).get_json()['data']['id']
