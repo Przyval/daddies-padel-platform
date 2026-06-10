@@ -88,6 +88,48 @@ export interface TournamentSummary {
   created_by: number | null;
 }
 
+export interface ParticipantRef {
+  id: number;
+  name: string;
+  first_name: string;
+  initials: string;
+  gender: string;
+  seed: number;
+  user_id: number | null;
+  sitting_out: boolean;
+}
+
+export interface MatchView {
+  id: number;
+  court: number;
+  status: string;
+  team1: (ParticipantRef | null)[];
+  team2: (ParticipantRef | null)[];
+  sets: number[][];
+  score_team1: number;
+  score_team2: number;
+  score_display: string;
+  winner: string | null;
+}
+
+export interface RoundView {
+  round_number: number;
+  is_complete: boolean;
+  total_matches: number;
+  pending_count: number;
+  matches: MatchView[];
+}
+
+export interface TournamentDetail extends TournamentSummary {
+  settings: {
+    win_points: number; draw_points: number; loss_points: number;
+    sort_by_wins: boolean; h2h_tiebreaker: boolean; court_bonus_round: number;
+  };
+  participants: ParticipantRef[];
+  rounds: RoundView[];
+  standings: StandingRow[];
+}
+
 export interface StandingRow {
   rank: number;
   participant: { id: number; name: string; first_name: string; initials: string };

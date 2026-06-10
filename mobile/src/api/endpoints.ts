@@ -1,7 +1,8 @@
 import { api, unwrap } from './client';
 import type {
   ApiEnvelope, AuthResult, UserFull, MembershipStatus, SessionSummary,
-  TournamentSummary, StandingRow, LeaderboardRow, NotificationItem, UserPublic,
+  TournamentSummary, TournamentDetail, StandingRow, LeaderboardRow,
+  NotificationItem, UserPublic,
 } from './types';
 
 // axios returns Promise<AxiosResponse<ApiEnvelope<T>>>, which unwrap() accepts
@@ -34,7 +35,8 @@ export const Tournaments = {
     unwrap<TournamentSummary[]>(
       api.get<ApiEnvelope<TournamentSummary[]>>(`/tournaments${status ? `?status=${status}` : ''}`)
     ),
-  detail: (id: number) => unwrap<unknown>(api.get<ApiEnvelope<unknown>>(`/tournaments/${id}`)),
+  detail: (id: number) =>
+    unwrap<TournamentDetail>(api.get<ApiEnvelope<TournamentDetail>>(`/tournaments/${id}`)),
   standings: (id: number) =>
     unwrap<StandingRow[]>(api.get<ApiEnvelope<StandingRow[]>>(`/tournaments/${id}/standings`)),
   score: (id: number, matchId: number, points_t1: number, points_t2: number) =>

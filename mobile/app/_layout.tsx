@@ -30,6 +30,7 @@ function RootNavigator() {
       <Stack.Screen name="(auth)" />
       <Stack.Screen name="(tabs)" />
       <Stack.Screen name="membership" options={{ headerShown: true, title: 'Membership', presentation: 'modal' }} />
+      <Stack.Screen name="tournament/[id]" options={{ headerShown: true, title: 'Turnamen' }} />
     </Stack>
   );
 }

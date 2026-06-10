@@ -19,6 +19,7 @@ export default function TabsLayout() {
     >
       <Tabs.Screen name="index" options={{ title: 'Beranda', tabBarIcon: icon('🏠') }} />
       <Tabs.Screen name="sessions" options={{ title: 'Sesi', tabBarIcon: icon('🎾') }} />
+      <Tabs.Screen name="tournaments" options={{ title: 'Turnamen', tabBarIcon: icon('🏆') }} />
       <Tabs.Screen name="members" options={{ title: 'Anggota', tabBarIcon: icon('👥') }} />
       <Tabs.Screen name="profile" options={{ title: 'Profil', tabBarIcon: icon('👤') }} />
     </Tabs>
