@@ -731,7 +731,26 @@ TOURNAMENT_FORMATS = {
 }
 
 
+# ── Scoring engine versions ──
+# Which engine computes a tournament's standings. Existing tournaments are
+# backfilled to LEGACY by the migration; new rows default to REFERENCE.
+# The dispatcher (Step 4) must fail closed on unknown values.
+SCORING_ENGINE_LEGACY = 'legacy_flask_v1'
+SCORING_ENGINE_REFERENCE = 'americano_reference_v1'
+SUPPORTED_SCORING_ENGINES = frozenset({
+    SCORING_ENGINE_LEGACY,
+    SCORING_ENGINE_REFERENCE,
+})
+
+
 class Tournament(db.Model):
+    __table_args__ = (
+        db.CheckConstraint(
+            "scoring_engine_version IN ('legacy_flask_v1', 'americano_reference_v1')",
+            name='ck_tournament_scoring_engine_version',
+        ),
+    )
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
     date = db.Column(db.DateTime, index=True, default=datetime.utcnow)
@@ -751,6 +770,14 @@ class Tournament(db.Model):
     current_round = db.Column(db.Integer, default=0)
     created_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    # `default` covers ORM creation; `server_default` covers direct SQL inserts.
+    # Not client-editable — never set this from request payloads.
+    scoring_engine_version = db.Column(
+        db.String(40),
+        nullable=False,
+        default=SCORING_ENGINE_REFERENCE,
+        server_default=SCORING_ENGINE_REFERENCE,
+    )
 
     participants = db.relationship('TournamentParticipant', backref='tournament', lazy='dynamic')
     rounds = db.relationship('TournamentRound', backref='tournament', lazy='dynamic',
