@@ -14,6 +14,9 @@ class _W:
         'player_id', 'source_order', 'raw_points', 'wins', 'losses', 'ties',
         'diff_pts', 'game_diff', 'set_diff', 'games', 'attended_games',
         'even_points', 'bonus_points', 'h2h',
+        # additive output-compat fields — NOT part of reference scoring or any
+        # tie-break; tracked only so adapters can emit legacy-shaped rows.
+        'games_for', 'games_against', 'sets_for', 'sets_against', 'teammates',
     )
 
     def __init__(self, player_id: int, source_order: int):
@@ -31,6 +34,11 @@ class _W:
         self.even_points = 0
         self.bonus_points = 0
         self.h2h: dict[int, int] = {}
+        self.games_for = 0
+        self.games_against = 0
+        self.sets_for = 0
+        self.sets_against = 0
+        self.teammates: dict[int, int] = {}
 
     @property
     def score(self) -> int:
@@ -49,6 +57,8 @@ def _apply_points(w: _W, game: GameResult, team: int, extra: int) -> None:
     opp = (game.points_team_2 if team == 1 else game.points_team_1) or 0
     w.raw_points += my
     w.diff_pts += my - opp
+    w.games_for += my          # output-compat (legacy games_won/games_lost)
+    w.games_against += opp
     if my > opp:
         w.wins += 1
     elif my < opp:
@@ -74,6 +84,15 @@ def _apply_sets(w: _W, game: GameResult, team: int, pfw: int, pfe: int) -> None:
     w.raw_points += points
     w.game_diff += game.games_diff(team)
     w.set_diff += game.set_diff(team)
+    # output-compat tallies (legacy sets_won/sets_lost, games_won/games_lost)
+    my_games = game.games_for(team)
+    opp_games = game.games_for(2 if team == 1 else 1)
+    w.games_for += my_games
+    w.games_against += opp_games
+    my_sets = sum(1 for a, b in game.sets if (a > b if team == 1 else b > a))
+    opp_sets = sum(1 for a, b in game.sets if (b > a if team == 1 else a > b))
+    w.sets_for += my_sets
+    w.sets_against += opp_sets
     if is_winner:
         w.wins += 1
     elif is_loser:
@@ -130,5 +149,15 @@ def accumulate(players, games, cfg: EngineConfig):
                 else:
                     _apply_points(w, game, team, extra)
         _record_h2h(game, table, sets_mode)
+
+        # output-compat: teammate counts (Dart playedWith, keyed by id here)
+        for ids in (game.team_1.player_ids, game.team_2.player_ids):
+            ids = list(ids)
+            for i in range(len(ids)):
+                for j in range(i + 1, len(ids)):
+                    a, b = table.get(ids[i]), table.get(ids[j])
+                    if a is not None and b is not None:
+                        a.teammates[b.player_id] = a.teammates.get(b.player_id, 0) + 1
+                        b.teammates[a.player_id] = b.teammates.get(a.player_id, 0) + 1
 
     return ordered, counted

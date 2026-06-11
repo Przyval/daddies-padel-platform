@@ -43,8 +43,8 @@ def generate():
         tid = body.get('tournament_id')
         tournament = Tournament.query.get(tid) if tid else None
         if tournament:
-            from app.routes.tournament import calculate_leaderboard
-            lb = calculate_leaderboard(tournament)
+            from app.services.tournament_scoring.dispatcher import calculate_tournament_standings
+            lb = calculate_tournament_standings(tournament)
             html = render_template('tournament/share_card.html', tournament=tournament, leaderboard=lb)
             lines = [f"🎾 DADDIES PADEL — {tournament.name}",
                      f"📍 {tournament.venue} · {tournament.date.strftime('%d %b %Y')}"]

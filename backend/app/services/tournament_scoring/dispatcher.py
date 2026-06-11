@@ -12,10 +12,8 @@ from __future__ import annotations
 
 from .engine import calculate_standings
 from .exceptions import UnsupportedScoringEngineVersion
-from .adapters import (
-    adapt_tournament_to_engine_input,
-    adapt_canonical_standings_to_rows,
-)
+from .adapters import adapt_tournament_to_engine_input
+from .adapters.flask_output import adapt_canonical_standings_to_legacy_rows
 
 # Version constants live on the model layer; import here is adapter-adjacent
 # (dispatcher already sits above the pure core).
@@ -24,20 +22,19 @@ SCORING_ENGINE_REFERENCE = 'americano_reference_v1'
 
 
 def _default_legacy_calculator(tournament):
-    # Lazy import to avoid a circular dependency at module load
-    # (routes -> dispatcher -> routes). Mechanical extraction of the legacy
-    # function into its own module is recommended for Step 4b.
-    from app.routes.tournament import calculate_leaderboard
+    # Lazy import keeps this package importable without the app context.
+    from app.services.tournament_legacy_scoring import calculate_leaderboard
     return calculate_leaderboard(tournament)
 
 
 def calculate_tournament_standings(tournament, *, legacy_calculator=None):
     """Compute standings for `tournament` with the engine its version pins.
 
-    Returns:
-      legacy   -> whatever calculate_leaderboard returns (unchanged shape)
-      reference-> list[dict] rows from adapt_canonical_standings_to_rows
-    Raises UnsupportedScoringEngineVersion for unknown/None/empty versions.
+    BOTH paths return rows in the legacy calculate_leaderboard shape
+    (participant/points/wins/.../teammates/h2h), so every existing template
+    and serializer keeps working; canonical rows additionally carry
+    rank/raw_score/bonus_points. Raises UnsupportedScoringEngineVersion for
+    unknown/None/empty versions (fail closed — no silent legacy fallback).
     """
     version = getattr(tournament, 'scoring_engine_version', None)
 
@@ -53,7 +50,7 @@ def calculate_tournament_standings(tournament, *, legacy_calculator=None):
             config=canonical_input.config,
         )
         participants = tournament.participants.all()
-        return adapt_canonical_standings_to_rows(result, participants)
+        return adapt_canonical_standings_to_legacy_rows(result, participants)
 
     raise UnsupportedScoringEngineVersion(version)
 

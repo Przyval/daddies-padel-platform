@@ -48,8 +48,13 @@ def test_reference_version_calls_only_canonical(app, db, monkeypatch):
     assert legacy_calls['n'] == 0
     assert len(rows) == 4                      # canonical produced rows
     assert {r['rank'] for r in rows} == {1, 2, 3, 4}
-    assert all('raw_score' in r and 'even_points' in r and 'bonus_points' in r
-               for r in rows)
+    # legacy-shaped keys for template/serializer compat + canonical extras
+    for r in rows:
+        for key in ('participant', 'points', 'wins', 'losses', 'ties',
+                    'matches_played', 'games_won', 'games_lost', 'diff_pts',
+                    'even_pts', 'teammates', 'h2h',
+                    'raw_score', 'bonus_points'):
+            assert key in r, key
 
 
 @pytest.mark.parametrize('bad', ['engine_v2_test', '', None, 'LEGACY_FLASK_V1'])
@@ -63,10 +68,20 @@ def test_rotation_dispatch_not_wired_yet():
         disp.generate_tournament_rotation(_Stub('americano_reference_v1'), [])
 
 
-def test_routes_do_not_import_dispatcher():
-    """Step 4a guarantee: no route module references the dispatcher yet."""
+def test_routes_use_dispatcher_and_legacy_algorithm_extracted():
+    """Step 4b cutover: every standings read goes through the dispatcher, and
+    the legacy algorithm body no longer lives inside route modules (it was
+    moved mechanically to tournament_legacy_scoring)."""
     import inspect
     import app.api.tournaments as api_t
     import app.routes.tournament as web_t
+    import app.services.tournament_legacy_scoring as legacy_mod
+
     for mod in (api_t, web_t):
-        assert 'dispatcher' not in inspect.getsource(mod), mod.__name__
+        src = inspect.getsource(mod)
+        assert 'calculate_tournament_standings' in src, mod.__name__
+        assert 'def calculate_leaderboard' not in src, mod.__name__
+
+    # the extracted legacy function still exists, importable from both places
+    from app.routes.tournament import calculate_leaderboard as reexported
+    assert reexported is legacy_mod.calculate_leaderboard

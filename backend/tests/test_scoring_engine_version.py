@@ -1,8 +1,9 @@
-"""Step 5 — scoring_engine_version is metadata only.
+"""scoring_engine_version: migration backfill (Step 5) + route cutover (4b).
 
 Proves: existing rows backfilled legacy, new rows default reference, unknown
-values rejected by the DB, and the standings route does NOT touch the
-canonical engine yet.
+values rejected by the DB, and post-cutover the standings routes select the
+engine strictly by version (legacy-pinned never touches canonical; reference
+always does; unknown fails closed). Web detail renders canonical rows.
 """
 import os
 import tempfile
@@ -72,19 +73,7 @@ def test_unknown_scoring_engine_version_is_rejected_by_database(app, db):
     _db.session.rollback()
 
 
-def test_current_standings_route_does_not_invoke_canonical_engine(
-        app, db, client, monkeypatch):
-    """Step 5 is metadata-only: GET standings must not call the canonical engine."""
-    import app.services.tournament_scoring.engine as canonical
-
-    calls = {'n': 0}
-
-    def spy(*a, **k):
-        calls['n'] += 1
-        raise AssertionError('canonical engine must not be called in Step 5')
-
-    monkeypatch.setattr(canonical, 'calculate_standings', spy)
-
+def _make_owner_and_tournament(client):
     u = User(username='Owner', email='o@t.com', phone='081x', role='member',
              membership='member', membership_paid=True)
     u.set_password('rahasia123')
@@ -93,14 +82,83 @@ def test_current_standings_route_does_not_invoke_canonical_engine(
     token = client.post('/api/v1/auth/login',
                         json={'email': 'o@t.com', 'password': 'rahasia123'}
                         ).get_json()['data']['access_token']
-
     r = client.post('/api/v1/tournaments',
                     headers={'Authorization': f'Bearer {token}'},
                     json={'name': 'T', 'format': 'americano', 'num_courts': 1,
                           'participants': [{'name': n} for n in ['A', 'B', 'C', 'D']]})
-    tid = r.get_json()['data']['id']
+    return token, r.get_json()['data']['id']
+
+
+def test_legacy_tournament_standings_do_not_invoke_canonical_engine(
+        app, db, client, monkeypatch):
+    """Post-cutover (4b): the engine is selected by version. A LEGACY-pinned
+    tournament must never touch the canonical engine."""
+    import app.services.tournament_scoring.dispatcher as disp
+
+    calls = {'n': 0}
+    real = disp.calculate_standings
+
+    def spy(**k):
+        calls['n'] += 1
+        return real(**k)
+
+    monkeypatch.setattr(disp, 'calculate_standings', spy)
+
+    token, tid = _make_owner_and_tournament(client)
+    t = _db.session.get(Tournament, tid)
+    t.scoring_engine_version = SCORING_ENGINE_LEGACY  # pin legacy explicitly
+    _db.session.commit()
+    calls['n'] = 0  # creation ran as reference; count the read below only
 
     rs = client.get(f'/api/v1/tournaments/{tid}/standings',
                     headers={'Authorization': f'Bearer {token}'})
     assert rs.status_code == 200
-    assert calls['n'] == 0  # legacy calculate_leaderboard did the work
+    assert calls['n'] == 0  # legacy path only
+
+
+def test_reference_tournament_standings_invoke_canonical_engine(
+        app, db, client, monkeypatch):
+    import app.services.tournament_scoring.dispatcher as disp
+
+    calls = {'n': 0}
+    real = disp.calculate_standings
+
+    def spy(**k):
+        calls['n'] += 1
+        return real(**k)
+
+    monkeypatch.setattr(disp, 'calculate_standings', spy)
+
+    token, tid = _make_owner_and_tournament(client)  # default = reference
+    rs = client.get(f'/api/v1/tournaments/{tid}/standings',
+                    headers={'Authorization': f'Bearer {token}'})
+    assert rs.status_code == 200
+    assert calls['n'] >= 1  # canonical engine did the work
+
+
+def test_web_detail_page_renders_for_reference_tournament(app, db, client):
+    """Web templates consume the legacy row shape; canonical rows must satisfy
+    them (legacy-shape output adapter). No web/API divergence: both read the
+    dispatcher."""
+    token, tid = _make_owner_and_tournament(client)
+    r = client.get(f'/tournament/{tid}?tab=standing')
+    assert r.status_code == 200
+
+
+def test_unknown_version_returns_error_not_legacy_silently(app, db, client):
+    """Fail-closed end-to-end: corrupt version on a tournament must error the
+    standings read, never silently compute with the wrong engine."""
+    from sqlalchemy import text
+    token, tid = _make_owner_and_tournament(client)
+    # bypass the CHECK constraint path via raw SQL is blocked; simulate by
+    # monkey-setting the loaded object attribute? DB rejects unknown values,
+    # so corrupt-version rows can only exist if the constraint is absent
+    # (e.g. legacy DBs). Simulate via ORM object without flushing.
+    t = _db.session.get(Tournament, tid)
+    t.scoring_engine_version = 'engine_v2_test'
+    from app.services.tournament_scoring.dispatcher import calculate_tournament_standings
+    from app.services.tournament_scoring.exceptions import UnsupportedScoringEngineVersion
+    import pytest as _pytest
+    with _pytest.raises(UnsupportedScoringEngineVersion):
+        calculate_tournament_standings(t)
+    _db.session.rollback()

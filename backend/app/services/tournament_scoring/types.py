@@ -117,3 +117,9 @@ class PlayerStanding:
     # head-to-head
     h2h_total: int
     h2h: dict[int, int] = field(default_factory=dict)
+    # ── output-compat extras (NOT reference scoring, NOT in any tie-break) ──
+    games_for: int = 0
+    games_against: int = 0
+    sets_for: int = 0
+    sets_against: int = 0
+    teammates: dict[int, int] = field(default_factory=dict)  # partner id -> count

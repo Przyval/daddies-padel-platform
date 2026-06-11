@@ -48,5 +48,10 @@ def calculate_standings(
             set_diff=w.set_diff,
             h2h_total=sum(w.h2h.values()),
             h2h=dict(w.h2h),
+            games_for=w.games_for,
+            games_against=w.games_against,
+            sets_for=w.sets_for,
+            sets_against=w.sets_against,
+            teammates=dict(w.teammates),
         ))
     return out

@@ -1,6 +1,7 @@
-"""Tournament endpoints. Reuses the existing engine in routes/tournament.py
-(calculate_leaderboard, round generators, _generate_all_rounds) and the
-master_tournament_cascade — no logic is duplicated, only exposed as JSON.
+"""Tournament endpoints. Standings go through the version dispatcher
+(legacy_flask_v1 -> legacy engine, americano_reference_v1 -> canonical engine);
+round generators/_generate_all_rounds are still the route-level legacy ones
+(rotation cutover pending). master_tournament_cascade reused, not duplicated.
 """
 import json
 from flask import request
@@ -11,10 +12,11 @@ from app.models import (
     TournamentPlayoff, master_tournament_cascade,
 )
 from app.routes.tournament import (
-    calculate_leaderboard, _generate_all_rounds,
+    _generate_all_rounds,
     generate_mixicano_round, generate_team_mexicano_round, generate_mexicano_round,
 )
 from . import api_bp
+from app.services.tournament_scoring.dispatcher import calculate_tournament_standings
 from .helpers import ok, err, current_api_user, member_required
 from .serializers import (
     tournament_summary, tournament_detail, tmatch_public, standing_row,
@@ -29,7 +31,7 @@ def _owner_or_admin(t, user):
 
 
 def _standings_rows(t):
-    return [standing_row(s, i + 1) for i, s in enumerate(calculate_leaderboard(t))]
+    return [standing_row(s, i + 1) for i, s in enumerate(calculate_tournament_standings(t))]
 
 
 def _advance_round(t):
@@ -60,15 +62,15 @@ def _advance_round(t):
         return next_num
 
     if fmt in ('mixicano', 'mix_americano'):
-        lb = calculate_leaderboard(t)
+        lb = calculate_tournament_standings(t)
         parts = t.participants.filter(active).order_by(TournamentParticipant.seed).all()
         _materialize(generate_mixicano_round(parts, lb, t.num_courts, is_first_round=False), parts)
     elif fmt == 'team_mexicano':
-        lb = calculate_leaderboard(t)
+        lb = calculate_tournament_standings(t)
         parts = t.participants.filter(active).order_by(TournamentParticipant.seed).all()
         _materialize(generate_team_mexicano_round(parts, lb, t.num_courts, is_first_round=False), parts)
     elif fmt in ('mexicano', 'super_mexicano', 'club_mexicano'):
-        lb = calculate_leaderboard(t)
+        lb = calculate_tournament_standings(t)
         standings = [{'idx': i, 'points': s['points']} for i, s in enumerate(lb)]
         parts = [s['participant'] for s in lb]
         _materialize(generate_mexicano_round(standings, t.num_courts), parts)
@@ -332,7 +334,7 @@ def generate_playoff(tid):
     if size not in (4, 8, 16):
         return err('VALIDATION', 'bracket_size harus 4, 8, atau 16', 422)
 
-    lb = calculate_leaderboard(t)
+    lb = calculate_tournament_standings(t)
     if len(lb) < size:
         return err('NOT_ENOUGH', f'Minimal {size} peserta', 422)
 

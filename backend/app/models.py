@@ -484,8 +484,8 @@ def master_tournament_cascade(tournament):
 
     Returns list of events that occurred (for flash messages / notifications).
     """
-    from app.routes.tournament import calculate_leaderboard
-    leaderboard = calculate_leaderboard(tournament)
+    from app.services.tournament_scoring.dispatcher import calculate_tournament_standings
+    leaderboard = calculate_tournament_standings(tournament)
     n = len(leaderboard)
     if n == 0:
         return []
