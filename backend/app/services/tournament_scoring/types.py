@@ -70,6 +70,19 @@ class GameResult:
 
 
 @dataclass(frozen=True)
+class RotationMatch:
+    court: int
+    team1: tuple[int, int]  # player ids
+    team2: tuple[int, int]
+
+
+@dataclass(frozen=True)
+class RotationRound:
+    number: int
+    matches: tuple[RotationMatch, ...]
+
+
+@dataclass(frozen=True)
 class EngineConfig:
     scoring_mode: ScoringMode
     court_count: int

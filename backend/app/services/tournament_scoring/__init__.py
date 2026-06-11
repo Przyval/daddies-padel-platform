@@ -6,10 +6,16 @@ Public API:
         PlayerStanding,
     )
 """
-from .types import Player, Team, Court, GameResult, EngineConfig, PlayerStanding
+from .types import (
+    Player, Team, Court, GameResult, EngineConfig, PlayerStanding,
+    RotationMatch, RotationRound,
+)
 from .engine import calculate_standings
+from .rotations import apply_table, has_table
 
 __all__ = [
     'calculate_standings',
+    'apply_table', 'has_table',
     'Player', 'Team', 'Court', 'GameResult', 'EngineConfig', 'PlayerStanding',
+    'RotationMatch', 'RotationRound',
 ]
