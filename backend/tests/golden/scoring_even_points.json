@@ -1,0 +1,394 @@
+{
+  "schema_version": 1,
+  "source_engine": "americano_padel_dart_reference",
+  "source_commit": "f399275de012d425e6c8bd1a0854631b40839bc1",
+  "generated_at": "2026-06-11T04:46:20.230419+00:00",
+  "cases_sha256": "de2b5f82a0b7ff2ffdf7df07e973c26c33ec0dcca833ac0f40d47c9439cdae38",
+  "cases": [
+    {
+      "id": "even_sit_twice",
+      "note": "5 players, 1 court, 2 rounds; P5 sits both \u2192 evenPoints=(maxGames-0)*(avg~/2)",
+      "input": {
+        "players": 5,
+        "result_number": 21,
+        "mode": "points",
+        "extra_points_from_round": 0,
+        "points_for_won_game": 3,
+        "points_for_even_game": 1,
+        "sort_by_wins": false,
+        "sort_head2head": false,
+        "courts": [
+          {
+            "number": 1,
+            "extra_points": 0
+          }
+        ],
+        "rounds": [
+          {
+            "round": 1,
+            "games": [
+              {
+                "team1": [
+                  1,
+                  2
+                ],
+                "team2": [
+                  3,
+                  4
+                ],
+                "team1_result": 21,
+                "team2_result": 0,
+                "sets": ""
+              }
+            ]
+          },
+          {
+            "round": 2,
+            "games": [
+              {
+                "team1": [
+                  1,
+                  3
+                ],
+                "team2": [
+                  2,
+                  4
+                ],
+                "team1_result": 21,
+                "team2_result": 0,
+                "sets": ""
+              }
+            ]
+          }
+        ]
+      },
+      "expected_standings": [
+        {
+          "rank": 1,
+          "player_id": 1,
+          "name": "P1",
+          "score": 42,
+          "raw_points": 42,
+          "even_points": 0,
+          "court_bonus": 0,
+          "wins": 2,
+          "losses": 0,
+          "ties": 0,
+          "games": 2,
+          "attended_games": 2,
+          "diff_pts": 42,
+          "game_diff": 0,
+          "set_diff": 0,
+          "h2h_total": 4,
+          "h2h": {
+            "3": 1,
+            "4": 2,
+            "2": 1
+          }
+        },
+        {
+          "rank": 2,
+          "player_id": 2,
+          "name": "P2",
+          "score": 21,
+          "raw_points": 21,
+          "even_points": 0,
+          "court_bonus": 0,
+          "wins": 1,
+          "losses": 1,
+          "ties": 0,
+          "games": 2,
+          "attended_games": 2,
+          "diff_pts": 0,
+          "game_diff": 0,
+          "set_diff": 0,
+          "h2h_total": 0,
+          "h2h": {
+            "3": 0,
+            "4": 1,
+            "1": -1
+          }
+        },
+        {
+          "rank": 3,
+          "player_id": 3,
+          "name": "P3",
+          "score": 21,
+          "raw_points": 21,
+          "even_points": 0,
+          "court_bonus": 0,
+          "wins": 1,
+          "losses": 1,
+          "ties": 0,
+          "games": 2,
+          "attended_games": 2,
+          "diff_pts": 0,
+          "game_diff": 0,
+          "set_diff": 0,
+          "h2h_total": 0,
+          "h2h": {
+            "1": -1,
+            "2": 0,
+            "4": 1
+          }
+        },
+        {
+          "rank": 4,
+          "player_id": 5,
+          "name": "P5",
+          "score": 20,
+          "raw_points": 0,
+          "even_points": 20,
+          "court_bonus": 0,
+          "wins": 0,
+          "losses": 0,
+          "ties": 0,
+          "games": 0,
+          "attended_games": 0,
+          "diff_pts": 0,
+          "game_diff": 0,
+          "set_diff": 0,
+          "h2h_total": 0,
+          "h2h": {}
+        },
+        {
+          "rank": 5,
+          "player_id": 4,
+          "name": "P4",
+          "score": 0,
+          "raw_points": 0,
+          "even_points": 0,
+          "court_bonus": 0,
+          "wins": 0,
+          "losses": 2,
+          "ties": 0,
+          "games": 2,
+          "attended_games": 2,
+          "diff_pts": -42,
+          "game_diff": 0,
+          "set_diff": 0,
+          "h2h_total": -4,
+          "h2h": {
+            "1": -2,
+            "2": -1,
+            "3": -1
+          }
+        }
+      ]
+    },
+    {
+      "id": "even_varied",
+      "note": "6 players, 1 court, 3 rounds; uneven sit-out frequency reveals compensation",
+      "input": {
+        "players": 6,
+        "result_number": 21,
+        "mode": "points",
+        "extra_points_from_round": 0,
+        "points_for_won_game": 3,
+        "points_for_even_game": 1,
+        "sort_by_wins": false,
+        "sort_head2head": false,
+        "courts": [
+          {
+            "number": 1,
+            "extra_points": 0
+          }
+        ],
+        "rounds": [
+          {
+            "round": 1,
+            "games": [
+              {
+                "team1": [
+                  1,
+                  2
+                ],
+                "team2": [
+                  3,
+                  4
+                ],
+                "team1_result": 16,
+                "team2_result": 8,
+                "sets": ""
+              }
+            ]
+          },
+          {
+            "round": 2,
+            "games": [
+              {
+                "team1": [
+                  1,
+                  5
+                ],
+                "team2": [
+                  2,
+                  6
+                ],
+                "team1_result": 14,
+                "team2_result": 10,
+                "sets": ""
+              }
+            ]
+          },
+          {
+            "round": 3,
+            "games": [
+              {
+                "team1": [
+                  3,
+                  5
+                ],
+                "team2": [
+                  4,
+                  6
+                ],
+                "team1_result": 12,
+                "team2_result": 12,
+                "sets": ""
+              }
+            ]
+          }
+        ]
+      },
+      "expected_standings": [
+        {
+          "rank": 1,
+          "player_id": 1,
+          "name": "P1",
+          "score": 30,
+          "raw_points": 30,
+          "even_points": 0,
+          "court_bonus": 0,
+          "wins": 2,
+          "losses": 0,
+          "ties": 0,
+          "games": 2,
+          "attended_games": 2,
+          "diff_pts": 12,
+          "game_diff": 0,
+          "set_diff": 0,
+          "h2h_total": 4,
+          "h2h": {
+            "3": 1,
+            "4": 1,
+            "2": 1,
+            "6": 1
+          }
+        },
+        {
+          "rank": 2,
+          "player_id": 5,
+          "name": "P5",
+          "score": 26,
+          "raw_points": 26,
+          "even_points": 0,
+          "court_bonus": 0,
+          "wins": 1,
+          "losses": 0,
+          "ties": 1,
+          "games": 2,
+          "attended_games": 2,
+          "diff_pts": 4,
+          "game_diff": 0,
+          "set_diff": 0,
+          "h2h_total": 2,
+          "h2h": {
+            "2": 1,
+            "6": 1
+          }
+        },
+        {
+          "rank": 3,
+          "player_id": 2,
+          "name": "P2",
+          "score": 26,
+          "raw_points": 26,
+          "even_points": 0,
+          "court_bonus": 0,
+          "wins": 1,
+          "losses": 1,
+          "ties": 0,
+          "games": 2,
+          "attended_games": 2,
+          "diff_pts": 4,
+          "game_diff": 0,
+          "set_diff": 0,
+          "h2h_total": 0,
+          "h2h": {
+            "3": 1,
+            "4": 1,
+            "1": -1,
+            "5": -1
+          }
+        },
+        {
+          "rank": 4,
+          "player_id": 6,
+          "name": "P6",
+          "score": 22,
+          "raw_points": 22,
+          "even_points": 0,
+          "court_bonus": 0,
+          "wins": 0,
+          "losses": 1,
+          "ties": 1,
+          "games": 2,
+          "attended_games": 2,
+          "diff_pts": -4,
+          "game_diff": 0,
+          "set_diff": 0,
+          "h2h_total": -2,
+          "h2h": {
+            "1": -1,
+            "5": -1
+          }
+        },
+        {
+          "rank": 5,
+          "player_id": 3,
+          "name": "P3",
+          "score": 20,
+          "raw_points": 20,
+          "even_points": 0,
+          "court_bonus": 0,
+          "wins": 0,
+          "losses": 1,
+          "ties": 1,
+          "games": 2,
+          "attended_games": 2,
+          "diff_pts": -8,
+          "game_diff": 0,
+          "set_diff": 0,
+          "h2h_total": -2,
+          "h2h": {
+            "1": -1,
+            "2": -1
+          }
+        },
+        {
+          "rank": 6,
+          "player_id": 4,
+          "name": "P4",
+          "score": 20,
+          "raw_points": 20,
+          "even_points": 0,
+          "court_bonus": 0,
+          "wins": 0,
+          "losses": 1,
+          "ties": 1,
+          "games": 2,
+          "attended_games": 2,
+          "diff_pts": -8,
+          "game_diff": 0,
+          "set_diff": 0,
+          "h2h_total": -2,
+          "h2h": {
+            "1": -1,
+            "2": -1
+          }
+        }
+      ]
+    }
+  ]
+}
