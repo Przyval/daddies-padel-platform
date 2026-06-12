@@ -179,6 +179,43 @@ def delete_tournament(tid):
     return ok({'deleted': tid})
 
 
+# ── engine migration (Step 6) ──────────────────────────────────────────────
+
+@api_bp.route('/tournaments/<int:tid>/engine/eligibility', methods=['GET'])
+@jwt_required()
+def engine_migration_eligibility(tid):
+    """Dry-run: can this tournament migrate legacy -> reference?"""
+    from app.services.tournament_scoring.engine_migration import migration_eligibility
+    t = Tournament.query.get(tid)
+    if t is None:
+        return err('NOT_FOUND', 'Turnamen tidak ditemukan', 404)
+    eligible, code, reason = migration_eligibility(t)
+    return ok({'eligible': eligible, 'code': code, 'reason': reason,
+               'current_version': t.scoring_engine_version})
+
+
+@api_bp.route('/tournaments/<int:tid>/engine/migrate', methods=['POST'])
+@jwt_required()
+def engine_migrate(tid):
+    """One-way legacy -> reference. Owner/admin only; policy enforced and
+    audit-logged in the service (refused if any score exists or completed)."""
+    from app.services.tournament_scoring.engine_migration import (
+        migrate_to_reference, MigrationNotAllowed,
+    )
+    user = current_api_user()
+    t = Tournament.query.get(tid)
+    if t is None:
+        return err('NOT_FOUND', 'Turnamen tidak ditemukan', 404)
+    if not _owner_or_admin(t, user):
+        return err('FORBIDDEN', 'Hanya pembuat/admin', 403)
+    try:
+        summary = migrate_to_reference(t, actor_id=user.id)
+    except MigrationNotAllowed as e:
+        return err(e.code, e.reason, 409)
+    db.session.commit()
+    return ok(summary)
+
+
 # ── scoring / rounds / complete ────────────────────────────────────────────
 
 @api_bp.route('/tournaments/<int:tid>/score/<int:match_id>', methods=['POST'])
