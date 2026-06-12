@@ -56,12 +56,38 @@ def calculate_tournament_standings(tournament, *, legacy_calculator=None):
 
 
 def generate_tournament_rotation(tournament, participants):
-    """Round generation dispatch — intentionally NOT implemented in Step 4a.
+    """Rotation dispatch (Step 4c). Separate from standings by design.
 
-    Kept as a separate operation (never reachable from standings) so the
-    cutover in Step 4b wires it explicitly. Until then every caller keeps
-    using the existing in-route generators."""
-    raise NotImplementedError(
-        'Rotation dispatch arrives in Step 4b; use the existing route-level '
-        'generators until the cutover.'
-    )
+    Returns tuple[RotationRound, ...] with PARTICIPANT IDS in the team slots,
+    or None meaning "canonical rotation does not apply — caller must use the
+    legacy generators". Scope (documented in golden/README):
+      - reference + format 'americano' + table count (8/12/../32) + natural
+        courts (N/4)  -> pre-computed reference table, players shuffled first
+        (the reference shuffles too: it's an input permutation, the table core
+        itself is deterministic)
+      - reference but non-table count / non-natural courts -> None (the
+        reference randomizes those layers; legacy generator is our fallback)
+      - legacy version -> None (legacy generators own rotation)
+      - unknown version -> UnsupportedScoringEngineVersion (fail closed)
+    """
+    import random as _random
+
+    from .types import Player
+    from .rotations import apply_table, has_table
+
+    version = getattr(tournament, 'scoring_engine_version', None)
+    if version == SCORING_ENGINE_LEGACY:
+        return None
+    if version != SCORING_ENGINE_REFERENCE:
+        raise UnsupportedScoringEngineVersion(version)
+
+    if tournament.format != 'americano':
+        return None
+    n = len(participants)
+    if not has_table(n) or tournament.num_courts != n // 4:
+        return None
+
+    shuffled = list(participants)
+    _random.shuffle(shuffled)
+    players = [Player(id=p.id, source_order=i) for i, p in enumerate(shuffled)]
+    return apply_table(players)

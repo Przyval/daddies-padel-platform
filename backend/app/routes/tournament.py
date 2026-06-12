@@ -596,6 +596,27 @@ def _generate_all_rounds(tournament):
     n = len(participants)
     fmt = tournament.format
 
+    # Reference-engine tournaments: try the canonical pre-computed rotation
+    # first (americano + table count + natural courts). Returns rounds with
+    # participant IDs directly; None -> fall through to legacy generators.
+    from app.services.tournament_scoring.dispatcher import generate_tournament_rotation
+    canonical_rounds = generate_tournament_rotation(tournament, participants)
+    if canonical_rounds is not None:
+        for rot_round in canonical_rounds:
+            rnd = TournamentRound(tournament_id=tournament.id,
+                                  round_number=rot_round.number)
+            db.session.add(rnd)
+            db.session.flush()
+            for m in rot_round.matches:
+                db.session.add(TournamentMatch(
+                    tournament_id=tournament.id, round_id=rnd.id, court=m.court,
+                    team1_p1_id=m.team1[0], team1_p2_id=m.team1[1],
+                    team2_p1_id=m.team2[0], team2_p2_id=m.team2[1],
+                    status='pending'
+                ))
+        db.session.flush()
+        return
+
     # Mixicano/Mix Americano: gender-aware pairing
     if fmt in ('mixicano', 'mix_americano'):
         rounds_data = [generate_mixicano_round(participants, [], tournament.num_courts, is_first_round=True)]

@@ -63,9 +63,14 @@ def test_unknown_version_fails_closed(bad):
         disp.calculate_tournament_standings(_Stub(bad), legacy_calculator=lambda t: [])
 
 
-def test_rotation_dispatch_not_wired_yet():
-    with pytest.raises(NotImplementedError):
-        disp.generate_tournament_rotation(_Stub('americano_reference_v1'), [])
+def test_rotation_dispatch_legacy_returns_none():
+    """Legacy tournaments own their rotation via the in-route generators."""
+    assert disp.generate_tournament_rotation(_Stub('legacy_flask_v1'), []) is None
+
+
+def test_rotation_dispatch_unknown_fails_closed():
+    with pytest.raises(UnsupportedScoringEngineVersion):
+        disp.generate_tournament_rotation(_Stub('engine_v2_test'), [])
 
 
 def test_routes_use_dispatcher_and_legacy_algorithm_extracted():
